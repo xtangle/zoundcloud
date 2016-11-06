@@ -1,0 +1,32 @@
+{
+  "name": "Zoundcloud",
+  "description": "Adds a download button to your Soundcloud playlists",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "permissions": [
+    "downloads",
+    "tabs",
+    "webNavigation",
+    "*://soundcloud.com/*/sets/*",
+    "*://api.soundcloud.com/*"
+  ],
+  "icons": {
+    "128": "images/icon128.png"
+  },
+  "background": {
+    "scripts": [
+      "src/background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://soundcloud.com/*/sets/*"
+      ],
+      "js": [
+        "lib/jquery-3.1.1.min.js",
+        "src/content.js"
+      ]
+    }
+  ]
+}
