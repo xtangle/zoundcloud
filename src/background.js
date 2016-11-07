@@ -34,11 +34,16 @@ function downloadTracks() {
   });
 }
 
+function removeSpecialCharacters(filename) {
+  // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
+  return filename.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
+}
+
 chrome.webNavigation.onHistoryStateUpdated.addListener(function (details) {
   if (details.frameId === 0) {
     chrome.tabs.get(details.tabId, function (tab) {
       if (tab.url === details.url) {
-        chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function() {
+        chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
           chrome.tabs.executeScript(null, {file: 'src/content.js'});
         });
       }
@@ -56,11 +61,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
   if (downloadItem.id === downloadId) {
     var fileExtension = downloadItem.filename.split('.').pop();
-    var downloadDirectory = playlist.user.username + ' - ' + playlist.title;
-    var trackName = playlist.tracks[trackIndex].title;
-
-    // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
-    var fileName = trackName.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
+    var downloadDirectory = removeSpecialCharacters(playlist.user.username + ' - ' + playlist.title);
+    var fileName = removeSpecialCharacters(playlist.tracks[trackIndex].title);
     suggest({
       filename: downloadDirectory + '/' + fileName + '.' + fileExtension
     });
