@@ -54,14 +54,17 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 });
 
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
-  var downloadDirectory = playlist.user.username + ' - ' + playlist.title;
-  var trackName = playlist.tracks[trackIndex].title;
-  var fileExtension = downloadItem.filename.split('.').pop();
-  // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
-  var fileName = trackName.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
-  suggest({
-    filename: downloadDirectory + '/' + fileName + '.' + fileExtension
-  });
+  if (downloadItem.id === downloadId) {
+    var fileExtension = downloadItem.filename.split('.').pop();
+    var downloadDirectory = playlist.user.username + ' - ' + playlist.title;
+    var trackName = playlist.tracks[trackIndex].title;
+
+    // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
+    var fileName = trackName.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
+    suggest({
+      filename: downloadDirectory + '/' + fileName + '.' + fileExtension
+    });
+  }
 });
 
 chrome.downloads.onChanged.addListener(function (delta) {
