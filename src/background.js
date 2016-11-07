@@ -6,7 +6,7 @@ var trackIndex = -1;
 var downloadId;
 
 function sendMessageToContentScript(message) {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {message: message});
   });
 }
@@ -29,22 +29,29 @@ function downloadTracks() {
   chrome.downloads.download({
     url: downloadUrl + '?client_id=' + clientId,
     saveAs: false
-  }, function(id) {
+  }, function (id) {
     downloadId = id;
   });
 }
 
-chrome.webNavigation.onHistoryStateUpdated.addListener(function(details) {
-  if(details.frameId === 0) {
-    chrome.tabs.get(details.tabId, function(tab) {
-      if(tab.url === details.url) {
-        chrome.tabs.executeScript(null, {file:"src/content.js"});
+chrome.webNavigation.onHistoryStateUpdated.addListener(function (details) {
+  if (details.frameId === 0) {
+    chrome.tabs.get(details.tabId, function (tab) {
+      if (tab.url === details.url) {
+        chrome.tabs.executeScript(null, {file: "src/content.js"});
       }
     });
   }
 });
 
-chrome.downloads.onDeterminingFilename.addListener(function(downloadItem, suggest) {
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if (tab.url.indexOf("*://soundcloud.com/*/sets/*") > -1 &&
+    changeInfo.url === undefined) {
+    chrome.tabs.executeScript(tabId, {file: "src/content.js"});
+  }
+});
+
+chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
   var downloadDirectory = playlist.user.username + ' - ' + playlist.title;
   var trackName = playlist.tracks[trackIndex].title;
   var fileExtension = downloadItem.filename.split('.').pop();
@@ -55,7 +62,7 @@ chrome.downloads.onDeterminingFilename.addListener(function(downloadItem, sugges
   });
 });
 
-chrome.downloads.onChanged.addListener(function(delta) {
+chrome.downloads.onChanged.addListener(function (delta) {
   if (!delta.state || delta.id !== downloadId) {
     return;
   }
@@ -69,7 +76,7 @@ chrome.downloads.onChanged.addListener(function(delta) {
   }
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'startDownload') {
     clientId = request.clientId;
     playlist = request.playlist;
