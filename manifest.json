@@ -15,6 +15,7 @@
   },
   "background": {
     "scripts": [
+      "lib/jquery-3.1.1.min.js",
       "src/background.js"
     ]
   },
