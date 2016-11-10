@@ -11,3 +11,7 @@ is the name of the playlist.
 - Navigate to 'chrome://extensions'
 - Click "Load Unpacked Extension"
 - Select the root folder of this extension
+
+## Known Issues
+
+- Download button appears and then disappears on some playlists (eg. https://soundcloud.com/brofessorbubbles/sets/yungbubbles-playlist)

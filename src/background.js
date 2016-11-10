@@ -40,22 +40,13 @@ function removeSpecialCharacters(filename) {
 }
 
 chrome.webNavigation.onHistoryStateUpdated.addListener(function (details) {
-  if (details.frameId === 0) {
-    chrome.tabs.get(details.tabId, function (tab) {
-      if (tab.url === details.url) {
-        chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
-          chrome.tabs.executeScript(null, {file: 'src/content.js'});
-        });
-      }
-    });
-  }
-});
-
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  if (tab.url.indexOf('*://soundcloud.com/*/sets/*') > -1 &&
-    changeInfo.url === undefined) {
-    chrome.tabs.executeScript(tabId, {file: 'src/content.js'});
-  }
+  chrome.tabs.get(details.tabId, function (tab) {
+    if (tab.url === details.url && tab.url.match(/[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+/)) {
+      chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
+        chrome.tabs.executeScript(null, {file: 'src/content.js'});
+      });
+    }
+  });
 });
 
 chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {

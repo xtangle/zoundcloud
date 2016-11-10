@@ -1,4 +1,4 @@
-if ($('#downloadBtn').length === 0) {
+if ($('#zcDownloadBtn').length === 0) {
 
   const SC_API_URL = 'https://api.soundcloud.com/';
   const CLIENT_ID = 'a3e059563d7fd3372b49b37f00a00bcf';
@@ -14,6 +14,11 @@ if ($('#downloadBtn').length === 0) {
     });
   }
 
+  function stopDownload() {
+    chrome.runtime.sendMessage({message: "stopDownload"});
+    setDownloadStoppedState();
+  }
+
   function downloadPlaylist() {
     if (!playlist) {
       alert('Playlist information has not been loaded yet!');
@@ -24,24 +29,25 @@ if ($('#downloadBtn').length === 0) {
       playlist: playlist,
       clientId: CLIENT_ID
     });
-  }
-
-  function onDownloadButtonClick() {
-    if (isDownloading) {
-      chrome.runtime.sendMessage({message: "stopDownload"});
-    } else {
-      downloadPlaylist();
-    }
+    setDownloadStartedState();
   }
 
   function setDownloadStartedState() {
     isDownloading = true;
-    $('#downloadBtn').text('Stop Download');
+    $('#zcDownloadBtn').text('Stop Download');
   }
 
   function setDownloadStoppedState() {
     isDownloading = false;
-    $('#downloadBtn').text('Download Playlist');
+    $('#zcDownloadBtn').text('Download Playlist');
+  }
+
+  function onDownloadButtonClick() {
+    if (isDownloading) {
+      stopDownload();
+    } else {
+      downloadPlaylist();
+    }
   }
 
   function getInitialDownloadState() {
@@ -57,7 +63,7 @@ if ($('#downloadBtn').length === 0) {
   function addDownloadButton() {
     var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
     var downloadButton = $('<button>', {
-      id: 'downloadBtn',
+      id: 'zcDownloadBtn',
       class: 'sc-button-medium sc-button',
       click: onDownloadButtonClick
     });
@@ -67,7 +73,7 @@ if ($('#downloadBtn').length === 0) {
       buttonGroup.append(downloadButton);
     } else {
       var downloadButtonContainer = $("<div>", {
-        id: 'downloadBtnContainer',
+        id: 'zcDownloadBtnContainer',
         class: 'sc-button-group'
       });
       downloadButtonContainer.append(downloadButton);
@@ -75,14 +81,14 @@ if ($('#downloadBtn').length === 0) {
     }
   }
 
+  chrome.runtime.onMessage.addListener(function (request) {
+    if (request.message === 'downloadStarted') {
+      setDownloadStartedState();
+    } else if (request.message === 'downloadStopped') {
+      setDownloadStoppedState();
+    }
+  });
+
   addDownloadButton();
   getInitialDownloadState();
 }
-
-chrome.runtime.onMessage.addListener(function (request) {
-  if (request.message === 'downloadStarted') {
-    setDownloadStartedState();
-  } else if (request.message === 'downloadStopped') {
-    setDownloadStoppedState();
-  }
-});
