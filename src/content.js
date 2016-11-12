@@ -20,7 +20,6 @@ if (tabUrl.match(urlPattern)) {
 
         function stopDownload() {
           chrome.runtime.sendMessage({message: "stopDownload"});
-          setDownloadStoppedState();
         }
 
         function downloadPlaylist() {
@@ -28,7 +27,6 @@ if (tabUrl.match(urlPattern)) {
             message: "startDownload",
             tabUrl: tabUrl
           });
-          setDownloadStartedState();
         }
 
         function setDownloadStartedState() {
@@ -46,6 +44,7 @@ if (tabUrl.match(urlPattern)) {
             stopDownload();
           } else {
             downloadPlaylist();
+            $('#zcDownloadBtn').text('Stop Download');
           }
         }
 
