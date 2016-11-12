@@ -1,7 +1,7 @@
-var urlPattern = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
+var URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
 var tabUrl = document.location.href;
 
-if (tabUrl.match(urlPattern)) {
+if (tabUrl.match(URL_PATTERN)) {
 
   var isDownloading;
   var timeoutId;
