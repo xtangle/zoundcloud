@@ -11,6 +11,7 @@ var trackIndex = -1;
 var tracksDownloaded;
 var failedDownloads;
 var downloadId;
+var lastSuccessfulDownloadId;
 
 function sendMessageToContentScript(message) {
   chrome.tabs.query({url: '*://soundcloud.com/*'}, function (tabs) {
@@ -20,13 +21,26 @@ function sendMessageToContentScript(message) {
   });
 }
 
+function createDownloadSummaryMessage() {
+  switch (tracksDownloaded) {
+    case 0:
+      return 'No tracks were downloaded';
+    case 1:
+      return 'Downloaded 1 track to \'' + downloadDir + '\'';
+    default:
+      return 'Downloaded ' + tracksDownloaded + ' tracks to \'' + downloadDir + '\'';
+  }
+}
+
 function createBasicNotification(notificationId, notificationObj) {
   chrome.notifications.create(notificationId, {
     type: 'basic',
     iconUrl: ZC_ICON_URL,
     title: notificationObj.title || '',
     message: notificationObj.message || '',
-    requireInteraction: notificationObj.requireInteraction || false
+    contextMessage: notificationObj.contextMessage || null,
+    requireInteraction: notificationObj.requireInteraction || false,
+    priority: 1
   });
 }
 
@@ -37,8 +51,15 @@ function createListNotification(notificationId, notificationObj) {
     title: notificationObj.title || '',
     items: notificationObj.items || [],
     message: '',
-    requireInteraction: notificationObj.requireInteraction || false
+    requireInteraction: notificationObj.requireInteraction || false,
+    priority: 1
   });
+}
+
+function clearNotifications() {
+  chrome.notifications.clear('downloadComplete');
+  chrome.notifications.clear('downloadStopped');
+  chrome.notifications.clear('failedDownloads');
 }
 
 function initializeDownload(playlistData) {
@@ -49,6 +70,9 @@ function initializeDownload(playlistData) {
   isDownloading = true;
   tracksDownloaded = 0;
   failedDownloads = [];
+  downloadId = null;
+  lastSuccessfulDownloadId = null;
+  clearNotifications();
 }
 
 function resetDownload() {
@@ -65,7 +89,7 @@ function getPlaylist(tabUrl) {
 function displayDownloadCompleteNotification() {
   createBasicNotification('downloadComplete', {
     title: 'Download Complete',
-    message: 'Downloaded ' + tracksDownloaded + ' tracks to \'' + downloadDir + '\'',
+    message: createDownloadSummaryMessage(),
     requireInteraction: true
   });
   if (failedDownloads.length > 0) {
@@ -106,6 +130,7 @@ function onDownloadFailed(reason) {
 function onDownloadComplete() {
   tracksDownloaded += 1;
   trackIndex += 1;
+  lastSuccessfulDownloadId = downloadId;
   downloadNextTrack();
 }
 
@@ -144,6 +169,21 @@ function downloadNextTrack() {
   }
 }
 
+function stopDownload() {
+  chrome.downloads.search({id: downloadId}, function (downloadItems) {
+    if (downloadItems[0].state === 'complete') {
+      createBasicNotification('downloadStopped', {
+        title: 'Download Stopped',
+        message: createDownloadSummaryMessage(),
+        requireInteraction: true
+      });
+      resetDownload();
+    } else {
+      chrome.downloads.cancel(downloadId);
+    }
+  });
+}
+
 function removeSpecialCharacters(filename) {
   // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
   return filename.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
@@ -160,11 +200,15 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
 chrome.notifications.onClicked.addListener(function (notificationId) {
   switch (notificationId) {
     case 'downloadComplete':
-      chrome.downloads.show(downloadId);
-    case 'failedDownloads':
-    case 'downloadInterrupted':
     case 'downloadStopped':
+      if (lastSuccessfulDownloadId) {
+        chrome.downloads.show(lastSuccessfulDownloadId);
+      }
       chrome.notifications.clear(notificationId);
+      break;
+    case 'failedDownloads':
+      chrome.notifications.clear(notificationId);
+      break;
   }
 });
 
@@ -184,13 +228,15 @@ chrome.downloads.onChanged.addListener(function (delta) {
   }
   if (delta.state.previous === 'in_progress') {
     if (delta.state.current === 'interrupted') {
-      createBasicNotification('downloadInterrupted', {
-        title: 'Download Interrupted',
-        message: 'Downloaded ' + tracksDownloaded + ' tracks to \'' + downloadDir + '\'',
-        requireInteraction: true
+      chrome.downloads.search({id: downloadId}, function (downloadItems) {
+        createBasicNotification('downloadStopped', {
+          title: 'Download Stopped',
+          message: createDownloadSummaryMessage(),
+          contextMessage: 'Interrupt Reason: ' + downloadItems[0].error,
+          requireInteraction: true
+        });
+        resetDownload();
       });
-      chrome.downloads.cancel(downloadId);
-      resetDownload();
     } else if (delta.state.current === 'complete') {
       onDownloadComplete();
     }
@@ -218,13 +264,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       });
       break;
     case 'stopDownload':
-      chrome.downloads.cancel(downloadId);
-      resetDownload();
-      createBasicNotification('downloadStopped', {
-        title: 'Download Stopped',
-        message: 'Downloaded ' + tracksDownloaded + ' tracks to \'' + downloadDir + '\'',
-        requireInteraction: true
-      });
+      stopDownload();
       break;
     case 'getDownloadState':
       sendResponse({isDownloading: isDownloading});
