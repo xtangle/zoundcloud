@@ -160,9 +160,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
 chrome.notifications.onClicked.addListener(function (notificationId) {
   switch (notificationId) {
     case 'downloadComplete':
-    case 'failedDownloads':
-      chrome.notifications.clear(notificationId);
       chrome.downloads.show(downloadId);
+    case 'failedDownloads':
+    case 'downloadInterrupted':
+    case 'downloadStopped':
+      chrome.notifications.clear(notificationId);
   }
 });
 
@@ -182,7 +184,7 @@ chrome.downloads.onChanged.addListener(function (delta) {
   }
   if (delta.state.previous === 'in_progress') {
     if (delta.state.current === 'interrupted') {
-      createBasicNotification({
+      createBasicNotification('downloadInterrupted', {
         title: 'Download Interrupted',
         message: 'Downloaded ' + tracksDownloaded + ' tracks to \'' + downloadDir + '\'',
         requireInteraction: true
@@ -218,7 +220,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     case 'stopDownload':
       chrome.downloads.cancel(downloadId);
       resetDownload();
-      createBasicNotification({
+      createBasicNotification('downloadStopped', {
         title: 'Download Stopped',
         message: 'Downloaded ' + tracksDownloaded + ' tracks to \'' + downloadDir + '\'',
         requireInteraction: true
