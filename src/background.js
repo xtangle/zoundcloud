@@ -12,6 +12,7 @@ var tracksDownloaded;
 var failedDownloads;
 var downloadId;
 var lastSuccessfulDownloadId;
+var downloadCancelled;
 
 function sendMessageToContentScript(message) {
   chrome.tabs.query({url: '*://soundcloud.com/*'}, function (tabs) {
@@ -61,10 +62,20 @@ function createListNotification(notificationId, notificationObj) {
   });
 }
 
-function unableToStartDownload(message) {
-  createBasicNotification('unableToStartDownload', {
+function createUnableToStartNotification(message) {
+  createBasicNotification('unableToStart', {
     title: 'Unable To Start Download',
-    message: message
+    message: message,
+    requireInteraction: false
+  });
+}
+
+function createDownloadStoppedNotification(interruptReason) {
+  createBasicNotification('downloadStopped', {
+    title: 'Download Stopped',
+    message: createDownloadSummaryMessage(),
+    contextMessage: 'Interrupt Reason: ' + interruptReason,
+    requireInteraction: true
   });
 }
 
@@ -72,7 +83,7 @@ function clearNotifications() {
   chrome.notifications.clear('downloadComplete');
   chrome.notifications.clear('downloadStopped');
   chrome.notifications.clear('failedDownloads');
-  chrome.notifications.clear('unableToStartDownload');
+  chrome.notifications.clear('unableToStart');
 }
 
 function initializeDownload(playlistData) {
@@ -85,12 +96,14 @@ function initializeDownload(playlistData) {
   failedDownloads = [];
   downloadId = null;
   lastSuccessfulDownloadId = null;
+  downloadCancelled = false;
   clearNotifications();
 }
 
 function resetDownload() {
   isDownloading = false;
   trackIndex = -1;
+  downloadCancelled = true;
   sendMessageToContentScript('downloadStopped');
 }
 
@@ -186,12 +199,8 @@ function downloadNextTrack() {
 function stopDownload() {
   chrome.downloads.search({id: downloadId}, function (downloadItems) {
     if (downloadItems[0].state === 'complete') {
-      createBasicNotification('downloadStopped', {
-        title: 'Download Stopped',
-        message: createDownloadSummaryMessage(),
-        requireInteraction: true
-      });
       resetDownload();
+      createDownloadStoppedNotification('USER_CANCELED');
     } else {
       chrome.downloads.cancel(downloadId);
     }
@@ -236,14 +245,9 @@ chrome.downloads.onChanged.addListener(function (delta) {
     return;
   }
   if (delta.state.previous === 'in_progress') {
-    if (delta.state.current === 'interrupted') {
+    if (delta.state.current === 'interrupted' && !downloadCancelled) {
       chrome.downloads.search({id: downloadId}, function (downloadItems) {
-        createBasicNotification('downloadStopped', {
-          title: 'Download Stopped',
-          message: createDownloadSummaryMessage(),
-          contextMessage: 'Interrupt Reason: ' + downloadItems[0].error,
-          requireInteraction: true
-        });
+        createDownloadStoppedNotification(downloadItems[0].error);
         resetDownload();
       });
     } else if (delta.state.current === 'complete') {
@@ -256,15 +260,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.message) {
     case 'startDownload':
       if (isDownloading) {
-        unableToStartDownload('A download is currently in progress. Please wait for it to finish.');
+        createUnableToStartNotification('A download is currently in progress. Please wait for it to finish.');
         return;
       }
       getPlaylist(request.tabUrl).always(function (data, textStatus) {
         if (textStatus !== 'success') {
-          unableToStartDownload('Could not retrieve playlist information. (' + textStatus + ')');
+          createUnableToStartNotification('Could not retrieve playlist information. (' + textStatus + ')');
           sendMessageToContentScript('downloadStopped');
         } else if (!data || data.kind !== 'playlist') {
-          unableToStartDownload('Could not retrieve playlist information. (Retrieved object is not a playlist)');
+          createUnableToStartNotification('Could not retrieve playlist information. (Retrieved object is not a playlist)');
           sendMessageToContentScript('downloadStopped');
         } else {
           initializeDownload(data);
