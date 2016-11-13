@@ -1,6 +1,6 @@
 {
-  "name": "Zoundcloud",
-  "description": "Adds a download button to your Soundcloud playlists",
+  "name": "ZoundCloud",
+  "description": "Adds a download button to SoundCloud playlist pages",
   "version": "1.0.0",
   "manifest_version": 2,
   "permissions": [
