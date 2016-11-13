@@ -1,7 +1,7 @@
 var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
-var TAB_URL = document.location.href;
+var PLAYLIST_TAB_URL = document.location.href;
 
-if (TAB_URL.match(PLAYLIST_URL_PATTERN)) {
+if (PLAYLIST_TAB_URL.match(PLAYLIST_URL_PATTERN)) {
 
   var TIMEOUT_INTERVAL = 1000;
   var isDownloading;
@@ -15,7 +15,7 @@ if (TAB_URL.match(PLAYLIST_URL_PATTERN)) {
   function downloadPlaylist() {
     chrome.runtime.sendMessage({
       message: 'startPlaylistDownload',
-      tabUrl: TAB_URL
+      tabUrl: PLAYLIST_TAB_URL
     });
     setDownloadStartedState();
   }
@@ -65,28 +65,35 @@ if (TAB_URL.match(PLAYLIST_URL_PATTERN)) {
   }
 
   function addDownloadButton() {
-
-    var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
     var downloadButton = $('<button>', {
       id: 'zcDownloadBtn',
       class: 'sc-button sc-button-medium',
       click: onDownloadButtonClick
     });
 
-    if (soundActionsToolbar.children('div').length === 1) {
-      var buttonGroup = soundActionsToolbar.children().first();
-      showLabelOnButton = true;
+    var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
+    showLabelOnButton = soundActionsToolbar.find('.sc-button-responsive').length > 0;
+
+    if (showLabelOnButton) {
       downloadButton.addClass('sc-button-responsive');
-      buttonGroup.append(downloadButton);
     } else {
+      downloadButton.addClass('sc-button-icon');
+    }
+
+    var soundActionToolbarChildren = soundActionsToolbar.children('div');
+    var addSeparateContainer = soundActionToolbarChildren.length > 1 &&
+      soundActionToolbarChildren.last().find('button').length > 0;
+
+    if (addSeparateContainer) {
       var downloadButtonContainer = $("<div>", {
         id: 'zcDownloadBtnContainer',
         class: 'sc-button-group'
       });
-      showLabelOnButton = false;
-      downloadButton.addClass('sc-button-icon');
       downloadButtonContainer.append(downloadButton);
       soundActionsToolbar.append(downloadButtonContainer);
+    } else {
+      var buttonGroup = soundActionsToolbar.children().first();
+      buttonGroup.append(downloadButton);
     }
   }
 
@@ -102,7 +109,7 @@ if (TAB_URL.match(PLAYLIST_URL_PATTERN)) {
   });
 
   function injectDownloadButton() {
-    if (document.location.href !== TAB_URL) {
+    if (document.location.href !== PLAYLIST_TAB_URL) {
       $('#zcDownloadBtn').remove();
       clearTimeout(timeoutId);
       return;
@@ -118,4 +125,5 @@ if (TAB_URL.match(PLAYLIST_URL_PATTERN)) {
   }
 
   injectDownloadButton();
+
 }
