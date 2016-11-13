@@ -1,5 +1,7 @@
 var SC_API_URL = 'https://api.soundcloud.com/';
+var SC_I1_API_URL = 'https://api.soundcloud.com/i1/';
 var CLIENT_ID = 'a3e059563d7fd3372b49b37f00a00bcf';
+var I1_CLIENT_ID = '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea';
 var ZC_ICON_URL = '../images/icon128.png';
 var URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
 
@@ -161,12 +163,27 @@ function onDownloadComplete() {
   downloadNextTrack();
 }
 
+function downloadUsingI1StreamUrl(track) {
+  var i1StreamsUrl = SC_I1_API_URL + 'tracks/' + track.id + '/streams?client_id=' + I1_CLIENT_ID;
+  $.getJSON(i1StreamsUrl).always(function (data, statusText) {
+    var downloadUrl;
+    if (statusText === 'success') {
+      downloadUrl = data['http_mp3_128_url'];
+    }
+    if (downloadUrl) {
+      initiateDownload(downloadUrl);
+    } else {
+      onDownloadFailed('Could not get stream url');
+    }
+  });
+}
+
 function downloadUsingStreamUrl(track) {
   if (track.stream_url) {
     var downloadUrl = track.stream_url + '?client_id=' + CLIENT_ID;
     initiateDownload(downloadUrl);
   } else {
-    onDownloadFailed('Not streamable');
+    downloadUsingI1StreamUrl(track);
   }
 }
 
