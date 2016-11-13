@@ -26,6 +26,7 @@ if (TAB_URL.match(URL_PATTERN)) {
     downloadButton
       .removeClass('zc-button-download')
       .addClass('zc-button-stop')
+      .addClass('sc-button-active')
       .prop('title', 'Stop downloading playlist');
     if (showLabelOnButton) {
       downloadButton.text('Stop Download');
@@ -36,6 +37,7 @@ if (TAB_URL.match(URL_PATTERN)) {
     isDownloading = false;
     var downloadButton = $('#zcDownloadBtn');
     downloadButton
+      .removeClass('sc-button-active')
       .removeClass('zc-button-stop')
       .addClass('zc-button-download')
       .prop('title', 'Download this playlist');
