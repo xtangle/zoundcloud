@@ -6,6 +6,7 @@ if (TAB_URL.match(URL_PATTERN)) {
   var TIMEOUT_INTERVAL = 1000;
   var isDownloading;
   var timeoutId;
+  var showLabelOnButton;
 
   function stopDownload() {
     chrome.runtime.sendMessage({message: "stopDownload"});
@@ -21,18 +22,26 @@ if (TAB_URL.match(URL_PATTERN)) {
 
   function setDownloadStartedState() {
     isDownloading = true;
-    $('#zcDownloadBtn')
+    var downloadButton = $('#zcDownloadBtn');
+    downloadButton
       .removeClass('zc-button-download')
       .addClass('zc-button-stop')
       .prop('title', 'Stop downloading playlist');
+    if (showLabelOnButton) {
+      downloadButton.text('Stop Download');
+    }
   }
 
   function setDownloadStoppedState() {
     isDownloading = false;
-    $('#zcDownloadBtn')
+    var downloadButton = $('#zcDownloadBtn');
+    downloadButton
       .removeClass('zc-button-stop')
       .addClass('zc-button-download')
       .prop('title', 'Download this playlist');
+    if (showLabelOnButton) {
+      downloadButton.text('Download');
+    }
   }
 
   function onDownloadButtonClick() {
@@ -58,18 +67,22 @@ if (TAB_URL.match(URL_PATTERN)) {
     var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
     var downloadButton = $('<button>', {
       id: 'zcDownloadBtn',
-      class: 'sc-button sc-button-medium sc-button-icon',
+      class: 'sc-button sc-button-medium',
       click: onDownloadButtonClick
     });
 
     if (soundActionsToolbar.children('div').length === 1) {
       var buttonGroup = soundActionsToolbar.children().first();
+      showLabelOnButton = true;
+      downloadButton.addClass('sc-button-responsive');
       buttonGroup.append(downloadButton);
     } else {
       var downloadButtonContainer = $("<div>", {
         id: 'zcDownloadBtnContainer',
         class: 'sc-button-group'
       });
+      showLabelOnButton = false;
+      downloadButton.addClass('sc-button-icon');
       downloadButtonContainer.append(downloadButton);
       soundActionsToolbar.append(downloadButtonContainer);
     }
