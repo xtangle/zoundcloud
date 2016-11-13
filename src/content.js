@@ -16,16 +16,23 @@ if (TAB_URL.match(URL_PATTERN)) {
       message: "startDownload",
       tabUrl: TAB_URL
     });
+    setDownloadStartedState();
   }
 
   function setDownloadStartedState() {
     isDownloading = true;
-    $('#zcDownloadBtn').text('Stop Download');
+    $('#zcDownloadBtn')
+      .removeClass('zc-button-download')
+      .addClass('zc-button-stop')
+      .prop('title', 'Stop downloading playlist');
   }
 
   function setDownloadStoppedState() {
     isDownloading = false;
-    $('#zcDownloadBtn').text('Download Playlist');
+    $('#zcDownloadBtn')
+      .removeClass('zc-button-stop')
+      .addClass('zc-button-download')
+      .prop('title', 'Download this playlist');
   }
 
   function onDownloadButtonClick() {
@@ -33,7 +40,6 @@ if (TAB_URL.match(URL_PATTERN)) {
       stopDownload();
     } else {
       downloadPlaylist();
-      $('#zcDownloadBtn').text('Stop Download');
     }
   }
 
@@ -48,10 +54,11 @@ if (TAB_URL.match(URL_PATTERN)) {
   }
 
   function addDownloadButton() {
+
     var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
     var downloadButton = $('<button>', {
       id: 'zcDownloadBtn',
-      class: 'sc-button-medium sc-button',
+      class: 'sc-button sc-button-medium sc-button-icon',
       click: onDownloadButtonClick
     });
 

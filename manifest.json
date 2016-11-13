@@ -12,7 +12,7 @@
     "*://api.soundcloud.com/*"
   ],
   "icons": {
-    "128": "images/icon128.png"
+    "128": "assets/images/icon128.png"
   },
   "background": {
     "scripts": [
@@ -31,6 +31,9 @@
       ],
       "exclude-globs": [
         "*://soundcloud.com/*/*/sets/*"
+      ],
+      "css": [
+        "assets/css/content.css"
       ],
       "js": [
         "lib/jquery-3.1.1.min.js",
