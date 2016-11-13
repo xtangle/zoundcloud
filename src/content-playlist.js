@@ -1,7 +1,7 @@
-var URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
+var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
 var TAB_URL = document.location.href;
 
-if (TAB_URL.match(URL_PATTERN)) {
+if (TAB_URL.match(PLAYLIST_URL_PATTERN)) {
 
   var TIMEOUT_INTERVAL = 1000;
   var isDownloading;
@@ -9,12 +9,12 @@ if (TAB_URL.match(URL_PATTERN)) {
   var showLabelOnButton;
 
   function stopDownload() {
-    chrome.runtime.sendMessage({message: "stopDownload"});
+    chrome.runtime.sendMessage({message: "stopPlaylistDownload"});
   }
 
   function downloadPlaylist() {
     chrome.runtime.sendMessage({
-      message: "startDownload",
+      message: 'startPlaylistDownload',
       tabUrl: TAB_URL
     });
     setDownloadStartedState();
@@ -55,8 +55,8 @@ if (TAB_URL.match(URL_PATTERN)) {
   }
 
   function getInitialDownloadState() {
-    chrome.runtime.sendMessage({message: "getDownloadState"}, function (response) {
-      if (response.isDownloading) {
+    chrome.runtime.sendMessage({message: "getPlaylistDownloadState"}, function (response) {
+      if (response.isDownloadingPlaylist) {
         setDownloadStartedState();
       } else {
         setDownloadStoppedState();
@@ -92,10 +92,10 @@ if (TAB_URL.match(URL_PATTERN)) {
 
   chrome.runtime.onMessage.addListener(function (request) {
     switch (request.message) {
-      case 'downloadStarted':
+      case 'playlistDownloadStarted':
         setDownloadStartedState();
         break;
-      case 'downloadStopped':
+      case 'playlistDownloadStopped':
         setDownloadStoppedState();
         break;
     }
