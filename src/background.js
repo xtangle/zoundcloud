@@ -173,7 +173,7 @@ function downloadUsingI1StreamUrl(track) {
     if (downloadUrl) {
       initiateDownload(downloadUrl);
     } else {
-      onDownloadFailed('Could not get stream url');
+      onDownloadFailed('cannot get stream url');
     }
   });
 }
@@ -187,17 +187,9 @@ function downloadUsingStreamUrl(track) {
   }
 }
 
-function downloadNextTrack() {
-  if (trackIndex >= playlist.tracks.length) {
-    displayDownloadCompleteNotification();
-    resetDownload();
-    return;
-  }
-
-  var track = playlist.tracks[trackIndex];
-  var downloadUrl = track.download_url + '?client_id=' + CLIENT_ID;
-
+function downloadUsingDownloadUrl(track) {
   if (track.download_url) {
+    var downloadUrl = track.download_url + '?client_id=' + CLIENT_ID;
     $.ajax({
       url: downloadUrl,
       type: 'get'
@@ -211,6 +203,15 @@ function downloadNextTrack() {
   } else {
     downloadUsingStreamUrl(track);
   }
+}
+
+function downloadNextTrack() {
+  if (trackIndex >= playlist.tracks.length) {
+    displayDownloadCompleteNotification();
+    resetDownload();
+    return;
+  }
+  downloadUsingDownloadUrl(playlist.tracks[trackIndex]);
 }
 
 function stopDownload() {
