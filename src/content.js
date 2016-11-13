@@ -3,9 +3,9 @@ var TAB_URL = document.location.href;
 
 if (TAB_URL.match(URL_PATTERN)) {
 
+  var TIMEOUT_INTERVAL = 1000;
   var isDownloading;
   var timeoutId;
-  var timeoutInterval = 1000;
 
   function stopDownload() {
     chrome.runtime.sendMessage({message: "stopDownload"});
@@ -92,7 +92,7 @@ if (TAB_URL.match(URL_PATTERN)) {
         getInitialDownloadState();
       }
       injectDownloadButton();
-    }, timeoutInterval);
+    }, TIMEOUT_INTERVAL);
   }
 
   injectDownloadButton();

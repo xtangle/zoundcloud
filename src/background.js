@@ -21,6 +21,11 @@ function sendMessageToContentScript(message) {
   });
 }
 
+function removeSpecialCharacters(filename) {
+  // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
+  return filename.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
+}
+
 function createDownloadSummaryMessage() {
   switch (tracksDownloaded) {
     case 0:
@@ -56,10 +61,18 @@ function createListNotification(notificationId, notificationObj) {
   });
 }
 
+function unableToStartDownload(message) {
+  createBasicNotification('unableToStartDownload', {
+    title: 'Unable To Start Download',
+    message: message
+  });
+}
+
 function clearNotifications() {
   chrome.notifications.clear('downloadComplete');
   chrome.notifications.clear('downloadStopped');
   chrome.notifications.clear('failedDownloads');
+  chrome.notifications.clear('unableToStartDownload');
 }
 
 function initializeDownload(playlistData) {
@@ -107,14 +120,15 @@ function displayDownloadCompleteNotification() {
 }
 
 function initiateDownload(url) {
-  if (isDownloading) {
-    chrome.downloads.download({
-      url: url,
-      saveAs: false
-    }, function (id) {
-      downloadId = id;
-    });
-  }
+  chrome.downloads.download({
+    url: url,
+    saveAs: false
+  }, function (id) {
+    downloadId = id;
+    if (!isDownloading) {
+      chrome.downloads.cancel(downloadId);
+    }
+  });
 }
 
 function onDownloadFailed(reason) {
@@ -184,11 +198,6 @@ function stopDownload() {
   });
 }
 
-function removeSpecialCharacters(filename) {
-  // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
-  return filename.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
-}
-
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
   if (changeInfo.url && changeInfo.url.match(URL_PATTERN)) {
     chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
@@ -247,15 +256,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.message) {
     case 'startDownload':
       if (isDownloading) {
-        alert('A download is currently in progress. Please wait for it to finish.');
+        unableToStartDownload('A download is currently in progress. Please wait for it to finish.');
         return;
       }
       getPlaylist(request.tabUrl).always(function (data, textStatus) {
         if (textStatus !== 'success') {
-          alert('Could not retrieve playlist information. (' + textStatus + ')');
+          unableToStartDownload('Could not retrieve playlist information. (' + textStatus + ')');
           sendMessageToContentScript('downloadStopped');
         } else if (!data || data.kind !== 'playlist') {
-          alert('Could not retrieve playlist information. (retrieved object is not a playlist)');
+          unableToStartDownload('Could not retrieve playlist information. (Retrieved object is not a playlist)');
           sendMessageToContentScript('downloadStopped');
         } else {
           initializeDownload(data);
