@@ -49,6 +49,8 @@ chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, sugge
     suggest({
       filename: fileName + '.' + fileExtension
     });
+  } else {
+    suggest();
   }
 });
 
