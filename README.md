@@ -8,11 +8,12 @@ For playlists, it will download every track in the playlist sequentially, in the
 It will attempt to download a track in its original format if it's available. If not, it will download the streamable 
 128kb mp3 version.
 
-Tracks will be downloaded in the Downloads folder. Tracks in playlists will be downloaded in Downloads/{user} - {playlist}, 
-where {user} is the username of the owner of the playlist, and {playlist} is the title of the playlist.
+Single tracks will be downloaded in the Downloads folder. Tracks in playlists will be downloaded in the subfolder
+Downloads/{user} - {playlist}, where {user} is the username of the owner of the playlist, and {playlist} is the title 
+of the playlist.
 
-After a playlist download has started, the user can stop the download at any time. Only one playlist can be downloaded 
-at any given time.
+After a playlist download has started, the user can stop the sequence of downloads at any time. Only one playlist can 
+be downloaded at any given time.
 
 ## Installation
 
