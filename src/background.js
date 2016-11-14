@@ -5,21 +5,102 @@ var I1_CLIENT_ID = '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea';
 var ZC_ICON_URL = '../assets/images/icon128.png';
 
 var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
+var TRACK_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/(?:[^\/]+$)|(?:[^\/]+(?=(?:\?in=)).+$)/;
 
 var playlist;
 var playlistDownloadDirectory;
 var isDownloadingPlaylist = false;
 var playlistTrackIndex = -1;
-
 var numberOfPlaylistTracksDownloaded;
+
 var failedPlaylistDownloads;
 var playlistTrackDownloadId;
 var lastSuccessfulPlaylistTrackDownloadId;
 var playlistDownloadCancelled;
 
+var track;
+var trackDownloadId;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Global Function Definitions & Listeners
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
+  if (changeInfo.url) {
+    if (changeInfo.url.match(PLAYLIST_URL_PATTERN)) {
+      loadContentPlaylistScript();
+    } else if (changeInfo.url.match(TRACK_URL_PATTERN)) {
+      loadContentTrackScript();
+    }
+  }
+});
+
+chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
+  var fileExtension, fileName;
+  if (downloadItem.id === playlistTrackDownloadId) {
+    fileExtension = downloadItem.filename.split('.').pop();
+    fileName = removeSpecialCharacters(playlist.tracks[playlistTrackIndex].title);
+    suggest({
+      filename: playlistDownloadDirectory + '/' + fileName + '.' + fileExtension
+    });
+  } else if (downloadItem.id === trackDownloadId) {
+    fileExtension = downloadItem.filename.split('.').pop();
+    fileName = removeSpecialCharacters(track.title);
+    suggest({
+      filename: fileName + '.' + fileExtension
+    });
+  }
+});
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  switch (request.message) {
+    case 'startPlaylistDownload':
+      startPlaylistDownload(request.tabUrl);
+      break;
+    case 'stopPlaylistDownload':
+      stopPlaylistDownload();
+      break;
+    case 'getPlaylistDownloadState':
+      sendResponse({isDownloadingPlaylist: isDownloadingPlaylist});
+      break;
+    case 'startTrackDownload':
+      startTrackDownload(request.tabUrl);
+      break;
+  }
+});
+
+chrome.notifications.onClicked.addListener(function (notificationId) {
+  switch (notificationId) {
+    case 'playlistDownloadComplete':
+    case 'playlistDownloadStopped':
+      if (lastSuccessfulPlaylistTrackDownloadId) {
+        chrome.downloads.show(lastSuccessfulPlaylistTrackDownloadId);
+      }
+      chrome.notifications.clear(notificationId);
+      break;
+    case 'failedPlaylistDownloads':
+    case 'unableToStartPlaylistDownload':
+    case 'unableToStartTrackDownload':
+      chrome.notifications.clear(notificationId);
+      break;
+  }
+});
+
+chrome.downloads.onChanged.addListener(function (delta) {
+  if (!delta.state) {
+    return;
+  }
+  if (delta.id === playlistTrackDownloadId && delta.state.previous === 'in_progress') {
+    if (delta.state.current === 'interrupted' && !playlistDownloadCancelled) {
+      chrome.downloads.search({id: playlistTrackDownloadId}, function (downloadItems) {
+        displayPlaylistDownloadStoppedNotification(downloadItems[0].error);
+        resetPlaylistDownload();
+      });
+    } else if (delta.state.current === 'complete') {
+      onPlaylistTrackDownloadComplete();
+    }
+  }
+});
 
 function sendMessageToContentScript(message) {
   chrome.tabs.query({url: '*://soundcloud.com/*'}, function (tabs) {
@@ -76,7 +157,7 @@ function downloadTrackUsingI1StreamUrl(track, successCallback, failCallback) {
     if (downloadUrl) {
       initiateTrackDownload(downloadUrl, successCallback, failCallback);
     } else {
-      failCallback('cannot get stream url');
+      failCallback('Cannot get stream url');
     }
   });
 }
@@ -113,90 +194,20 @@ function removeSpecialCharacters(path) {
   return path.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
 }
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-  if (changeInfo.url && changeInfo.url.match(PLAYLIST_URL_PATTERN)) {
-    chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
-      chrome.tabs.executeScript(null, {file: 'src/content-playlist.js'});
-    });
-  }
-});
+function loadContentPlaylistScript() {
+  chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
+    chrome.tabs.executeScript(null, {file: 'src/content-playlist.js'});
+  });
+}
 
-chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
-  if (downloadItem.id === playlistTrackDownloadId) {
-    var fileExtension = downloadItem.filename.split('.').pop();
-    var fileName = removeSpecialCharacters(playlist.tracks[playlistTrackIndex].title);
-    suggest({
-      filename: playlistDownloadDirectory + '/' + fileName + '.' + fileExtension
-    });
-  }
-});
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  switch (request.message) {
-    case 'startPlaylistDownload':
-      if (isDownloadingPlaylist) {
-        displayUnableToStartPlaylistDownloadNotification(
-          'A playlist download is currently in progress. Please wait for it to finish.');
-        return;
-      }
-      getPlaylist(request.tabUrl).always(function (data, textStatus) {
-        if (textStatus !== 'success') {
-          displayUnableToStartPlaylistDownloadNotification(
-            'Could not retrieve playlist information. (' + textStatus + ')');
-          sendMessageToContentScript('playlistDownloadStopped');
-        } else if (!data || data.kind !== 'playlist') {
-          displayUnableToStartPlaylistDownloadNotification(
-            'Could not retrieve playlist information. (Retrieved object is not a playlist)');
-          sendMessageToContentScript('playlistDownloadStopped');
-        } else {
-          initializePlaylistDownload(data);
-          downloadNextPlaylistTrack();
-        }
-      });
-      break;
-    case 'stopPlaylistDownload':
-      stopPlaylistDownload();
-      break;
-    case 'getPlaylistDownloadState':
-      sendResponse({isDownloadingPlaylist: isDownloadingPlaylist});
-      break;
-  }
-});
-
-chrome.notifications.onClicked.addListener(function (notificationId) {
-  switch (notificationId) {
-    case 'playlistDownloadComplete':
-    case 'playlistDownloadStopped':
-      if (lastSuccessfulPlaylistTrackDownloadId) {
-        chrome.downloads.show(lastSuccessfulPlaylistTrackDownloadId);
-      }
-      chrome.notifications.clear(notificationId);
-      break;
-    case 'failedPlaylistDownloads':
-    case 'unableToStartPlaylistDownload':
-      chrome.notifications.clear(notificationId);
-      break;
-  }
-});
-
-chrome.downloads.onChanged.addListener(function (delta) {
-  if (!delta.state) {
-    return;
-  }
-  if (delta.id === playlistTrackDownloadId && delta.state.previous === 'in_progress') {
-    if (delta.state.current === 'interrupted' && !playlistDownloadCancelled) {
-      chrome.downloads.search({id: playlistTrackDownloadId}, function (downloadItems) {
-        displayPlaylistDownloadStoppedNotification(downloadItems[0].error);
-        resetPlaylistDownload();
-      });
-    } else if (delta.state.current === 'complete') {
-      onPlaylistTrackDownloadComplete();
-    }
-  }
-});
+function loadContentTrackScript() {
+  chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
+    chrome.tabs.executeScript(null, {file: 'src/content-track.js'});
+  });
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Playlist Related Function Definitions
+// Playlist Download Function Definitions
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function createPlaylistDownloadSummaryMessage() {
@@ -317,6 +328,23 @@ function downloadNextPlaylistTrack() {
   );
 }
 
+function startPlaylistDownload(tabUrl) {
+  if (isDownloadingPlaylist) {
+    displayUnableToStartPlaylistDownloadNotification(
+      'A playlist download is currently in progress, please wait for it to finish');
+    return;
+  }
+  getPlaylist(tabUrl).always(function (data, textStatus) {
+    if (textStatus !== 'success' || !data || data.kind !== 'playlist') {
+      displayUnableToStartPlaylistDownloadNotification('Could not retrieve playlist information');
+      sendMessageToContentScript('playlistDownloadStopped');
+    } else {
+      initializePlaylistDownload(data);
+      downloadNextPlaylistTrack();
+    }
+  });
+}
+
 function stopPlaylistDownload() {
   chrome.downloads.search({id: playlistTrackDownloadId}, function (downloadItems) {
     if (downloadItems[0].state === 'complete') {
@@ -324,6 +352,34 @@ function stopPlaylistDownload() {
       displayPlaylistDownloadStoppedNotification('USER_CANCELED');
     } else {
       chrome.downloads.cancel(playlistTrackDownloadId);
+    }
+  });
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Track Download Function Definitions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function displayUnableToStartTrackDownloadNotification(message) {
+  createBasicNotification('unableToStartTrackDownload', {
+    title: 'Unable To Download Track',
+    message: message,
+    requireInteraction: false
+  });
+}
+
+function startTrackDownload(tabUrl) {
+  var trackUrl = SC_API_URL + 'resolve.json?url=' + tabUrl + '&client_id=' + CLIENT_ID;
+  $.getJSON(trackUrl).always(function (data, textStatus) {
+    if (textStatus !== 'success' || !data || data.kind !== 'track') {
+      displayUnableToStartTrackDownloadNotification('Could not retrieve track information');
+    } else {
+      track = data;
+      downloadTrackUsingDownloadUrl(track,
+        function (id) {
+          trackDownloadId = id;
+        },
+        displayUnableToStartTrackDownloadNotification);
     }
   });
 }

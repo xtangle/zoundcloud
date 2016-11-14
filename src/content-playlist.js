@@ -3,78 +3,88 @@ var PLAYLIST_TAB_URL = document.location.href;
 
 if (PLAYLIST_TAB_URL.match(PLAYLIST_URL_PATTERN)) {
 
-  var TIMEOUT_INTERVAL = 1000;
-  var isDownloading;
-  var timeoutId;
-  var showLabelOnButton;
+  var PLAYLIST_INJECT_INTERVAL = 1000;
+  var isDownloadingPlaylist;
+  var playlistTimeoutId;
+  var showLabelOnPlaylistDownloadButton;
 
-  function stopDownload() {
+  chrome.runtime.onMessage.addListener(function (request) {
+    switch (request.message) {
+      case 'playlistDownloadStarted':
+        setPlaylistDownloadStartedState();
+        break;
+      case 'playlistDownloadStopped':
+        setPlaylistDownloadStoppedState();
+        break;
+    }
+  });
+
+  function stopPlaylistDownload() {
     chrome.runtime.sendMessage({message: "stopPlaylistDownload"});
   }
 
-  function downloadPlaylist() {
+  function startPlaylistDownload() {
     chrome.runtime.sendMessage({
       message: 'startPlaylistDownload',
       tabUrl: PLAYLIST_TAB_URL
     });
-    setDownloadStartedState();
+    setPlaylistDownloadStartedState();
   }
 
-  function setDownloadStartedState() {
-    isDownloading = true;
-    var downloadButton = $('#zcDownloadBtn');
+  function setPlaylistDownloadStartedState() {
+    isDownloadingPlaylist = true;
+    var downloadButton = $('#zcPlaylistDownloadBtn');
     downloadButton
       .removeClass('zc-button-download')
       .addClass('zc-button-stop')
       .addClass('sc-button-active')
       .prop('title', 'Stop downloading playlist');
-    if (showLabelOnButton) {
+    if (showLabelOnPlaylistDownloadButton) {
       downloadButton.text('Stop Download');
     }
   }
 
-  function setDownloadStoppedState() {
-    isDownloading = false;
-    var downloadButton = $('#zcDownloadBtn');
+  function setPlaylistDownloadStoppedState() {
+    isDownloadingPlaylist = false;
+    var downloadButton = $('#zcPlaylistDownloadBtn');
     downloadButton
       .removeClass('sc-button-active')
       .removeClass('zc-button-stop')
       .addClass('zc-button-download')
       .prop('title', 'Download this playlist');
-    if (showLabelOnButton) {
+    if (showLabelOnPlaylistDownloadButton) {
       downloadButton.text('Download');
     }
   }
 
-  function onDownloadButtonClick() {
-    if (isDownloading) {
-      stopDownload();
+  function onPlaylistDownloadButtonClick() {
+    if (isDownloadingPlaylist) {
+      stopPlaylistDownload();
     } else {
-      downloadPlaylist();
+      startPlaylistDownload();
     }
   }
 
-  function getInitialDownloadState() {
+  function getPlaylistDownloadState() {
     chrome.runtime.sendMessage({message: "getPlaylistDownloadState"}, function (response) {
       if (response.isDownloadingPlaylist) {
-        setDownloadStartedState();
+        setPlaylistDownloadStartedState();
       } else {
-        setDownloadStoppedState();
+        setPlaylistDownloadStoppedState();
       }
     });
   }
 
-  function addDownloadButton() {
+  function addPlaylistDownloadButton() {
+    var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
     var downloadButton = $('<button>', {
-      id: 'zcDownloadBtn',
+      id: 'zcPlaylistDownloadBtn',
       class: 'sc-button sc-button-medium',
-      click: onDownloadButtonClick
+      click: onPlaylistDownloadButtonClick
     });
 
-    var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
-    showLabelOnButton = soundActionsToolbar.find('.sc-button-responsive').length > 0;
-
-    if (showLabelOnButton) {
+    showLabelOnPlaylistDownloadButton = soundActionsToolbar.find('.sc-button-responsive').length > 0;
+    if (showLabelOnPlaylistDownloadButton) {
       downloadButton.addClass('sc-button-responsive');
     } else {
       downloadButton.addClass('sc-button-icon');
@@ -86,44 +96,37 @@ if (PLAYLIST_TAB_URL.match(PLAYLIST_URL_PATTERN)) {
 
     if (addSeparateContainer) {
       var downloadButtonContainer = $("<div>", {
-        id: 'zcDownloadBtnContainer',
+        id: 'zcPlaylistDownloadBtnContainer',
         class: 'sc-button-group'
       });
       downloadButtonContainer.append(downloadButton);
       soundActionsToolbar.append(downloadButtonContainer);
     } else {
-      var buttonGroup = soundActionsToolbar.children().first();
-      buttonGroup.append(downloadButton);
+      var buttonGroup = soundActionToolbarChildren.first();
+      var lastButtonInGroup = buttonGroup.children('button').last();
+      if (lastButtonInGroup.hasClass('sc-button-more')) {
+        lastButtonInGroup.before(downloadButton);
+      } else {
+        buttonGroup.append(downloadButton);
+      }
     }
   }
 
-  chrome.runtime.onMessage.addListener(function (request) {
-    switch (request.message) {
-      case 'playlistDownloadStarted':
-        setDownloadStartedState();
-        break;
-      case 'playlistDownloadStopped':
-        setDownloadStoppedState();
-        break;
-    }
-  });
-
-  function injectDownloadButton() {
+  function injectPlaylistDownloadButton() {
     if (document.location.href !== PLAYLIST_TAB_URL) {
-      $('#zcDownloadBtn').remove();
-      clearTimeout(timeoutId);
+      $('#zcPlaylistDownloadBtn').remove();
+      clearTimeout(playlistTimeoutId);
       return;
     }
 
-    timeoutId = setTimeout(function () {
-      if ($('#zcDownloadBtn').length === 0) {
-        addDownloadButton();
-        getInitialDownloadState();
+    playlistTimeoutId = setTimeout(function () {
+      if ($('#zcPlaylistDownloadBtn').length === 0) {
+        addPlaylistDownloadButton();
+        getPlaylistDownloadState();
       }
-      injectDownloadButton();
-    }, TIMEOUT_INTERVAL);
+      injectPlaylistDownloadButton();
+    }, PLAYLIST_INJECT_INTERVAL);
   }
 
-  injectDownloadButton();
-
+  injectPlaylistDownloadButton();
 }

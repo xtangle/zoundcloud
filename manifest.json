@@ -1,7 +1,7 @@
 {
   "name": "ZoundCloud",
   "description": "Adds a download button to SoundCloud playlist pages",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "manifest_version": 2,
   "permissions": [
     "downloads",
@@ -31,7 +31,8 @@
       ],
       "js": [
         "lib/jquery-3.1.1.min.js",
-        "src/content-playlist.js"
+        "src/content-playlist.js",
+        "src/content-track.js"
       ],
       "run_at": "document_end"
     }
