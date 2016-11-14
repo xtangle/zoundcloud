@@ -112,10 +112,15 @@ if (PLAYLIST_TAB_URL.match(PLAYLIST_URL_PATTERN)) {
     }
   }
 
+  function removePlaylistDownloadButton() {
+    $('#zcPlaylistDownloadBtn').remove();
+    $('#zcPlaylistDownloadBtnContainer').remove();
+    clearTimeout(playlistTimeoutId);
+  }
+
   function injectPlaylistDownloadButton() {
     if (document.location.href !== PLAYLIST_TAB_URL) {
-      $('#zcPlaylistDownloadBtn').remove();
-      clearTimeout(playlistTimeoutId);
+      removePlaylistDownloadButton();
       return;
     }
 

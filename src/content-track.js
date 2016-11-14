@@ -67,10 +67,15 @@ if (TRACK_TAB_URL.match(TRACK_URL_PATTERN)) {
     }
   }
 
+  function removeTrackDownloadButton() {
+    $('#zcTrackDownloadBtn').remove();
+    $('#zcTrackDownloadBtnContainer').remove();
+    clearTimeout(trackTimeoutId);
+  }
+
   function injectTrackDownloadButton() {
     if (document.location.href !== TRACK_TAB_URL || stopInjectingTrackDownloadButton) {
-      $('#zcTrackDownloadBtn').remove();
-      clearTimeout(trackTimeoutId);
+      removeTrackDownloadButton();
       return;
     }
 
