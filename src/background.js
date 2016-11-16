@@ -4,6 +4,7 @@ var CLIENT_ID = 'a3e059563d7fd3372b49b37f00a00bcf';
 var I1_CLIENT_ID = '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea';
 var ZC_ICON_URL = '../assets/images/icon128.png';
 
+var SC_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\//;
 var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
 var TRACK_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/(?:[^\/]+$)|(?:[^\/]+(?=(?:\?in=)).+$)/;
 
@@ -26,7 +27,7 @@ var trackDownloadId;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
-  if (changeInfo.url) {
+  if (changeInfo.url && changeInfo.url.match(SC_URL_PATTERN)) {
     if (changeInfo.url.match(PLAYLIST_URL_PATTERN)) {
       loadContentPlaylistScript();
     } else if (changeInfo.url.match(TRACK_URL_PATTERN)) {
@@ -49,8 +50,6 @@ chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, sugge
     suggest({
       filename: fileName + '.' + fileExtension
     });
-  } else {
-    suggest();
   }
 });
 
