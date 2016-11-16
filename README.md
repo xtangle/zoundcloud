@@ -23,6 +23,10 @@ be downloaded at any given time.
 
 ## Change Log
 
+### 1.1.1
+
+- Add individual download buttons to playlist tracks when on a playlist page.
+
 ### 1.1.0
 
-- Added individual track download functionality
+- Added individual track download functionality.

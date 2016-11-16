@@ -32,7 +32,8 @@
       "js": [
         "lib/jquery-3.1.1.min.js",
         "src/content-playlist.js",
-        "src/content-track.js"
+        "src/content-track.js",
+        "src/content-tracklist.js"
       ],
       "run_at": "document_end"
     }
