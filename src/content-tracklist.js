@@ -1,11 +1,13 @@
-var TRACK_LIST_URL_PATTERNS = [ /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/ ];
+var TRACK_LIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
 var TRACK_LIST_URL = document.location.href;
 
-if (TRACK_LIST_URL_PATTERNS.some(function (pattern) { return TRACK_LIST_URL.match(pattern); })) {
+if (TRACK_LIST_URL.match(TRACK_LIST_URL_PATTERN)) {
 
   var TRACK_LIST_SC_BASE_URL = 'https://soundcloud.com';
-  var TRACK_LIST_INJECT_INTERVAL = 3000;
+  var TRACK_LIST_INJECT_INTERVAL = 2000;
   var trackListTimeoutId;
+  var trackListButtonIsLoaded = [];
+  var trackListNumberOfButtonsLoaded = 0;
 
   function onTrackListDownloadButtonClick(trackUrl) {
     return function() {
@@ -19,24 +21,33 @@ if (TRACK_LIST_URL_PATTERNS.some(function (pattern) { return TRACK_LIST_URL.matc
   function addTrackListDownloadButtons() {
     var trackListContainer = $("div[class~='listenDetails'] div[class~='trackList']").first();
     var trackItems = trackListContainer.find('ul > li > .trackItem');
+    if (trackListNumberOfButtonsLoaded >= trackItems.length) {
+      return;
+    }
 
     trackItems.each(function (index, trackItem) {
-      var trackItemButtonGroup = $(trackItem).find('.soundActions > .sc-button-group').first();
-      if (trackItemButtonGroup.children('.zc-button-download-small').length === 0) {
-        var trackItemTitleLink = $(trackItem).find('.trackItem__content > .trackItem__trackTitle').first();
-        var trackUrl = TRACK_LIST_SC_BASE_URL + trackItemTitleLink.attr('href');
+      if (!trackListButtonIsLoaded[index]) {
+        var trackItemButtonGroup = $(trackItem).find('.soundActions > .sc-button-group').first();
+        if (trackItemButtonGroup.children('.zc-button-download-small').length === 0) {
+          var lastButtonInGroup = trackItemButtonGroup.children('button').last();
+          var trackItemTitleLink = $(trackItem).find('.trackItem__content > .trackItem__trackTitle').first();
+          var trackUrl = TRACK_LIST_SC_BASE_URL + trackItemTitleLink.attr('href');
 
-        var downloadButton = $('<button>', {
-          id: 'zcTrackListDownloadBtn-' + index,
-          class: 'sc-button sc-button-small sc-button-responsive sc-button-icon zc-button-download-small',
-          click: onTrackListDownloadButtonClick(trackUrl),
-          title: 'Download this track'
-        });
-
-        var lastButtonInGroup = trackItemButtonGroup.children('button').last();
-        lastButtonInGroup.before(downloadButton);
+          if (lastButtonInGroup.length > 0 && trackUrl) {
+            var downloadButton = $('<button>', {
+              id: 'zcTrackListDownloadBtn-' + index,
+              class: 'sc-button sc-button-small sc-button-responsive sc-button-icon zc-button-download-small',
+              click: onTrackListDownloadButtonClick(trackUrl),
+              title: 'Download this track'
+            });
+            lastButtonInGroup.before(downloadButton);
+            trackListButtonIsLoaded[index] = true;
+            trackListNumberOfButtonsLoaded++;
+          }
+        }
       }
     });
+    trackListButtonsLoaded = trackItems.length;
   }
 
   function removeTrackListDownloadButtons() {
