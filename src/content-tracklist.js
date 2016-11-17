@@ -47,7 +47,6 @@ if (TRACK_LIST_URL.match(TRACK_LIST_URL_PATTERN)) {
         }
       }
     });
-    trackListButtonsLoaded = trackItems.length;
   }
 
   function removeTrackListDownloadButtons() {
