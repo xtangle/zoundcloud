@@ -20,20 +20,27 @@
       ZC_BUTTON: '.zc-button-download-small'
     }
   };
-  var Utils = {
+  var DOMUtils = {
     setIdIfNotExists: function (element, id) {
       if (!element.id) {
         element.id = id;
       }
       return element.id;
     },
-    createButton: function (properties) {
-      var button = document.createElement('button');
-      button.setAttribute('class', properties.class);
-      button.onclick = properties.click;
-      button.title = properties.title;
-      button.innerHTML = properties.text;
-      return button;
+    createElement: function (type, attributes, properties) {
+      var element = document.createElement(type);
+      Object.keys(attributes).forEach(function (key) {
+        element.setAttribute(key, attributes[key]);
+      });
+      Object.keys(properties).forEach(function (key) {
+        element[key] = properties[key];
+      });
+      return element;
+    },
+    removeAll: function (selector) {
+      document.querySelectorAll(selector).forEach(function (element) {
+        element.parentNode.removeChild(element);
+      });
     }
   };
   if (document.location.href.match(CONSTANTS.URL_PATTERN)) {
@@ -56,12 +63,13 @@
         return;
       }
       trackItems.forEach(function (trackItem, index) {
-        var trackItemSelector = '#' + Utils.setIdIfNotExists(trackItem, CONSTANTS.ID_PREFIXES.TRACK_ITEM + index);
+        var trackItemSelector = '#' + DOMUtils.setIdIfNotExists(trackItem, CONSTANTS.ID_PREFIXES.TRACK_ITEM + index);
         var buttonGroup = document.querySelector(trackItemSelector + ' ' + CONSTANTS.SELECTORS.BUTTON_GROUP);
         if (!buttonGroup) {
           return;
         }
-        var buttonGroupSelector = '#' + Utils.setIdIfNotExists(buttonGroup, CONSTANTS.ID_PREFIXES.BUTTON_GROUP + index);
+        var buttonGroupSelector = '#' +
+          DOMUtils.setIdIfNotExists(buttonGroup, CONSTANTS.ID_PREFIXES.BUTTON_GROUP + index);
         if (document.querySelector(buttonGroupSelector + ' ' + CONSTANTS.SELECTORS.ZC_BUTTON)) {
           return;
         }
@@ -70,25 +78,22 @@
         var titleLink = document.querySelector(trackItemSelector + ' ' + CONSTANTS.SELECTORS.TRACK_TITLE);
         if (lastButton && titleLink) {
           var trackUrl = CONSTANTS.SC_URL + titleLink.getAttribute('href');
-          var downloadButton = Utils.createButton({
-            class: CONSTANTS.CLASSES.SC_BUTTON.concat(CONSTANTS.CLASSES.ZC_BUTTON).join(' '),
-            click: onDownloadButtonClick(trackUrl),
-            title: 'Download this track',
-            text: 'Download this track'
-          });
+          var downloadButton = DOMUtils.createElement(
+            'button', {
+              class: CONSTANTS.CLASSES.SC_BUTTON.concat(CONSTANTS.CLASSES.ZC_BUTTON).join(' ')
+            }, {
+              onclick: onDownloadButtonClick(trackUrl),
+              title: 'Download this track',
+              text: 'Download this track'
+            });
           lastButton.parentNode.insertBefore(downloadButton, lastButton);
         }
       });
     };
-    var removeDownloadButtons = function () {
-      document.querySelectorAll(CONSTANTS.SELECTORS.ZC_BUTTON).forEach(function (button) {
-        button.parentNode.removeChild(button);
-      });
-      clearTimeout(timeoutId);
-    };
     var injectDownloadButtons = function () {
       if (document.location.href !== CONSTANTS.TAB_URL) {
-        removeDownloadButtons();
+        DOMUtils.removeAll(CONSTANTS.SELECTORS.ZC_BUTTON);
+        clearTimeout(timeoutId);
         return;
       }
       timeoutId = setTimeout(function () {
