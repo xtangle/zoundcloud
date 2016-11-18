@@ -56,26 +56,26 @@
     };
     var addDownloadButtons = function () {
       var trackItems = document.querySelectorAll(
-        CONSTANTS.SELECTORS.TRACK_LIST + ' ' + CONSTANTS.SELECTORS.TRACK_ITEM);
+        [CONSTANTS.SELECTORS.TRACK_LIST, CONSTANTS.SELECTORS.TRACK_ITEM].join(' '));
       var injectedButtons = document.querySelectorAll(
-        CONSTANTS.SELECTORS.TRACK_LIST + ' ' + CONSTANTS.SELECTORS.ZC_BUTTON);
+        [CONSTANTS.SELECTORS.TRACK_LIST, CONSTANTS.SELECTORS.ZC_BUTTON].join(' '));
       if (injectedButtons.length >= trackItems.length) {
         return;
       }
       trackItems.forEach(function (trackItem, index) {
         var trackItemSelector = '#' + DOMUtils.setIdIfNotExists(trackItem, CONSTANTS.ID_PREFIXES.TRACK_ITEM + index);
-        var buttonGroup = document.querySelector(trackItemSelector + ' ' + CONSTANTS.SELECTORS.BUTTON_GROUP);
+        var buttonGroup = document.querySelector([trackItemSelector, CONSTANTS.SELECTORS.BUTTON_GROUP].join(' '));
         if (!buttonGroup) {
           return;
         }
         var buttonGroupSelector = '#' +
           DOMUtils.setIdIfNotExists(buttonGroup, CONSTANTS.ID_PREFIXES.BUTTON_GROUP + index);
-        if (document.querySelector(buttonGroupSelector + ' ' + CONSTANTS.SELECTORS.ZC_BUTTON)) {
+        if (document.querySelector([buttonGroupSelector, CONSTANTS.SELECTORS.ZC_BUTTON].join(' '))) {
           return;
         }
-        var buttons = document.querySelectorAll(buttonGroupSelector + ' button');
+        var buttons = document.querySelectorAll([buttonGroupSelector, 'button'].join(' '));
         var lastButton = buttons[buttons.length - 1];
-        var titleLink = document.querySelector(trackItemSelector + ' ' + CONSTANTS.SELECTORS.TRACK_TITLE);
+        var titleLink = document.querySelector([trackItemSelector, CONSTANTS.SELECTORS.TRACK_TITLE].join(' '));
         if (lastButton && titleLink) {
           var trackUrl = CONSTANTS.SC_URL + titleLink.getAttribute('href');
           var downloadButton = DOMUtils.createElement(
