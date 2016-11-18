@@ -209,9 +209,7 @@ function loadContentTrackScript() {
 }
 
 function loadContentTrackListScript() {
-  chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
-    chrome.tabs.executeScript(null, {file: 'src/content-tracklist.js'});
-  });
+  chrome.tabs.executeScript(null, {file: 'src/content-tracklist.js'});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
