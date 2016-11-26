@@ -4,10 +4,6 @@
     URL_PATTERN: /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/,
     SC_URL: 'https://soundcloud.com',
     INJECT_INTERVAL: 2500,
-    ID_PREFIXES: {
-      BUTTON_GROUP: 'zcButtonGroup-',
-      TRACK_ITEM: 'zcTrackItem-'
-    },
     CLASSES: {
       SC_BUTTON: ['sc-button', 'sc-button-small', 'sc-button-responsive', 'sc-button-icon'],
       ZC_BUTTON: 'zc-button-download-small'
@@ -20,13 +16,10 @@
       ZC_BUTTON: '.zc-button-download-small'
     }
   };
+  /*
+   import dom-utils.js
+   */
   var DOMUtils = {
-    setIdIfNotExists: function (element, id) {
-      if (!element.id) {
-        element.id = id;
-      }
-      return element.id;
-    },
     createElement: function (type, attributes, properties) {
       var element = document.createElement(type);
       Object.keys(attributes).forEach(function (key) {
@@ -37,6 +30,30 @@
       });
       return element;
     },
+    selectDescendant: (function () {
+      var hash = 'zc' + (Math.random().toString(36) + '000000000000000000').slice(2, 18) + '-';
+      var counter = 0;
+      return function (element, descendantSelector, options) {
+        if (!element) {
+          return;
+        }
+        if (!element.id) {
+          element.id = hash + counter;
+          counter++;
+        }
+        var select = document.querySelector;
+        var concat = ' ';
+        if (options) {
+          if (options['selectAll']) {
+            select = document.querySelectorAll;
+          }
+          if (options ['selectChildren']) {
+            concat = ' > ';
+          }
+        }
+        return select.call(document, ['#' + element.id, descendantSelector].join(concat));
+      }
+    })(),
     removeAll: function (selector) {
       document.querySelectorAll(selector).forEach(function (element) {
         element.parentNode.removeChild(element);
@@ -62,20 +79,17 @@
       if (injectedButtons.length >= trackItems.length) {
         return;
       }
-      trackItems.forEach(function (trackItem, index) {
-        var trackItemSelector = '#' + DOMUtils.setIdIfNotExists(trackItem, CONSTANTS.ID_PREFIXES.TRACK_ITEM + index);
-        var buttonGroup = document.querySelector([trackItemSelector, CONSTANTS.SELECTORS.BUTTON_GROUP].join(' '));
+      trackItems.forEach(function (trackItem) {
+        var buttonGroup = DOMUtils.selectDescendant(trackItem, CONSTANTS.SELECTORS.BUTTON_GROUP);
         if (!buttonGroup) {
           return;
         }
-        var buttonGroupSelector = '#' +
-          DOMUtils.setIdIfNotExists(buttonGroup, CONSTANTS.ID_PREFIXES.BUTTON_GROUP + index);
-        if (document.querySelector([buttonGroupSelector, CONSTANTS.SELECTORS.ZC_BUTTON].join(' '))) {
+        if (DOMUtils.selectDescendant(buttonGroup, CONSTANTS.SELECTORS.ZC_BUTTON)) {
           return;
         }
-        var buttons = document.querySelectorAll([buttonGroupSelector, 'button'].join(' '));
+        var buttons = DOMUtils.selectDescendant(buttonGroup, 'button', {selectAll: true});
         var lastButton = buttons[buttons.length - 1];
-        var titleLink = document.querySelector([trackItemSelector, CONSTANTS.SELECTORS.TRACK_TITLE].join(' '));
+        var titleLink = DOMUtils.selectDescendant(trackItem, CONSTANTS.SELECTORS.TRACK_TITLE);
         if (lastButton && titleLink) {
           var trackUrl = CONSTANTS.SC_URL + titleLink.getAttribute('href');
           var downloadButton = DOMUtils.createElement(

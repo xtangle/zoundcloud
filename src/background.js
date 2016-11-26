@@ -203,9 +203,7 @@ function loadContentPlaylistScript() {
 }
 
 function loadContentTrackScript() {
-  chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
-    chrome.tabs.executeScript(null, {file: 'src/content-track.js'});
-  });
+  chrome.tabs.executeScript(null, {file: 'src/content-track.js'});
 }
 
 function loadContentTrackListScript() {
