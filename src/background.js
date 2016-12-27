@@ -178,9 +178,9 @@ function downloadTrackUsingDownloadUrl(track, successCallback, failCallback) {
     var downloadUrl = track.download_url + '?client_id=' + CLIENT_ID;
     $.ajax({
       url: downloadUrl,
-      type: 'get'
+      type: 'head'
     }).always(function (data, statusText, xhr) {
-      if (statusText === 'success' && xhr.status === 200) {
+      if (xhr && xhr['status'] === 200) {
         initiateTrackDownload(downloadUrl, successCallback, failCallback);
       } else {
         downloadTrackUsingStreamUrl(track, successCallback, failCallback);
