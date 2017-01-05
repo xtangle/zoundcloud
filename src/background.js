@@ -197,7 +197,7 @@ function removeSpecialCharacters(path) {
 }
 
 function loadContentPlaylistScript() {
-  chrome.tabs.executeScript(null, {file: 'lib/jquery-3.1.1.min.js'}, function () {
+  chrome.tabs.executeScript(null, {file: 'assets/lib/jquery-3.1.1.min.js'}, function () {
     chrome.tabs.executeScript(null, {file: 'src/content-playlist.js'});
   });
 }
