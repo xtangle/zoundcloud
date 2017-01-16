@@ -2,7 +2,7 @@
 
 ## Description
 
-A Google Chrome extension that adds download buttons on playlist pages, track pages, 
+A Google Chrome extension that adds download buttons to playlist pages, track pages, 
 and beside lists of tracks on SoundCloud. It is currently a work in progress.
 
 For playlists, it will download every track in the playlist sequentially in the same order 
