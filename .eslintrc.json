@@ -7,11 +7,16 @@
     "eslint:recommended",
     "google"
   ],
+  "globals": {
+    "chrome": false
+  },
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
   },
   "rules": {
-    "require-jsdoc": 0
+    "no-multiple-empty-lines": [2, {"max": 1}],
+    "require-jsdoc": 0,
+    "sort-keys": 2
   }
 }

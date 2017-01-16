@@ -7,6 +7,8 @@
   },
   "files": {
     "conf": "./config/gulp.config.json",
+    "webpackConf": "./config/webpack.config.js",
+    "eslintrc": "./.eslintrc.json",
     "manifest": "./src/manifest.json",
     "key": "./certs/dummy.pem"
   }

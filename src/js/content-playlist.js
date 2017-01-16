@@ -1,3 +1,4 @@
+const $ = require('jquery');
 var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
 var PLAYLIST_TAB_URL = document.location.href;
 

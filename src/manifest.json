@@ -16,7 +16,6 @@
   },
   "background": {
     "scripts": [
-      "js/lib/jquery-3.1.1.min.js",
       "js/background.js"
     ],
     "persistent": false
@@ -30,7 +29,6 @@
         "css/content.css"
       ],
       "js": [
-        "js/lib/jquery-3.1.1.min.js",
         "js/content-playlist.js",
         "js/content-track.js",
         "js/content-tracklist.js"

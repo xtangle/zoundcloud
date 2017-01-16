@@ -1,4 +1,4 @@
-var DOMUtils = {
+module.exports = {
   createElement: function (type, attributes, properties) {
     var element = document.createElement(type);
     Object.keys(attributes).forEach(function (key) {

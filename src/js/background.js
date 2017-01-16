@@ -1,8 +1,10 @@
+const $ = require('jquery');
+
 var SC_API_URL = 'https://api.soundcloud.com/';
 var SC_I1_API_URL = 'https://api.soundcloud.com/i1/';
 var CLIENT_ID = 'a3e059563d7fd3372b49b37f00a00bcf';
-var I1_CLIENT_ID = '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea';
-var ZC_ICON_URL = '../assets/images/icon128.png';
+var I1_CLIENT_ID = 'fDoItMDbsbZz8dY16ZzARCZmzgHBPotA';
+var ZC_ICON_URL = '../images/icon128.png';
 
 var SC_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\//;
 var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
@@ -197,9 +199,7 @@ function removeSpecialCharacters(path) {
 }
 
 function loadContentPlaylistScript() {
-  chrome.tabs.executeScript(null, {file: 'js/lib/jquery-3.1.1.min.js'}, function () {
-    chrome.tabs.executeScript(null, {file: 'js/content-playlist.js'});
-  });
+  chrome.tabs.executeScript(null, {file: 'js/content-playlist.js'});
 }
 
 function loadContentTrackScript() {
