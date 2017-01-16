@@ -1,9 +1,9 @@
-# ZoundCloud Downloader
+# ZoundCloud
 
 ## Description
 
-A Google Chrome extension that adds download buttons on any playlist page, track page, 
-and components containing list of tracks on SoundCloud. It is currently a work in progress.
+A Google Chrome extension that adds download buttons on playlist pages, track pages, 
+and beside lists of tracks on SoundCloud. It is currently a work in progress.
 
 For playlists, it will download every track in the playlist sequentially in the same order 
 as listed in the playlist. It will attempt to download a track in its uploaded format and 
