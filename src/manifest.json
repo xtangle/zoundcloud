@@ -12,12 +12,12 @@
     "*://api.soundcloud.com/*"
   ],
   "icons": {
-    "128": "assets/images/icon128.png"
+    "128": "images/icon128.png"
   },
   "background": {
     "scripts": [
-      "assets/lib/jquery-3.1.1.min.js",
-      "src/background.js"
+      "js/lib/jquery-3.1.1.min.js",
+      "js/background.js"
     ],
     "persistent": false
   },
@@ -27,13 +27,13 @@
         "*://soundcloud.com/*"
       ],
       "css": [
-        "assets/css/content.css"
+        "css/content.css"
       ],
       "js": [
-        "assets/lib/jquery-3.1.1.min.js",
-        "src/content-playlist.js",
-        "src/content-track.js",
-        "src/content-tracklist.js"
+        "js/lib/jquery-3.1.1.min.js",
+        "js/content-playlist.js",
+        "js/content-track.js",
+        "js/content-tracklist.js"
       ],
       "run_at": "document_end"
     }

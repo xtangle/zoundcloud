@@ -1,0 +1,29 @@
+{
+  "name": "zoundcloud",
+  "version": "1.1.2",
+  "private": true,
+  "description": "Adds a download button to SoundCloud playlist and track pages.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtangle/ZoundCloud.git"
+  },
+  "author": "xtangle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xtangle/ZoundCloud/issues"
+  },
+  "homepage": "https://github.com/xtangle/ZoundCloud#readme",
+  "engines": {
+    "node": ">=6.9.2"
+  },
+  "devDependencies": {
+    "del": "^2.2.2",
+    "eslint": "^3.13.1",
+    "eslint-config-google": "^0.7.1",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-crx-pack": "^1.0.1",
+    "gulp-hub": "github:frankwallis/gulp-hub#4.0"
+  }
+}
