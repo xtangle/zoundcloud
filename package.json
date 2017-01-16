@@ -24,6 +24,7 @@
     "eslint-config-google": "^0.7.1",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-crx-pack": "^1.0.1",
-    "gulp-hub": "github:frankwallis/gulp-hub#4.0"
+    "gulp-hub": "github:frankwallis/gulp-hub#4.0",
+    "pump": "^1.0.2"
   }
 }

@@ -12,7 +12,6 @@
     "sourceType": "module"
   },
   "rules": {
-    "max-len": [2, {"code": 90}],
     "require-jsdoc": 0
   }
 }

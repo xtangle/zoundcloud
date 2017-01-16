@@ -1,13 +1,13 @@
 {
   "paths": {
-    "src": "src",
-    "build": "build",
-    "dist": "dist",
-    "tasks": "gulp-tasks"
+    "src": "./src",
+    "build": "./build",
+    "dist": "./dist",
+    "tasks": "./gulp-tasks"
   },
   "files": {
-    "conf": "config/gulp.config.json",
-    "manifest": "src/manifest.json",
-    "key": "certs/dummy.pem"
+    "conf": "./config/gulp.config.json",
+    "manifest": "./src/manifest.json",
+    "key": "./certs/dummy.pem"
   }
 }
