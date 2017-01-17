@@ -1,18 +1,27 @@
 const path = require('path');
+const BabiliPlugin = require('babili-webpack-plugin');
 
 module.exports = {
   context: path.resolve(__dirname, '..'),
-  loaders: [
-    {
-      exclude: /(node_modules|bower_components)/,
-      loader: 'babel-loader',
-      query: {
-        presets: ['es2015'],
+  module: {
+    rules: [
+      {
+        exclude: /(node_modules|bower_components)/,
+        loader: 'babel-loader',
+        query: {
+          babelrc: false,
+          presets: [
+            ['es2015', {'modules': false}],
+          ],
+        },
+        test: /\.js$/,
       },
-      test: /\.js$/,
-    },
-  ],
+    ],
+  },
   output: {
     filename: '[name].js',
   },
+  plugins: [
+    new BabiliPlugin(),
+  ],
 };

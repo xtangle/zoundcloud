@@ -1,4 +1,4 @@
-const $ = require('jquery');
+import $ from 'jquery';
 
 var SC_API_URL = 'https://api.soundcloud.com/';
 var SC_I1_API_URL = 'https://api.soundcloud.com/i1/';
