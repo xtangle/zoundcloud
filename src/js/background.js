@@ -1,62 +1,65 @@
 import $ from 'jquery';
 
-var SC_API_URL = 'https://api.soundcloud.com/';
-var SC_I1_API_URL = 'https://api.soundcloud.com/i1/';
-var CLIENT_ID = 'a3e059563d7fd3372b49b37f00a00bcf';
-var I1_CLIENT_ID = 'fDoItMDbsbZz8dY16ZzARCZmzgHBPotA';
-var ZC_ICON_URL = '../images/icon128.png';
+const SC_API_URL = 'https://api.soundcloud.com/';
+const SC_I1_API_URL = 'https://api.soundcloud.com/i1/';
+const CLIENT_ID = 'a3e059563d7fd3372b49b37f00a00bcf';
+const I1_CLIENT_ID = 'fDoItMDbsbZz8dY16ZzARCZmzgHBPotA';
+const ZC_ICON_URL = '../images/icon128.png';
 
-var SC_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\//;
-var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
-var TRACK_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/(?:[^\/]+$)|(?:[^\/]+(?=(?:\?in=)).+$)/;
+const SC_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\//;
+const PLAYLIST_URL_PATTERN =
+  /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
+const TRACK_URL_PATTERN =
+  /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/(?:[^\/]+$)|(?:[^\/]+(?=(?:\?in=)).+$)/;
 
-var playlist;
-var playlistDownloadDirectory;
-var isDownloadingPlaylist = false;
-var playlistTrackIndex = -1;
-var numberOfPlaylistTracksDownloaded;
+let playlist;
+let playlistDownloadDirectory;
+let isDownloadingPlaylist = false;
+let playlistTrackIndex = -1;
+let numberOfPlaylistTracksDownloaded;
 
-var failedPlaylistDownloads;
-var playlistTrackDownloadId;
-var lastSuccessfulPlaylistTrackDownloadId;
-var playlistDownloadCancelled;
+let failedPlaylistDownloads;
+let playlistTrackDownloadId;
+let lastSuccessfulPlaylistTrackDownloadId;
+let playlistDownloadCancelled;
 
-var track;
-var trackDownloadId;
+let track;
+let trackDownloadId;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// =============================================================================
 // Global Function Definitions & Listeners
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// =============================================================================
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.url && changeInfo.url.match(SC_URL_PATTERN)) {
     if (changeInfo.url.match(PLAYLIST_URL_PATTERN)) {
-      loadContentPlaylistScript();
-      loadContentTrackListScript();
+      executeScript('js/content-playlist.js');
+      executeScript('js/content-tracklist.js');
     } else if (changeInfo.url.match(TRACK_URL_PATTERN)) {
-      loadContentTrackScript();
+      executeScript('js/content-track.js');
     }
   }
 });
 
-chrome.downloads.onDeterminingFilename.addListener(function (downloadItem, suggest) {
-  var fileExtension, fileName;
+chrome.downloads.onDeterminingFilename.addListener((downloadItem, suggest) => {
   if (downloadItem.id === playlistTrackDownloadId) {
-    fileExtension = downloadItem.filename.split('.').pop();
-    fileName = removeSpecialCharacters(playlist.tracks[playlistTrackIndex].title);
+    let fileExtension = downloadItem.filename.split('.').pop();
+    let fileName = removeSpecialCharacters(
+      playlist.tracks[playlistTrackIndex].title);
     suggest({
-      filename: playlistDownloadDirectory + '/' + fileName + '.' + fileExtension
+      filename: playlistDownloadDirectory + '/' +
+      fileName + '.' + fileExtension,
     });
   } else if (downloadItem.id === trackDownloadId) {
-    fileExtension = downloadItem.filename.split('.').pop();
-    fileName = removeSpecialCharacters(track.title);
+    let fileExtension = downloadItem.filename.split('.').pop();
+    let fileName = removeSpecialCharacters(track.title);
     suggest({
-      filename: fileName + '.' + fileExtension
+      filename: fileName + '.' + fileExtension,
     });
   }
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.message) {
     case 'startPlaylistDownload':
       startPlaylistDownload(request.tabUrl);
@@ -73,7 +76,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-chrome.notifications.onClicked.addListener(function (notificationId) {
+chrome.notifications.onClicked.addListener((notificationId) => {
   switch (notificationId) {
     case 'playlistDownloadComplete':
     case 'playlistDownloadStopped':
@@ -90,16 +93,19 @@ chrome.notifications.onClicked.addListener(function (notificationId) {
   }
 });
 
-chrome.downloads.onChanged.addListener(function (delta) {
+chrome.downloads.onChanged.addListener((delta) => {
   if (!delta.state) {
     return;
   }
-  if (delta.id === playlistTrackDownloadId && delta.state.previous === 'in_progress') {
+  if (delta.id === playlistTrackDownloadId
+    && delta.state.previous === 'in_progress') {
     if (delta.state.current === 'interrupted' && !playlistDownloadCancelled) {
-      chrome.downloads.search({id: playlistTrackDownloadId}, function (downloadItems) {
-        displayPlaylistDownloadStoppedNotification(downloadItems[0].error);
-        resetPlaylistDownload();
-      });
+      chrome.downloads.search({id: playlistTrackDownloadId},
+        (downloadItems) => {
+          displayPlaylistDownloadStoppedNotification(downloadItems[0].error);
+          resetPlaylistDownload();
+        }
+      );
     } else if (delta.state.current === 'complete') {
       onPlaylistTrackDownloadComplete();
     }
@@ -107,8 +113,8 @@ chrome.downloads.onChanged.addListener(function (delta) {
 });
 
 function sendMessageToContentScript(message) {
-  chrome.tabs.query({url: '*://soundcloud.com/*'}, function (tabs) {
-    tabs.forEach(function (tab) {
+  chrome.tabs.query({url: '*://soundcloud.com/*'}, (tabs) => {
+    tabs.forEach((tab) => {
       chrome.tabs.sendMessage(tab.id, {message: message});
     });
   });
@@ -116,45 +122,42 @@ function sendMessageToContentScript(message) {
 
 function createBasicNotification(notificationId, notificationObj) {
   chrome.notifications.create(notificationId, {
-    type: 'basic',
-    iconUrl: ZC_ICON_URL,
-    title: notificationObj.title || '',
-    message: notificationObj.message || '',
     contextMessage: notificationObj.contextMessage || null,
+    iconUrl: ZC_ICON_URL,
+    message: notificationObj.message || '',
+    priority: 1,
     requireInteraction: notificationObj.requireInteraction || false,
-    priority: 1
+    title: notificationObj.title || '',
+    type: 'basic',
   });
 }
 
 function createListNotification(notificationId, notificationObj) {
   chrome.notifications.create(notificationId, {
-    type: 'list',
     iconUrl: ZC_ICON_URL,
-    title: notificationObj.title || '',
     items: notificationObj.items || [],
     message: '',
+    priority: 1,
     requireInteraction: notificationObj.requireInteraction || false,
-    priority: 1
+    title: notificationObj.title || '',
+    type: 'list',
   });
 }
 
 function initiateTrackDownload(url, successCallback, failCallback) {
   chrome.downloads.download({
+    saveAs: false,
     url: url,
-    saveAs: false
-  }, function (id) {
-    if (id) {
-      successCallback(id);
-    } else {
-      failCallback(chrome.runtime.lastError.message);
-    }
+  }, (id) => {
+    id ? successCallback(id) : failCallback(chrome.runtime.lastError.message);
   });
 }
 
 function downloadTrackUsingI1StreamUrl(track, successCallback, failCallback) {
-  var i1StreamsUrl = SC_I1_API_URL + 'tracks/' + track.id + '/streams?client_id=' + I1_CLIENT_ID;
-  $.getJSON(i1StreamsUrl).always(function (data, statusText) {
-    var downloadUrl;
+  let i1StreamsUrl = SC_I1_API_URL + 'tracks/' + track.id
+    + '/streams?client_id=' + I1_CLIENT_ID;
+  $.getJSON(i1StreamsUrl).always((data, statusText) => {
+    let downloadUrl;
     if (statusText === 'success') {
       downloadUrl = data['http_mp3_128_url'];
     }
@@ -168,7 +171,7 @@ function downloadTrackUsingI1StreamUrl(track, successCallback, failCallback) {
 
 function downloadTrackUsingStreamUrl(track, successCallback, failCallback) {
   if (track.stream_url) {
-    var downloadUrl = track.stream_url + '?client_id=' + CLIENT_ID;
+    let downloadUrl = track.stream_url + '?client_id=' + CLIENT_ID;
     initiateTrackDownload(downloadUrl, successCallback, failCallback);
   } else {
     downloadTrackUsingI1StreamUrl(track, successCallback, failCallback);
@@ -177,11 +180,11 @@ function downloadTrackUsingStreamUrl(track, successCallback, failCallback) {
 
 function downloadTrackUsingDownloadUrl(track, successCallback, failCallback) {
   if (track.download_url) {
-    var downloadUrl = track.download_url + '?client_id=' + CLIENT_ID;
+    let downloadUrl = track.download_url + '?client_id=' + CLIENT_ID;
     $.ajax({
+      type: 'head',
       url: downloadUrl,
-      type: 'head'
-    }).always(function (data, statusText, xhr) {
+    }).always((data, statusText, xhr) => {
       if (xhr && xhr['status'] === 200) {
         initiateTrackDownload(downloadUrl, successCallback, failCallback);
       } else {
@@ -194,25 +197,18 @@ function downloadTrackUsingDownloadUrl(track, successCallback, failCallback) {
 }
 
 function removeSpecialCharacters(path) {
-  // Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
+  // Chrome download api is really finicky with which characters to
+  // allow in filenames (eg. the ~ symbol)
   return path.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
 }
 
-function loadContentPlaylistScript() {
-  chrome.tabs.executeScript(null, {file: 'js/content-playlist.js'});
+function executeScript(fileUrl) {
+  chrome.tabs.executeScript(null, {file: fileUrl});
 }
 
-function loadContentTrackScript() {
-  chrome.tabs.executeScript(null, {file: 'js/content-track.js'});
-}
-
-function loadContentTrackListScript() {
-  chrome.tabs.executeScript(null, {file: 'js/content-tracklist.js'});
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// =============================================================================
 // Playlist Download Function Definitions
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// =============================================================================
 
 function createPlaylistDownloadSummaryMessage() {
   switch (numberOfPlaylistTracksDownloaded) {
@@ -221,43 +217,44 @@ function createPlaylistDownloadSummaryMessage() {
     case 1:
       return 'Downloaded 1 track to \'' + playlistDownloadDirectory + '\'';
     default:
-      return 'Downloaded ' + numberOfPlaylistTracksDownloaded + ' tracks to \'' + playlistDownloadDirectory + '\'';
+      return 'Downloaded ' + numberOfPlaylistTracksDownloaded
+        + ' tracks to \'' + playlistDownloadDirectory + '\'';
   }
 }
 
 function displayUnableToStartPlaylistDownloadNotification(message) {
   createBasicNotification('unableToStartPlaylistDownload', {
-    title: 'Unable To Start Playlist Download',
     message: message,
-    requireInteraction: false
+    requireInteraction: false,
+    title: 'Unable To Start Playlist Download',
   });
 }
 
 function displayPlaylistDownloadStoppedNotification(interruptReason) {
   createBasicNotification('playlistDownloadStopped', {
-    title: 'Playlist Download Stopped',
-    message: createPlaylistDownloadSummaryMessage(),
     contextMessage: 'Interrupt Reason: ' + interruptReason,
-    requireInteraction: true
+    message: createPlaylistDownloadSummaryMessage(),
+    requireInteraction: true,
+    title: 'Playlist Download Stopped',
   });
 }
 
 function displayPlaylistDownloadCompleteNotification() {
   createBasicNotification('playlistDownloadComplete', {
-    title: 'Playlist Download Complete',
     message: createPlaylistDownloadSummaryMessage(),
-    requireInteraction: true
+    requireInteraction: true,
+    title: 'Playlist Download Complete',
   });
   if (failedPlaylistDownloads.length > 0) {
     createListNotification('failedPlaylistDownloads', {
-      title: 'Failed Playlist Downloads',
-      items: failedPlaylistDownloads.map(function (failedItem) {
+      items: failedPlaylistDownloads.map((failedItem) => {
         return {
+          message: '(' + failedItem.reason + ')',
           title: failedItem.trackNumber + ') ' + failedItem.track.title,
-          message: '(' + failedItem.reason + ')'
-        }
+        };
       }),
-      requireInteraction: true
+      requireInteraction: true,
+      title: 'Failed Playlist Downloads',
     });
   }
 }
@@ -272,7 +269,8 @@ function clearPlaylistNotifications() {
 function initializePlaylistDownload(playlistData) {
   sendMessageToContentScript('playlistDownloadStarted');
   playlist = playlistData;
-  playlistDownloadDirectory = removeSpecialCharacters(playlist.user.username + ' - ' + playlist.title);
+  playlistDownloadDirectory =
+    removeSpecialCharacters(playlist.user.username + ' - ' + playlist.title);
   playlistTrackIndex = 0;
   isDownloadingPlaylist = true;
   numberOfPlaylistTracksDownloaded = 0;
@@ -291,7 +289,8 @@ function resetPlaylistDownload() {
 }
 
 function getPlaylist(tabUrl) {
-  var playlistUrl = SC_API_URL + 'resolve.json?url=' + tabUrl + '&client_id=' + CLIENT_ID;
+  let playlistUrl = SC_API_URL + 'resolve.json?url=' + tabUrl
+    + '&client_id=' + CLIENT_ID;
   return $.getJSON(playlistUrl);
 }
 
@@ -304,9 +303,9 @@ function onPlaylistTrackDownloadStart(id) {
 
 function onPlaylistTrackDownloadFail(reason) {
   failedPlaylistDownloads.push({
-    trackNumber: playlistTrackIndex + 1,
+    reason: reason,
     track: playlist.tracks[playlistTrackIndex],
-    reason: reason
+    trackNumber: playlistTrackIndex + 1,
   });
   playlistTrackIndex += 1;
   downloadNextPlaylistTrack();
@@ -335,12 +334,14 @@ function downloadNextPlaylistTrack() {
 function startPlaylistDownload(tabUrl) {
   if (isDownloadingPlaylist) {
     displayUnableToStartPlaylistDownloadNotification(
-      'A playlist download is currently in progress, please wait for it to finish');
+      'A playlist download is currently in progress, '
+      + 'please wait for it to finish');
     return;
   }
-  getPlaylist(tabUrl).always(function (data, textStatus) {
+  getPlaylist(tabUrl).always((data, textStatus) => {
     if (textStatus !== 'success' || !data || data.kind !== 'playlist') {
-      displayUnableToStartPlaylistDownloadNotification('Could not retrieve playlist information');
+      displayUnableToStartPlaylistDownloadNotification(
+        'Could not retrieve playlist information');
       sendMessageToContentScript('playlistDownloadStopped');
     } else {
       initializePlaylistDownload(data);
@@ -350,7 +351,7 @@ function startPlaylistDownload(tabUrl) {
 }
 
 function stopPlaylistDownload() {
-  chrome.downloads.search({id: playlistTrackDownloadId}, function (downloadItems) {
+  chrome.downloads.search({id: playlistTrackDownloadId}, (downloadItems) => {
     if (downloadItems[0].state === 'complete') {
       resetPlaylistDownload();
       displayPlaylistDownloadStoppedNotification('USER_CANCELED');
@@ -360,29 +361,28 @@ function stopPlaylistDownload() {
   });
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// =============================================================================
 // Track Download Function Definitions
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// =============================================================================
 
 function displayUnableToStartTrackDownloadNotification(message) {
   createBasicNotification('unableToStartTrackDownload', {
-    title: 'Unable To Download Track',
     message: message,
-    requireInteraction: false
+    requireInteraction: false,
+    title: 'Unable To Download Track',
   });
 }
 
 function startTrackDownload(tabUrl) {
-  var trackUrl = SC_API_URL + 'resolve.json?url=' + tabUrl + '&client_id=' + CLIENT_ID;
-  $.getJSON(trackUrl).always(function (data, textStatus) {
+  let trackUrl = SC_API_URL + 'resolve.json?url=' + tabUrl
+    + '&client_id=' + CLIENT_ID;
+  $.getJSON(trackUrl).always((data, textStatus) => {
     if (textStatus !== 'success' || !data || data.kind !== 'track') {
-      displayUnableToStartTrackDownloadNotification('Could not retrieve track information');
+      displayUnableToStartTrackDownloadNotification(
+        'Could not retrieve track information');
     } else {
       track = data;
-      downloadTrackUsingDownloadUrl(track,
-        function (id) {
-          trackDownloadId = id;
-        },
+      downloadTrackUsingDownloadUrl(track, (id) => trackDownloadId = id,
         displayUnableToStartTrackDownloadNotification);
     }
   });
