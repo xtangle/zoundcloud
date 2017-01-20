@@ -1,139 +1,141 @@
-import $ from 'jquery';
+import DOMUtils from './common/dom-helper';
 
-var PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/;
-var PLAYLIST_TAB_URL = document.location.href;
+{
+  const CONSTANTS = {
+    INJECT_INTERVAL: 1000,
+    TAB_URL: document.location.href,
+    URL_PATTERN: /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/[^\/]+$/,
+  };
 
-if (PLAYLIST_TAB_URL.match(PLAYLIST_URL_PATTERN)) {
+  if (document.location.href.match(CONSTANTS.URL_PATTERN)) {
+    let isDownloadingPlaylist;
+    let timeoutId;
+    let showLabelOnPlaylistDownloadButton;
 
-  var PLAYLIST_INJECT_INTERVAL = 1000;
-  var isDownloadingPlaylist;
-  var playlistTimeoutId;
-  var showLabelOnPlaylistDownloadButton;
+    let setPlaylistDownloadStartedState = () => {
+      isDownloadingPlaylist = true;
+      let downloadButton = document.querySelector('#zcPlaylistDownloadBtn');
+      downloadButton.classList.remove('zc-button-download');
+      downloadButton.classList.add('zc-button-stop', 'sc-button-active');
+      downloadButton.setAttribute('title', 'Stop downloading playlist');
+      if (showLabelOnPlaylistDownloadButton) {
+        downloadButton.innerHTML = 'Stop Download';
+      }
+    };
 
-  chrome.runtime.onMessage.addListener(function (request) {
-    switch (request.message) {
-      case 'playlistDownloadStarted':
-        setPlaylistDownloadStartedState();
-        break;
-      case 'playlistDownloadStopped':
-        setPlaylistDownloadStoppedState();
-        break;
-    }
-  });
+    let setPlaylistDownloadStoppedState = () => {
+      isDownloadingPlaylist = false;
+      let downloadButton = document.querySelector('#zcPlaylistDownloadBtn');
+      downloadButton.classList.remove('sc-button-active', 'zc-button-stop');
+      downloadButton.classList.add('zc-button-download');
+      downloadButton.setAttribute('title', 'Download this playlist');
+      if (showLabelOnPlaylistDownloadButton) {
+        downloadButton.innerHTML = 'Download';
+      }
+    };
 
-  function stopPlaylistDownload() {
-    chrome.runtime.sendMessage({message: "stopPlaylistDownload"});
-  }
-
-  function startPlaylistDownload() {
-    chrome.runtime.sendMessage({
-      message: 'startPlaylistDownload',
-      tabUrl: PLAYLIST_TAB_URL
-    });
-    setPlaylistDownloadStartedState();
-  }
-
-  function setPlaylistDownloadStartedState() {
-    isDownloadingPlaylist = true;
-    var downloadButton = $('#zcPlaylistDownloadBtn');
-    downloadButton
-      .removeClass('zc-button-download')
-      .addClass('zc-button-stop')
-      .addClass('sc-button-active')
-      .prop('title', 'Stop downloading playlist');
-    if (showLabelOnPlaylistDownloadButton) {
-      downloadButton.text('Stop Download');
-    }
-  }
-
-  function setPlaylistDownloadStoppedState() {
-    isDownloadingPlaylist = false;
-    var downloadButton = $('#zcPlaylistDownloadBtn');
-    downloadButton
-      .removeClass('sc-button-active')
-      .removeClass('zc-button-stop')
-      .addClass('zc-button-download')
-      .prop('title', 'Download this playlist');
-    if (showLabelOnPlaylistDownloadButton) {
-      downloadButton.text('Download');
-    }
-  }
-
-  function onPlaylistDownloadButtonClick() {
-    if (isDownloadingPlaylist) {
-      stopPlaylistDownload();
-    } else {
-      startPlaylistDownload();
-    }
-  }
-
-  function getPlaylistDownloadState() {
-    chrome.runtime.sendMessage({message: "getPlaylistDownloadState"}, function (response) {
-      if (response.isDownloadingPlaylist) {
-        setPlaylistDownloadStartedState();
-      } else {
-        setPlaylistDownloadStoppedState();
+    chrome.runtime.onMessage.addListener((request) => {
+      switch (request.message) {
+        case 'playlistDownloadStarted':
+          setPlaylistDownloadStartedState();
+          break;
+        case 'playlistDownloadStopped':
+          setPlaylistDownloadStoppedState();
+          break;
       }
     });
-  }
 
-  function addPlaylistDownloadButton() {
-    var soundActionsToolbar = $("div[class~='listenEngagement'] div[class~='soundActions']").first();
-    var downloadButton = $('<button>', {
-      id: 'zcPlaylistDownloadBtn',
-      class: 'sc-button sc-button-medium',
-      click: onPlaylistDownloadButtonClick
-    });
-
-    showLabelOnPlaylistDownloadButton = soundActionsToolbar.find('.sc-button-responsive').length > 0;
-    if (showLabelOnPlaylistDownloadButton) {
-      downloadButton.addClass('sc-button-responsive');
-    } else {
-      downloadButton.addClass('sc-button-icon');
-    }
-
-    var soundActionToolbarChildren = soundActionsToolbar.children('div');
-    var addSeparateContainer = soundActionToolbarChildren.length > 1 &&
-      soundActionToolbarChildren.last().find('button').length > 0;
-
-    if (addSeparateContainer) {
-      var downloadButtonContainer = $("<div>", {
-        id: 'zcPlaylistDownloadBtnContainer',
-        class: 'sc-button-group'
+    let startPlaylistDownload = () => {
+      chrome.runtime.sendMessage({
+        message: 'startPlaylistDownload',
+        tabUrl: CONSTANTS.TAB_URL,
       });
-      downloadButtonContainer.append(downloadButton);
-      soundActionsToolbar.append(downloadButtonContainer);
-    } else {
-      var buttonGroup = soundActionToolbarChildren.first();
-      var lastButtonInGroup = buttonGroup.children('button').last();
-      if (lastButtonInGroup.hasClass('sc-button-more')) {
-        lastButtonInGroup.before(downloadButton);
+      setPlaylistDownloadStartedState();
+    };
+
+    let stopPlaylistDownload = () => {
+      chrome.runtime.sendMessage({message: 'stopPlaylistDownload'});
+    };
+
+    let onPlaylistDownloadButtonClick = () => {
+      isDownloadingPlaylist ? stopPlaylistDownload()
+        : startPlaylistDownload();
+    };
+
+    let getPlaylistDownloadState = () => {
+      chrome.runtime.sendMessage({message: 'getPlaylistDownloadState'},
+        (response) =>
+          response.isDownloadingPlaylist ? setPlaylistDownloadStartedState()
+          : setPlaylistDownloadStoppedState()
+      );
+    };
+
+    let addPlaylistDownloadButton = () => {
+      let soundActionsToolbar = document.querySelector(
+        'div[class~="listenEngagement"] div[class~="soundActions"]');
+      let downloadButton = DOMUtils.createElement(
+        'button', {
+          class: 'sc-button sc-button-medium',
+          id: 'zcPlaylistDownloadBtn',
+        }, {
+          onclick: onPlaylistDownloadButtonClick,
+        });
+
+      showLabelOnPlaylistDownloadButton = DOMUtils.selectDescendant(
+        soundActionsToolbar, '.sc-button-responsive');
+      if (showLabelOnPlaylistDownloadButton) {
+        downloadButton.classList.add('sc-button-responsive');
       } else {
-        buttonGroup.append(downloadButton);
+        downloadButton.classList.add('sc-button-icon');
       }
-    }
-  }
 
-  function removePlaylistDownloadButton() {
-    $('#zcPlaylistDownloadBtn').remove();
-    $('#zcPlaylistDownloadBtnContainer').remove();
-    clearTimeout(playlistTimeoutId);
-  }
+      let soundActionChildren = DOMUtils.selectDescendant(
+        soundActionsToolbar, 'div', {selectAll: true, selectChildren: true});
+      let lastChild = soundActionChildren[soundActionChildren.length - 1];
 
-  function injectPlaylistDownloadButton() {
-    if (document.location.href !== PLAYLIST_TAB_URL) {
-      removePlaylistDownloadButton();
-      return;
-    }
-
-    playlistTimeoutId = setTimeout(function () {
-      if ($('#zcPlaylistDownloadBtn').length === 0) {
-        addPlaylistDownloadButton();
-        getPlaylistDownloadState();
+      if (soundActionChildren.length > 1
+        && DOMUtils.selectDescendant(lastChild, 'button')) {
+        let downloadButtonContainer = DOMUtils.createElement('div', {
+          class: 'sc-button-group',
+          id: 'zcPlaylistDownloadBtnContainer',
+        });
+        downloadButtonContainer.appendChild(downloadButton);
+        soundActionsToolbar.appendChild(downloadButtonContainer);
+      } else {
+        let buttonGroup = soundActionChildren[0];
+        let buttonsInGroup = DOMUtils.selectDescendant(
+          buttonGroup, 'button', {selectAll: true, selectChildren: true});
+        let lastButtonInGroup = buttonsInGroup[buttonsInGroup.length - 1];
+        if (lastButtonInGroup.classList.contains('sc-button-more')) {
+          lastButtonInGroup.parentNode
+            .insertBefore(downloadButton, lastButtonInGroup);
+        } else {
+          buttonGroup.appendChild(downloadButton);
+        }
       }
-      injectPlaylistDownloadButton();
-    }, PLAYLIST_INJECT_INTERVAL);
-  }
+    };
 
-  injectPlaylistDownloadButton();
+    let removePlaylistDownloadButton = () => {
+      DOMUtils.removeAll('#zcPlaylistDownloadBtn');
+      DOMUtils.removeAll('#zcPlaylistDownloadBtnContainer');
+    };
+
+    let injectPlaylistDownloadButton = () => {
+      if (document.location.href !== CONSTANTS.TAB_URL) {
+        removePlaylistDownloadButton();
+        clearTimeout(timeoutId);
+        return;
+      }
+
+      timeoutId = setTimeout(() => {
+        if (!document.querySelector('#zcPlaylistDownloadBtn')) {
+          addPlaylistDownloadButton();
+          getPlaylistDownloadState();
+        }
+        injectPlaylistDownloadButton();
+      }, CONSTANTS.INJECT_INTERVAL);
+    };
+
+    injectPlaylistDownloadButton();
+  }
 }

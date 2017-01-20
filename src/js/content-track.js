@@ -76,8 +76,8 @@ import DOMUtils from './common/dom-helper';
         soundActionsToolbar, 'div', {selectAll: true, selectChildren: true});
       let lastChild = soundActionChildren[soundActionChildren.length - 1];
 
-      if (soundActionChildren.length > 1 &&
-        DOMUtils.selectDescendant(lastChild, 'button')) {
+      if (soundActionChildren.length > 1
+        && DOMUtils.selectDescendant(lastChild, 'button')) {
         let downloadButtonContainer = DOMUtils.createElement('div', {
           class: CONSTANTS.CLASSES.ZC_BUTTON_GROUP,
           id: CONSTANTS.IDS.ZC_BUTTON_GROUP,
@@ -106,6 +106,7 @@ import DOMUtils from './common/dom-helper';
         clearTimeout(timeoutId);
         return;
       }
+
       timeoutId = setTimeout(() => {
         if (!document.querySelector(CONSTANTS.SELECTORS.ZC_BUTTON)) {
           addDownloadButton();
