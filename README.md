@@ -1,5 +1,7 @@
 # ZoundCloud
 
+Yes, I know the source code is horrible and gulp is outdated. It will be refactored someday.
+
 ## Description
 
 A Google Chrome extension that adds download buttons to playlist pages, track pages, 
