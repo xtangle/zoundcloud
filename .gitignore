@@ -1,6 +1,6 @@
 .idea/
 *.iml
 
-build/
+build/[!index.html]
 dist/
 **/node_modules/
