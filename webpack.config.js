@@ -1,8 +1,10 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    app: path.join(__dirname, 'src/app.ts')
+    app: path.join(__dirname, 'src/ts/app.ts'),
+    vendor: ['jquery']
     //popup: path.join(__dirname, 'src/popup.ts'),
     //options: path.join(__dirname, 'src/options.ts'),
     //content_script: path.join(__dirname, 'src/content_script.ts'),
@@ -23,4 +25,11 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
   },
+  plugins: [
+    // pack common vender files
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: Infinity
+    })
+  ]
 };
