@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
     "target": "es6",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "sourceMap": false,
     "rootDir": "src",
-    "outDir": "dist/js",
-    "noEmitOnError": true
+    "outDir": "dist/js"
   }
 }

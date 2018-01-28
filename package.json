@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
+    "lint": "tslint -p .",
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "watch": "webpack -w"
   },
@@ -32,6 +33,7 @@
     "ts-node": "^4.1.0",
     "tslint": "^5.9.1",
     "tslint-eslint-rules": "^4.1.1",
+    "tslint-loader": "^3.5.3",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0"
   }

@@ -16,11 +16,23 @@ module.exports = {
     filename: '[name].js'
   },
   module: {
-    loaders: [{
-      exclude: /node_modules/,
-      test: /\.tsx?$/,
-      loader: 'ts-loader'
-    }]
+    rules: [
+      {
+        exclude: /node_modules/,
+        test: /\.tsx?$/,
+        loader: 'ts-loader'
+      },
+      {
+        exclude: /node_modules/,
+        test: /\.tsx?$/,
+        loader: 'tslint-loader',
+        enforce: 'pre',
+        options: {
+          failOnHint: true,
+          typeCheck: true
+        }
+      }
+    ]
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']

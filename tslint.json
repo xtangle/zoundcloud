@@ -6,8 +6,9 @@
   ],
   "jsRules": {},
   "rules": {
+    "arrow-return-shorthand": [true, "multiline"],
+    "indent": [true, "spaces"],
     "max-line-length": [true, 120],
-    "no-unreachable": true,
     "quotemark": [true, "single"],
     "ter-indent": [true, 2]
   },
