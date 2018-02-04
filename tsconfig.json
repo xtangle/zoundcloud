@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "noImplicitAny": true,
     "sourceMap": false,
     "rootDir": "src",
-    "outDir": "dist/js"
+    "outDir": "dist"
   }
 }
