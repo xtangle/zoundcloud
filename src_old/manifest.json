@@ -19,7 +19,7 @@
       "js/background.js"
     ],
     "persistent": false
-  },
+},
   "content_scripts": [
     {
       "matches": [

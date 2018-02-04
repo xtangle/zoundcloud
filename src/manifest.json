@@ -4,7 +4,10 @@
   "version": "2.0.0",
   "manifest_version": 2,
   "permissions": [
-    "tabs"
+    "tabs",
+    "webNavigation",
+    "*://soundcloud.com/*",
+    "*://api.soundcloud.com/*"
   ],
   "icons": {
     "128": "icon128.png"
@@ -15,5 +18,20 @@
       "background.js"
     ],
     "persistent": false
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://soundcloud.com/*"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "js": [
+        "vendor.js",
+        "content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ]
 }

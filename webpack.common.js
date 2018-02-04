@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     app: path.join(__dirname, 'src/ts/app.ts'),
     background: path.join(__dirname, 'src/ts/background.ts'),
+    content: path.join(__dirname, 'src/ts/content.ts'),
     vendor: ['jquery']
     //popup: path.join(__dirname, 'src/popup.ts'),
     //options: path.join(__dirname, 'src/options.ts'),
