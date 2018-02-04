@@ -2,7 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ChromeExtensionReloader  = require('webpack-chrome-extension-reloader');
 
 module.exports = {
   entry: {
@@ -51,14 +50,6 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: Infinity
-    }),
-    // minify
-    // new webpack.optimize.UglifyJsPlugin(),
-    // enables hot-reloading
-/*    new ChromeExtensionReloader({
-      entries: { //The entries used for the content/background scripts
-        background: 'background' //Use the entry names, not the file name or the path
-      }
-    })*/
+    })
   ]
 };
