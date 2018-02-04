@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ChromeExtensionReloader  = require('webpack-chrome-extension-reloader');
 
 module.exports = {
   entry: {
@@ -11,7 +12,6 @@ module.exports = {
     //popup: path.join(__dirname, 'src/popup.ts'),
     //options: path.join(__dirname, 'src/options.ts'),
     //content_script: path.join(__dirname, 'src/content_script.ts'),
-    //vendor: ['moment', 'jquery']
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -40,6 +40,7 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js']
   },
   plugins: [
+    // clean build directory
     new CleanWebpackPlugin(['dist']),
     // copy assets
     new CopyWebpackPlugin([{
@@ -50,6 +51,14 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: Infinity
-    })
+    }),
+    // minify
+    // new webpack.optimize.UglifyJsPlugin(),
+    // enables hot-reloading
+/*    new ChromeExtensionReloader({
+      entries: { //The entries used for the content/background scripts
+        background: 'background' //Use the entry names, not the file name or the path
+      }
+    })*/
   ]
 };

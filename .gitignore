@@ -2,7 +2,7 @@
 *.iml
 
 build/*
-dist/
+dist/*
 **/node_modules/
 
 !build/index.html

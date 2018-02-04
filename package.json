@@ -1,6 +1,6 @@
 {
   "name": "zoundcloud",
-  "version": "1.1.3",
+  "version": "2.0.0",
   "private": true,
   "description": "Adds download buttons to SoundCloud pages.",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "build": "webpack",
     "lint": "tslint -p .",
     "test": "mocha -r ts-node/register src/**/*.spec.ts",
-    "watch": "webpack -w"
+    "watch": "cross-env NODE_ENV=development webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -25,12 +25,13 @@
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
-    "@types/chrome": "0.0.59",
+    "@types/chrome": "^0.0.59",
     "@types/jquery": "^3.3.0",
     "@types/mocha": "^2.2.47",
     "chai": "^4.1.2",
     "clean-webpack-plugin": "^0.1.18",
     "copy-webpack-plugin": "^4.3.1",
+    "cross-env": "^5.1.3",
     "mocha": "^5.0.0",
     "ts-loader": "^3.3.1",
     "ts-node": "^4.1.0",
@@ -38,6 +39,7 @@
     "tslint-eslint-rules": "^4.1.1",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.6.2",
-    "webpack": "^3.10.0"
+    "webpack": "^3.10.0",
+    "webpack-chrome-extension-reloader": "^0.7.0"
   }
 }
