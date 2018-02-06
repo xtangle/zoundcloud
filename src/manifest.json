@@ -15,23 +15,8 @@
   "background": {
     "scripts": [
       "vendor.js",
-      "background.js"
+      "eventPage.js"
     ],
     "persistent": false
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://soundcloud.com/*"
-      ],
-      "css": [
-        "styles.css"
-      ],
-      "js": [
-        "vendor.js",
-        "content.js"
-      ],
-      "run_at": "document_end"
-    }
-  ]
+  }
 }

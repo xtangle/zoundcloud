@@ -5,13 +5,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
-    app: path.join(__dirname, 'src/ts/app.ts'),
-    background: path.join(__dirname, 'src/ts/background.ts'),
-    content: path.join(__dirname, 'src/ts/content.ts'),
+    eventPage: path.join(__dirname, 'src/ts/event-page.ts'),
+    contentTrack: path.join(__dirname, 'src/ts/content-track.ts'),
     vendor: ['jquery']
-    //popup: path.join(__dirname, 'src/popup.ts'),
-    //options: path.join(__dirname, 'src/options.ts'),
-    //content_script: path.join(__dirname, 'src/content_script.ts'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
