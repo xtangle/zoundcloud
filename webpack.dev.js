@@ -16,7 +16,8 @@ function getPlugins() {
       // enables hot-reloading in the browser
       new ChromeExtensionReloader({
         entries: { //The entries used for the content/background scripts
-          background: 'eventPage' //Use the entry names, not the file name or the path
+          background: 'background', //Use the entry names, not the file name or the path
+          contentScript: 'content-script' //Use the entry names, not the file name or the path
         }
       })
     );

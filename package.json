@@ -9,7 +9,7 @@
     "build:prod": "webpack --config webpack.prod.js",
     "lint": "tslint -p .",
     "start": "npm run watch",
-    "test": "mocha -r ts-node/register -r jsdom-global/register src/**/*.spec.ts",
+    "test": "mocha -r ts-node/register src/**/*.spec.ts",
     "watch": "cross-env NODE_ENV=development webpack --config webpack.dev.js --watch"
   },
   "repository": {

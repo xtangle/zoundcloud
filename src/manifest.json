@@ -15,7 +15,7 @@
   "background": {
     "scripts": [
       "vendor.js",
-      "eventPage.js"
+      "background.js"
     ],
     "persistent": false
   }

@@ -13,7 +13,7 @@ const soundCloudPageVisited$: Observable<WebNavigationTransitionCallbackDetails>
 soundCloudPageVisited$.subscribe((details: WebNavigationTransitionCallbackDetails) => {
   console.log('On history state updated match!', details);
   chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
-  chrome.tabs.executeScript(details.tabId, {file: 'contentTrack.js'});
+  chrome.tabs.executeScript(details.tabId, {file: 'content-script.js'});
 });
 
 /*chrome.webNavigation.onHistoryStateUpdated.addListener((details: WebNavigationCallbackDetails) => {
