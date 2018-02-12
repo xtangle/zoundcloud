@@ -9,9 +9,4 @@ export const PLAYLIST_URL_PATTERN = /^[^\/]+:\/\/soundcloud\.com\/[^\/]+\/sets\/
 export const TRACK_URL_PATTERN = '^[^/]+://soundcloud\\.com/[^/]+/(?:[^/]+$)|(?:[^/]+(?=(?:\\?in=)).+$)';
 
 // Style-related constants
-export const SC_BUTTON_CLASSES = ['sc-button', 'sc-button-medium'];
 export const ZC_DL_BUTTON_CLASS = 'zc-button-download';
-export const ZC_DL_BUTTON_GROUP_CLASS = 'zc-button-group';
-
-export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
-export const ZC_TRACK_DL_BUTTON_GROUP_ID = 'zcTrackDlButtonGroup';

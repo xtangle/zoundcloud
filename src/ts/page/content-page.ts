@@ -1,31 +1,48 @@
 import * as $ from 'jquery';
+import {Subscription} from 'rxjs/Subscription';
+import {domElementRemoved$} from './dom-utils';
 
 export abstract class ContentPage {
-  protected constructor(protected readonly id: string,
-                        protected readonly shouldLoad: () => boolean,
-                        protected readonly onLoad: () => void) {
+  protected subscriptions: Subscription = new Subscription();
+
+  protected constructor(protected readonly id: string) {
   }
 
-  public init() {
+  public bootstrap() {
     if (this.shouldLoad()) {
-      if (!contentLoaded(this.id)) {
-        loadContent(this.id, this.onLoad);
+      if (!this.hasInitialized()) {
+        this.initialize();
       }
     } else {
-      unloadContent(this.id);
+      if (!this.hasUninitialized()) {
+        this.unInitialize();
+      }
     }
   }
-}
 
-function contentLoaded(id: string): boolean {
-  return $(`#${id}`).length > 0;
-}
+  protected abstract shouldLoad(): boolean;
 
-function loadContent(id: string, onLoad: () => void) {
-  $('body').append($('<div/>', {id}));
-  onLoad();
-}
+  protected abstract onInit(): void;
 
-function unloadContent(id: string) {
-  $(`#${id}`).remove();
+  private hasInitialized(): boolean {
+    return $(`#${this.id}`).length > 0;
+  }
+
+  private hasUninitialized(): boolean {
+    return $(`#${this.id}`).length === 0;
+  }
+
+  private initialize(): void {
+    console.log('(ZC): Initializing content page', this.id);
+    const contentPageTag = $('<div/>', {id: this.id});
+    $('body').append(contentPageTag);
+    this.subscriptions.add(domElementRemoved$(contentPageTag[0]).subscribe(() => this.unInitialize()));
+    this.onInit();
+  }
+
+  private unInitialize(): void {
+    console.log('(ZC): Un-initializing content page', this.id);
+    $(`#${this.id}`).remove();
+    this.subscriptions.unsubscribe();
+  }
 }
