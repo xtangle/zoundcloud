@@ -1,15 +1,11 @@
 import * as $ from 'jquery';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/operator/delay';
+import 'rxjs/add/observable/merge';
 import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
 import {ZC_DL_BUTTON_CLASS} from '../constants';
 import {ContentPage} from './content-page';
-import {domElementRemoved$} from './dom-utils';
+import {elementAdded$, elementExist$} from './dom-utils';
 
 export class TrackContentPage extends ContentPage {
-  protected injectContent$: Subject<boolean>;
-
   constructor() {
     super('zc-track-content');
   }
@@ -25,40 +21,22 @@ export class TrackContentPage extends ContentPage {
   }
 
   protected onInit(): void {
-    this.injectContent$ = Subject.create(null, Observable.interval(10000).delay(1000));
-    this.subscriptions.add(this.injectContent$.subscribe(this.injectContents.bind(this)));
-  }
-
-  private injectContents(): void {
-    if (!downloadButtonExists()) {
-      console.log('(ZC): Injecting contents');
-      const soundActions = getSoundActionsToolbar();
-      if (soundActions.length) {
-        const dlButton = createDownloadButton(soundActions);
-        dlButton.on('click', () => console.log('(ZC): Clicked download button!'));
-        addDownloadButton(soundActions, dlButton);
-        this.subscriptions.add(domElementRemoved$(dlButton[0]).subscribe(() => {
-          console.log('Button removed!');
-          this.injectContent$.next(true);
-        }));
-      }
-    }
+    const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
+    this.subscriptions.add(Observable.merge(
+      elementExist$(listenEngagementSelector),
+      elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
+    ).subscribe(injectDlButton.bind(this)));
   }
 }
 
-function downloadButtonExists(): boolean {
-  return $('#zcTrackDlButton').length > 0;
+function injectDlButton(listenEngagement: Node): void {
+  const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
+  const dlButton = createDlButton(soundActions);
+  dlButton.on('click', () => console.log('(ZC): Clicked download button!'));
+  addDlButton(soundActions, dlButton);
 }
 
-function getSoundActionsToolbar(): JQuery<HTMLElement> {
-  let soundActions = $('.listenEngagement .soundActions');
-  if (!!soundActions.length) {
-    soundActions = $('.soundActions.soundActions__medium');
-  }
-  return soundActions.first();
-}
-
-function createDownloadButton(soundActions: JQuery<HTMLElement>): JQuery<HTMLElement> {
+function createDlButton(soundActions: JQuery<HTMLElement>): JQuery<HTMLElement> {
   const dlButton = $('<button/>')
     .addClass(['sc-button', 'sc-button-medium'])
     .addClass(ZC_DL_BUTTON_CLASS)
@@ -73,7 +51,7 @@ function createDownloadButton(soundActions: JQuery<HTMLElement>): JQuery<HTMLEle
   return dlButton;
 }
 
-function addDownloadButton(soundActions: JQuery<HTMLElement>, dlButton: JQuery<HTMLElement>): void {
+function addDlButton(soundActions: JQuery<HTMLElement>, dlButton: JQuery<HTMLElement>): void {
   const buttonGroup = soundActions.children('div').first();
   if (buttonGroup.length) {
     const lastButtonInGroup = buttonGroup.children('button').last();

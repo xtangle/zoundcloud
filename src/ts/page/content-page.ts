@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import {Subscription} from 'rxjs/Subscription';
-import {domElementRemoved$} from './dom-utils';
+import {elementRemoved$} from './dom-utils';
 
 export abstract class ContentPage {
   protected subscriptions: Subscription = new Subscription();
@@ -36,7 +36,7 @@ export abstract class ContentPage {
     console.log('(ZC): Initializing content page', this.id);
     const contentPageTag = $('<div/>', {id: this.id});
     $('body').append(contentPageTag);
-    this.subscriptions.add(domElementRemoved$(contentPageTag[0]).subscribe(() => this.unInitialize()));
+    this.subscriptions.add(elementRemoved$(contentPageTag[0]).subscribe(() => this.unInitialize()));
     this.onInit();
   }
 

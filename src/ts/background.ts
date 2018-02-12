@@ -8,7 +8,7 @@ const soundCloudPageVisited$: Observable<WebNavigationTransitionCallbackDetails>
   Observable.fromEventPattern<WebNavigationTransitionCallbackDetails>(
     (handler: (details: WebNavigationTransitionCallbackDetails) => void) =>
       chrome.webNavigation.onHistoryStateUpdated.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-  ).distinctUntilKeyChanged('url');
+  );
 
 soundCloudPageVisited$.subscribe((details: WebNavigationTransitionCallbackDetails) => {
   console.log('On history state updated match!', details);
@@ -16,16 +16,3 @@ soundCloudPageVisited$.subscribe((details: WebNavigationTransitionCallbackDetail
   chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
   chrome.tabs.executeScript(details.tabId, {file: 'content-script.js'});
 });
-
-/*chrome.webNavigation.onHistoryStateUpdated.addListener((details: WebNavigationCallbackDetails) => {
-  console.log('On history state updated match!', details);
-  chrome.tabs.executeScript(details.tabId, {file: 'content.js'});
-}, {url: [{urlMatches: TRACK_URL_PATTERN.toString().slice(1, -1)}]});*/
-
-/*
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'CONTENT_TRACK_OPENED') {
-    chrome.tabs.sendMessage(sender.tab.id, {type: 'CLOSE_CONTENT_TRACK'});
-  }
-});
-*/
