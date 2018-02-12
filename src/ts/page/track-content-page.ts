@@ -2,8 +2,8 @@ import * as $ from 'jquery';
 import 'rxjs/add/observable/merge';
 import {Observable} from 'rxjs/Observable';
 import {ZC_DL_BUTTON_CLASS} from '../constants';
+import {elementAdded$, elementExist$} from '../util/dom-utils';
 import {ContentPage} from './content-page';
-import {elementAdded$, elementExist$} from './dom-utils';
 
 export class TrackContentPage extends ContentPage {
   constructor() {

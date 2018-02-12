@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import {Subscription} from 'rxjs/Subscription';
-import {elementRemoved$} from './dom-utils';
+import {elementRemoved$} from '../util/dom-utils';
 
 export abstract class ContentPage {
   protected subscriptions: Subscription = new Subscription();

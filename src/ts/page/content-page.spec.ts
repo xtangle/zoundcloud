@@ -6,11 +6,13 @@ import * as $ from 'jquery';
 import 'mocha';
 import {spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
+import {shimMutationObserver} from '../util/mutation-observer.shim';
 import {ContentPage} from './content-page';
 
 /* tslint:disable:no-unused-expression */
 describe('content page', () => {
   chai.use(sinonChai);
+  shimMutationObserver();
   let fixture: DummyContentPageImpl;
 
   describe('bootstrap', () => {
@@ -18,8 +20,7 @@ describe('content page', () => {
       document.body.innerHTML = '<body></body>';
     });
 
-    // Fixme: Test fails because MutationObserver is not supported in jsdom. Try to find a shim.
-    xit('should initialize when it should be loaded', () => {
+    it('should initialize when it should be loaded', () => {
       fixture = new DummyContentPageImpl('id', () => true, spy());
       fixture.bootstrap();
 
