@@ -1,18 +1,13 @@
-import 'jsdom-global/register';
-/* tslint:disable-next-line:ordered-imports */
 import * as chai from 'chai';
 import {expect} from 'chai';
 import * as $ from 'jquery';
-import 'mocha';
 import {spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {shimMutationObserver} from '../util/mutation-observer.shim';
 import {ContentPage} from './content-page';
 
 /* tslint:disable:no-unused-expression */
 describe('content page', () => {
   chai.use(sinonChai);
-  shimMutationObserver();
   let fixture: DummyContentPageImpl;
 
   describe('bootstrap', () => {
