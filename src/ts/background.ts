@@ -16,3 +16,4 @@ soundCloudPageVisited$.subscribe((details: WebNavigationTransitionCallbackDetail
   chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
   chrome.tabs.executeScript(details.tabId, {file: 'content-script.js'});
 });
+
