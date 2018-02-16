@@ -9,7 +9,6 @@
     "build:prod": "webpack --config webpack.prod.js",
     "build:watch": "cross-env NODE_ENV=development webpack --config webpack.dev.js --watch",
     "lint": "tslint -p .",
-    "lint:force": "tslint -p . --force",
     "start": "npm run build:watch",
     "test": "karma start karma.conf.js",
     "test:watch": "karma start karma.conf.js --single-run false"
