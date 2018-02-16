@@ -3,12 +3,11 @@ const webpackConfig = require('./webpack.common');
 module.exports = function (config) {
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'chai', 'sinon'],
+    frameworks: ['mocha', 'chai', 'sinon', 'sinon-chrome'],
     files: [
       'src/ts/**/*.ts'
     ],
     exclude: [
-      'src/ts/background.ts'
     ],
     preprocessors: {
       'src/ts/**/*.ts': ['webpack']
