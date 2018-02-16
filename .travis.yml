@@ -5,3 +5,6 @@ script:
   - npm test
   - npm run build
   - npm run build:prod
+sudo: required
+addons:
+  chrome: stable
