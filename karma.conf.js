@@ -22,6 +22,12 @@ module.exports = function (config) {
     webpackMiddleware: {
       noInfo: true
     },
+    client: {
+      captureConsole: false,
+      mocha: {
+        timeout: 500
+      }
+    },
     reporters: ['spec'],
     port: 9876,
     colors: true,

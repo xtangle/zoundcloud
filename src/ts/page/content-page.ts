@@ -1,9 +1,9 @@
 import * as $ from 'jquery';
 import {Subscription} from 'rxjs/Subscription';
-import {elementRemoved$} from '../util/dom-utils';
+import {elementRemoved$} from '../util/dom-observer';
 
 export abstract class ContentPage {
-  protected subscriptions: Subscription = new Subscription();
+  private readonly internalSubscriptions: Subscription = new Subscription();
 
   protected constructor(protected readonly id: string) {
   }
@@ -18,6 +18,10 @@ export abstract class ContentPage {
         this.unInitialize();
       }
     }
+  }
+
+  protected get subscriptions(): Subscription {
+    return this.internalSubscriptions;
   }
 
   protected abstract shouldLoad(): boolean;
