@@ -17,7 +17,7 @@ module.exports = function (config) {
         opts: 'mocha.opts'
       }
     },
-    reporters: ['mocha'],
+    reporters: ['mocha', 'karma-typescript'],
     karmaTypescriptConfig: {
       bundlerOptions: {
         entrypoints: /\.spec\.ts$/
