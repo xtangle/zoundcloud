@@ -1,26 +1,16 @@
-const webpackConfig = require('./webpack.common');
-
 module.exports = function (config) {
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'chai', 'sinon', 'sinon-chrome'],
+    frameworks: ['mocha', 'chai', 'sinon', 'sinon-chrome', 'karma-typescript'],
     files: [
       'src/ts/**/*.ts'
     ],
-    exclude: [
-    ],
+    exclude: [],
     preprocessors: {
-      'src/ts/**/*.ts': ['webpack']
+      'src/ts/**/*.ts': ['karma-typescript']
     },
     mime: {
-      'text/x-typescript': ['ts','tsx']
-    },
-    webpack: {
-      module: webpackConfig.module,
-      resolve: webpackConfig.resolve
-    },
-    webpackMiddleware: {
-      noInfo: true
+      'text/x-typescript': ['ts', 'tsx']
     },
     client: {
       captureConsole: false,
@@ -29,6 +19,18 @@ module.exports = function (config) {
       }
     },
     reporters: ['spec'],
+    karmaTypescriptConfig: {
+      bundlerOptions: {
+        entrypoints: /\.spec\.ts$/
+      },
+      compilerOptions: {
+        target: 'es2015'
+      },
+      reports: {
+        'html': 'coverage',
+        'text': ''
+      }
+    },
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
@@ -36,5 +38,5 @@ module.exports = function (config) {
     browsers: ['ChromeHeadless'],
     singleRun: true,
     concurrency: Infinity
-  })
+  });
 };
