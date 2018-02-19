@@ -1,7 +1,7 @@
 module.exports = function (config) {
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'chai', 'sinon', 'sinon-chrome', 'karma-typescript'],
+    frameworks: ['mocha', 'sinon-chrome', 'karma-typescript'],
     files: [
       'src/ts/**/*.ts'
     ],
@@ -14,13 +14,13 @@ module.exports = function (config) {
     client: {
       captureConsole: false,
       mocha: {
-        timeout: 500
+        opts: 'mocha.opts'
       }
     },
-    reporters: ['spec'],
+    reporters: ['mocha'],
     karmaTypescriptConfig: {
       bundlerOptions: {
-        entrypoints: /\.spec\.ts$/
+        entrypoints: /\.spec\.ts$/,
       },
       compilerOptions: {
         target: 'es2015'
