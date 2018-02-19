@@ -20,11 +20,9 @@ module.exports = function (config) {
     reporters: ['mocha'],
     karmaTypescriptConfig: {
       bundlerOptions: {
-        entrypoints: /\.spec\.ts$/,
+        entrypoints: /\.spec\.ts$/
       },
-      compilerOptions: {
-        target: 'es2015'
-      },
+      compilerOptions: require('./tsconfig').compilerOptions,
       reports: {
         'html': 'coverage',
         'text': ''
