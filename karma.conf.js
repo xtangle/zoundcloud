@@ -5,12 +5,11 @@ module.exports = function (config) {
     files: [
       'src/ts/**/*.ts'
     ],
-    exclude: [],
+    exclude: [
+      'src/ts/constants.ts'
+    ],
     preprocessors: {
       'src/ts/**/*.ts': ['karma-typescript']
-    },
-    mime: {
-      'text/x-typescript': ['ts', 'tsx']
     },
     client: {
       captureConsole: false,
