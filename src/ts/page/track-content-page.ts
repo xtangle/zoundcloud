@@ -1,16 +1,17 @@
 import * as $ from 'jquery';
 import 'rxjs/add/observable/merge';
 import {Observable} from 'rxjs/Observable';
+import {Subscription} from 'rxjs/Subscription';
 import {ZC_DL_BUTTON_CLASS} from '../constants';
 import {elementAdded$, elementExist$} from '../util/dom-observer';
-import {ContentPage} from './content-page';
+import {logger} from '../util/logger';
+import {IContentPage} from './content-page';
 
-export class TrackContentPage extends ContentPage {
-  constructor() {
-    super('zc-track-content');
-  }
+export class TrackContentPage implements IContentPage {
+  public readonly id = 'zc-track-content';
+  public readonly subscriptions: Subscription = new Subscription();
 
-  protected shouldLoad(): boolean {
+  public shouldLoad(): boolean {
     const TRACK_URL_PATTERN = /^[^:]*:\/\/soundcloud\.com\/([^\/]+)\/([^\/]+)(?:\?in=.+)?$/;
     const TRACK_URL_BLACKLIST_1 = ['you', 'charts', 'pages', 'settings', 'jobs', 'tags', 'stations'];
     const TRACK_URL_BLACKLIST_2 = ['stats'];
@@ -20,7 +21,7 @@ export class TrackContentPage extends ContentPage {
       (TRACK_URL_BLACKLIST_2.indexOf(matchResults[2]) < 0);
   }
 
-  protected onInit(): void {
+  public onLoad(): void {
     const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
     this.subscriptions.add(Observable.merge(
       elementExist$(listenEngagementSelector),
@@ -32,7 +33,7 @@ export class TrackContentPage extends ContentPage {
 function injectDlButton(listenEngagement: Node): void {
   const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
   const dlButton = createDlButton(soundActions);
-  dlButton.on('click', () => console.log('(ZC): Clicked download button!'));
+  dlButton.on('click', () => logger.log('Clicked download button!'));
   addDlButton(soundActions, dlButton);
 }
 

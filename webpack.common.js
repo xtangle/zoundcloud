@@ -47,6 +47,10 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: Infinity
+    }),
+    // set environment global variable
+    new webpack.DefinePlugin({
+      ENV: JSON.stringify(process !== undefined ? process.env.NODE_ENV : 'development')
     })
   ]
 };

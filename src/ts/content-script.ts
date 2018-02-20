@@ -1,3 +1,4 @@
+import {bootstrap} from './page/bootstrap';
 import {TrackContentPage} from './page/track-content-page';
 
-new TrackContentPage().bootstrap();
+bootstrap(new TrackContentPage());
