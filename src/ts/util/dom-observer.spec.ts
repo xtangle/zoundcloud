@@ -1,7 +1,6 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
 import * as $ from 'jquery';
-import 'mocha';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonSpy, spy} from 'sinon';

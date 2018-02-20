@@ -3,7 +3,7 @@ node_js:
   - "node"
   - "lts/*"
 script:
-  - yarn run test
+  - yarn run test:coverage
   - yarn run build
   - yarn run build:prod
 sudo: required

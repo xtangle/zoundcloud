@@ -11,6 +11,7 @@
     "lint": "tslint -p .",
     "start": "yarn run build:watch",
     "test": "karma start karma.conf.js",
+    "test:coverage": "karma start karma.conf.js --reporters mocha,karma-typescript",
     "test:watch": "karma start karma.conf.js --single-run false"
   },
   "repository": {
