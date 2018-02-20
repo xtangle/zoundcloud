@@ -11,60 +11,59 @@ import {IContentPage} from './content-page';
 describe('bootstrap function', () => {
   chai.use(sinonChai);
   let contentPage: DummyContentPage;
-  let spyUnsubscribe: SinonSpy;
-  let spyOnLoad: SinonSpy;
+  let spyLoad: SinonSpy;
+  let spyUnload: SinonSpy;
 
   beforeEach(() => {
     document.body.innerHTML = '<body></body>';
   });
 
-  it('should load the content page when it should be loaded', () => {
+  it('should load the content page when test passes', () => {
     initContentPage(true);
     bootstrap(contentPage);
-    verifyIdTagInsertedToDOM();
-    expect(spyOnLoad).to.have.been.calledOnce;
+    verifyIdTagAddedToDOM();
+    expect(spyLoad).to.have.been.calledOnce;
   });
 
-  it('should not load the content page when it should be loaded but is already loaded', () => {
+  it('should not load the content page when it is already loaded and test passes', () => {
     initContentPage(true);
     document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
     bootstrap(contentPage);
-    expect(spyOnLoad).to.not.have.been.calledOnce;
+    expect(spyLoad).to.not.have.been.called;
   });
 
-  it('should unload the content page when it should be unloaded', () => {
+  it('should unload the content page when test fails', () => {
     initContentPage(false);
     document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
     bootstrap(contentPage);
     verifyIdTagRemovedFromDOM();
-    expect(spyUnsubscribe).to.have.been.calledOnce;
+    expect(spyUnload).to.have.been.calledOnce;
   });
 
-  it('should not unload the content page when it should be unloaded but is already unloaded', () => {
+  it('should not unload the content page when it is already unloaded and test fails', () => {
     initContentPage(false);
     bootstrap(contentPage);
-    expect(spyUnsubscribe).to.not.have.been.called;
+    expect(spyUnload).to.not.have.been.called;
   });
 
-  it('should un-subscribe all subscriptions when id tag is removed from the page after bootstrapping', (done) => {
+  it('should unload the content page when the id tag is removed from the DOM', (done) => {
     initContentPage(true);
     bootstrap(contentPage);
-    expect(spyUnsubscribe).to.not.have.been.called;
     removeIdTagFromDOM();
     setTimeout(() => {
-      expect(spyUnsubscribe).to.have.been.calledOnce;
+      expect(spyUnload).to.have.been.calledOnce;
       done();
     }, this.timeout);
   });
 
   function initContentPage(shouldLoad: boolean): DummyContentPage {
     contentPage = new DummyContentPage(shouldLoad);
-    spyUnsubscribe = spy(contentPage.subscriptions, 'unsubscribe');
-    spyOnLoad = spy(contentPage, 'onLoad');
+    spyLoad = spy(contentPage, 'load');
+    spyUnload = spy(contentPage, 'unload');
     return contentPage;
   }
 
-  function verifyIdTagInsertedToDOM() {
+  function verifyIdTagAddedToDOM() {
     expect($(`#${contentPage.id}`).length).to.be.equal(1);
   }
 
@@ -81,14 +80,18 @@ class DummyContentPage implements IContentPage {
   public id: string = 'id';
   public subscriptions: Subscription = new Subscription();
 
-  constructor(public shouldLoadValue: boolean) {
+  constructor(public testValue: boolean) {
   }
 
-  public shouldLoad(): boolean {
-    return this.shouldLoadValue;
+  public test(): boolean {
+    return this.testValue;
   }
 
-  public onLoad(): void {
+  public load(): void {
     return undefined;
+  }
+
+  public unload(): void {
+    this.subscriptions.unsubscribe();
   }
 }

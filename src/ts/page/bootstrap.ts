@@ -4,14 +4,28 @@ import {logger} from '../util/logger';
 import {IContentPage} from './content-page';
 
 export function bootstrap(contentPage: IContentPage): void {
-  if (contentPage.shouldLoad()) {
-    if (!hasLoaded(contentPage)) {
-      load(contentPage);
-    }
+  if (contentPage.test()) {
+    load(contentPage);
   } else {
-    if (!hasUnloaded(contentPage)) {
-      unload(contentPage);
-    }
+    unload(contentPage);
+  }
+}
+
+function load(contentPage: IContentPage): void {
+  if (!hasLoaded(contentPage)) {
+    logger.log('Loading content page', contentPage.id);
+    const idTag = createIdTag(contentPage.id);
+    addIdTagToDOM(idTag);
+    contentPage.subscriptions.add(elementRemoved$(idTag).subscribe(() => contentPage.unload()));
+    contentPage.load();
+  }
+}
+
+function unload(contentPage: IContentPage): void {
+  if (!hasUnloaded(contentPage)) {
+    logger.log('Unloading content page', contentPage.id);
+    removeIdTagFromDOM(contentPage.id);
+    contentPage.unload();
   }
 }
 
@@ -23,17 +37,14 @@ function hasUnloaded(contentPage: IContentPage): boolean {
   return $(`#${contentPage.id}`).length === 0;
 }
 
-function load(contentPage: IContentPage): void {
-  logger.log('Loading content page', contentPage.id);
-  const contentPageTag = $('<div/>', {id: contentPage.id});
-  $('body').append(contentPageTag);
-  contentPage.subscriptions.add(elementRemoved$(contentPageTag[0])
-    .subscribe(unload.bind(null, contentPage)));
-  contentPage.onLoad();
+function createIdTag(id: string): HTMLElement {
+  return $('<div/>', {id})[0];
 }
 
-function unload(contentPage: IContentPage): void {
-  logger.log('Unloading content page', contentPage.id);
-  $(`#${contentPage.id}`).remove();
-  contentPage.subscriptions.unsubscribe();
+function addIdTagToDOM(idTag: HTMLElement): void {
+  $('body').append(idTag);
+}
+
+function removeIdTagFromDOM(id: string): void {
+  $(`#${id}`).remove();
 }

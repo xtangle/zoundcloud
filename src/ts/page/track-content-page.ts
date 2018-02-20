@@ -11,7 +11,7 @@ export class TrackContentPage implements IContentPage {
   public readonly id = 'zc-track-content';
   public readonly subscriptions: Subscription = new Subscription();
 
-  public shouldLoad(): boolean {
+  public test(): boolean {
     const TRACK_URL_PATTERN = /^[^:]*:\/\/soundcloud\.com\/([^\/]+)\/([^\/]+)(?:\?in=.+)?$/;
     const TRACK_URL_BLACKLIST_1 = ['you', 'charts', 'pages', 'settings', 'jobs', 'tags', 'stations'];
     const TRACK_URL_BLACKLIST_2 = ['stats'];
@@ -21,12 +21,16 @@ export class TrackContentPage implements IContentPage {
       (TRACK_URL_BLACKLIST_2.indexOf(matchResults[2]) < 0);
   }
 
-  public onLoad(): void {
+  public load(): void {
     const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
     this.subscriptions.add(Observable.merge(
       elementExist$(listenEngagementSelector),
       elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
     ).subscribe(injectDlButton.bind(this)));
+  }
+
+  public unload(): void {
+    this.subscriptions.unsubscribe();
   }
 }
 
