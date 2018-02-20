@@ -1,4 +1,5 @@
 const merge = require('webpack-merge');
+const webpack = require('webpack');
 const common = require('./webpack.common.js');
 const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
 const argv = require('yargs').argv;
@@ -9,7 +10,12 @@ module.exports = merge(common, {
 });
 
 function getPlugins() {
-  const plugins = [];
+  const plugins = [
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
+      DEBUG: true
+    })
+  ];
   // only add plugin if the --watch flag is set
   if (argv.watch) {
     plugins.push(

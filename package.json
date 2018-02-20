@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.dev.js",
-    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
+    "build:prod": "webpack --config webpack.prod.js",
     "build:watch": "webpack --config webpack.dev.js --watch",
     "lint": "tslint -p .",
     "start": "yarn run build:watch",
@@ -37,7 +37,6 @@
     "chai": "^4.1.2",
     "clean-webpack-plugin": "^0.1.18",
     "copy-webpack-plugin": "^4.4.1",
-    "cross-env": "^5.1.3",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-mocha": "^1.3.0",
