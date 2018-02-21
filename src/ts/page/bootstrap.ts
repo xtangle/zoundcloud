@@ -1,4 +1,5 @@
 import * as $ from 'jquery';
+import 'rxjs/add/operator/first';
 import {elementRemoved$} from '../util/dom-observer';
 import {logger} from '../util/logger';
 import {IContentPage} from './content-page';
@@ -16,7 +17,7 @@ function load(contentPage: IContentPage): void {
     logger.log('Loading content page', contentPage.id);
     const idTag = createIdTag(contentPage.id);
     addIdTagToDOM(idTag);
-    contentPage.subscriptions.add(elementRemoved$(idTag).subscribe(() => contentPage.unload()));
+    elementRemoved$(idTag).first().subscribe(() => contentPage.unload());
     contentPage.load();
   }
 }

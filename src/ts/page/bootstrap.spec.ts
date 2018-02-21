@@ -1,7 +1,6 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
 import * as $ from 'jquery';
-import {Subscription} from 'rxjs/Subscription';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import {bootstrap} from './bootstrap';
@@ -78,7 +77,6 @@ describe('bootstrap function', () => {
 
 class DummyContentPage implements IContentPage {
   public id: string = 'id';
-  public subscriptions: Subscription = new Subscription();
 
   constructor(public testValue: boolean) {
   }
@@ -87,11 +85,6 @@ class DummyContentPage implements IContentPage {
     return this.testValue;
   }
 
-  public load(): void {
-    return undefined;
-  }
-
-  public unload(): void {
-    this.subscriptions.unsubscribe();
-  }
+  public load: () => void = () => undefined;
+  public unload: () => void = () => undefined;
 }

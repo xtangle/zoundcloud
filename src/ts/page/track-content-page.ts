@@ -9,7 +9,7 @@ import {IContentPage} from './content-page';
 
 export class TrackContentPage implements IContentPage {
   public readonly id = 'zc-track-content';
-  public readonly subscriptions: Subscription = new Subscription();
+  private readonly subscriptions: Subscription = new Subscription();
 
   public test(): boolean {
     const TRACK_URL_PATTERN = /^[^:]*:\/\/soundcloud\.com\/([^\/]+)\/([^\/]+)(?:\?in=.+)?$/;
