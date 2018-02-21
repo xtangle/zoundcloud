@@ -1,41 +1,23 @@
 import * as $ from 'jquery';
 import 'rxjs/add/operator/first';
 import {elementRemoved$} from '../util/dom-observer';
-import {logger} from '../util/logger';
 import {IContentPage} from './content-page';
 
 export function bootstrap(contentPage: IContentPage): void {
   if (contentPage.test()) {
-    load(contentPage);
+    if (!idTagIsInDOM(contentPage.id)) {
+      const idTag = createIdTag(contentPage.id);
+      addIdTagToDOM(idTag);
+      elementRemoved$(idTag).first().subscribe(() => contentPage.unload());
+      contentPage.load();
+    }
   } else {
-    unload(contentPage);
-  }
-}
-
-function load(contentPage: IContentPage): void {
-  if (!hasLoaded(contentPage)) {
-    logger.log('Loading content page', contentPage.id);
-    const idTag = createIdTag(contentPage.id);
-    addIdTagToDOM(idTag);
-    elementRemoved$(idTag).first().subscribe(() => contentPage.unload());
-    contentPage.load();
-  }
-}
-
-function unload(contentPage: IContentPage): void {
-  if (!hasUnloaded(contentPage)) {
-    logger.log('Unloading content page', contentPage.id);
     removeIdTagFromDOM(contentPage.id);
-    contentPage.unload();
   }
 }
 
-function hasLoaded(contentPage: IContentPage): boolean {
-  return $(`#${contentPage.id}`).length > 0;
-}
-
-function hasUnloaded(contentPage: IContentPage): boolean {
-  return $(`#${contentPage.id}`).length === 0;
+function idTagIsInDOM(id: string): boolean {
+  return $(`#${id}`).length > 0;
 }
 
 function createIdTag(id: string): HTMLElement {

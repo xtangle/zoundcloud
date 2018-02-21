@@ -17,35 +17,28 @@ describe('bootstrap function', () => {
     document.body.innerHTML = '<body></body>';
   });
 
-  it('should load the content page when test passes', () => {
+  it('should bootstrap the content page when test passes and id tag is not in DOM', () => {
     initContentPage(true);
     bootstrap(contentPage);
     verifyIdTagAddedToDOM();
     expect(spyLoad).to.have.been.calledOnce;
   });
 
-  it('should not load the content page when it is already loaded and test passes', () => {
+  it('should not bootstrap the content page when test passes and id tag is in DOM', () => {
     initContentPage(true);
     document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
     bootstrap(contentPage);
     expect(spyLoad).to.not.have.been.called;
   });
 
-  it('should unload the content page when test fails', () => {
+  it('should remove the id tag when test fails', () => {
     initContentPage(false);
     document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
     bootstrap(contentPage);
     verifyIdTagRemovedFromDOM();
-    expect(spyUnload).to.have.been.calledOnce;
   });
 
-  it('should not unload the content page when it is already unloaded and test fails', () => {
-    initContentPage(false);
-    bootstrap(contentPage);
-    expect(spyUnload).to.not.have.been.called;
-  });
-
-  it('should unload the content page when the id tag is removed from the DOM', (done) => {
+  it('should unload the content page when the id tag is removed from the DOM after bootstrapping', (done) => {
     initContentPage(true);
     bootstrap(contentPage);
     removeIdTagFromDOM();
@@ -55,8 +48,8 @@ describe('bootstrap function', () => {
     }, this.timeout);
   });
 
-  function initContentPage(shouldLoad: boolean): DummyContentPage {
-    contentPage = new DummyContentPage(shouldLoad);
+  function initContentPage(testValue: boolean): DummyContentPage {
+    contentPage = new DummyContentPage(testValue);
     spyLoad = spy(contentPage, 'load');
     spyUnload = spy(contentPage, 'unload');
     return contentPage;

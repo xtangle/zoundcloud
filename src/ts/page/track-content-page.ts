@@ -7,6 +7,8 @@ import {elementAdded$, elementExist$} from '../util/dom-observer';
 import {logger} from '../util/logger';
 import {IContentPage} from './content-page';
 
+const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
+
 export class TrackContentPage implements IContentPage {
   public readonly id = 'zc-track-content';
   private readonly subscriptions: Subscription = new Subscription();
@@ -27,17 +29,20 @@ export class TrackContentPage implements IContentPage {
       elementExist$(listenEngagementSelector),
       elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
     ).subscribe(injectDlButton.bind(this)));
+    logger.log('Loaded track content page');
   }
 
   public unload(): void {
+    removeDlButton();
     this.subscriptions.unsubscribe();
+    logger.log('Unloaded track content page');
   }
 }
 
 function injectDlButton(listenEngagement: Node): void {
   const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
   const dlButton = createDlButton(soundActions);
-  dlButton.on('click', () => logger.log('Clicked download button!'));
+  dlButton.on('click', () => logger.log('Clicked track download button'));
   addDlButton(soundActions, dlButton);
 }
 
@@ -45,7 +50,7 @@ function createDlButton(soundActions: JQuery<HTMLElement>): JQuery<HTMLElement> 
   const dlButton = $('<button/>')
     .addClass(['sc-button', 'sc-button-medium'])
     .addClass(ZC_DL_BUTTON_CLASS)
-    .attr('id', 'zcTrackDlButton')
+    .attr('id', ZC_TRACK_DL_BUTTON_ID)
     .prop('title', 'Download this track');
   if ($(soundActions).find('.sc-button-responsive').length) {
     dlButton.addClass('sc-button-responsive');
@@ -66,4 +71,8 @@ function addDlButton(soundActions: JQuery<HTMLElement>, dlButton: JQuery<HTMLEle
       buttonGroup.append(dlButton);
     }
   }
+}
+
+function removeDlButton(): void {
+  $(`#${ZC_TRACK_DL_BUTTON_ID}`).remove();
 }
