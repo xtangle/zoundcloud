@@ -23,7 +23,7 @@ function getPlugins() {
       new ChromeExtensionReloader({
         entries: { //The entries used for the content/background scripts
           background: 'background', //Use the entry names, not the file name or the path
-          contentScript: 'content-script' //Use the entry names, not the file name or the path
+          contentScript: 'content' //Use the entry names, not the file name or the path
         }
       })
     );

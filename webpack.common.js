@@ -6,7 +6,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 module.exports = {
   entry: {
     background: path.join(__dirname, 'src/ts/background.ts'),
-    'content-script': path.join(__dirname, 'src/ts/content-script.ts'),
+    content: path.join(__dirname, 'src/ts/content.ts'),
     vendor: ['jquery']
   },
   output: {
@@ -47,10 +47,6 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: Infinity
-    }),
-    // set environment global variable
-    new webpack.DefinePlugin({
-      ENV: JSON.stringify(process !== undefined ? process.env.NODE_ENV : 'development')
     })
   ]
 };

@@ -6,7 +6,6 @@ module.exports = function (config) {
       'src/ts/**/*.ts'
     ],
     exclude: [
-      'src/ts/constants.ts'
     ],
     preprocessors: {
       'src/ts/**/*.ts': ['karma-typescript']
