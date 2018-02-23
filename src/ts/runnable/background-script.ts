@@ -17,6 +17,10 @@ export class BackgroundScript implements IRunnable {
 
   private subscriptions: Subscription = new Subscription();
 
+  public cleanUp(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   public run(): void {
     this.subscriptions.add(this.soundCloudPageVisited$.subscribe((details: WebNavigationTransitionCallbackDetails) => {
       logger.log('On history state updated match!', details);
@@ -24,9 +28,5 @@ export class BackgroundScript implements IRunnable {
       chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
       chrome.tabs.executeScript(details.tabId, {file: 'content.js'});
     }));
-  }
-
-  public cleanUp(): void {
-    this.subscriptions.unsubscribe();
   }
 }

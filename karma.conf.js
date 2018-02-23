@@ -1,7 +1,7 @@
 module.exports = function (config) {
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'sinon-chrome', 'karma-typescript'],
+    frameworks: ['mocha', 'karma-typescript'],
     files: [
       'src/ts/**/*.ts'
     ],
@@ -11,7 +11,6 @@ module.exports = function (config) {
       'src/ts/**/*.ts': ['karma-typescript']
     },
     client: {
-      captureConsole: false,
       mocha: {
         opts: 'mocha.opts'
       }
