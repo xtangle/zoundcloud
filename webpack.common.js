@@ -1,7 +1,7 @@
 const path = require('path');
-const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -18,16 +18,9 @@ module.exports = {
       {
         exclude: /node_modules/,
         test: /\.tsx?$/,
-        loader: 'ts-loader'
-      },
-      {
-        exclude: /node_modules/,
-        test: /\.tsx?$/,
-        loader: 'tslint-loader',
-        enforce: 'pre',
+        loader: 'ts-loader',
         options: {
-          failOnHint: false,
-          typeCheck: true
+          transpileOnly: true
         }
       }
     ]
@@ -43,10 +36,10 @@ module.exports = {
       context: 'src',
       from: '*.*'
     }]),
-    // pack common vender files
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      minChunks: Infinity
+    /** todo: Use official repo to dl the plugin once Webpack 4 support is merged
+        see https://github.com/TypeStrong/fork-ts-checker-webpack-plugin */
+    new ForkTsCheckerWebpackPlugin({
+      tslint: true
     })
   ]
 };
