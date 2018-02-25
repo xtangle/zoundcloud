@@ -1,9 +1,10 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
+import {Subject} from 'rxjs/Subject';
 import * as sinonChai from 'sinon-chai';
 import * as sinonChrome from 'sinon-chrome';
 import {BackgroundScript} from './background-script';
-import WebNavigationTransitionCallbackDetails = chrome.webNavigation.WebNavigationTransitionCallbackDetails;
+import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 /* tslint:disable:no-unused-expression */
 describe('background script', () => {
@@ -16,65 +17,46 @@ describe('background script', () => {
   });
 
   after(() => {
-    sinonChrome.flush();
     delete (global as any).chrome;
   });
 
   beforeEach(() => {
-    sinonChrome.reset();
     fixture = new BackgroundScript();
   });
 
   afterEach(() => {
     fixture.cleanUp();
+    sinonChrome.flush();
+    sinonChrome.reset();
   });
 
-  describe('running the content script', () => {
-    const defaultTabId = 123;
-    const cssFile = 'styles.css';
-    const vendorFile = 'vendor.js';
-    const contentFile = 'content.js';
+  context('running the content script', () => {
 
-    it('should run the content script when navigating to a SoundCloud web page', () => {
-      const urls: string[] = [
-        'https://soundcloud.com/some-user/some-track',
-        'https://soundcloud.com/some-user/some-track?in=another-user-123/sets/Playlist123'
-      ];
+    it('should run the content script when visiting a SoundCloud page', () => {
+      const tabId = 123;
+      const scPageVisited$: Subject<WebNavigationUrlCallbackDetails> = new Subject<WebNavigationUrlCallbackDetails>();
+      fixture.scPageVisited$ = scPageVisited$;
 
       fixture.run();
+      scPageVisited$.next({tabId, timeStamp: 432.1, url: 'some-url'});
 
-      urls.forEach((url: string) => {
-        resetStubHistories();
-        sinonChrome.webNavigation.onHistoryStateUpdated.dispatch(createCallbackDetails(url));
-        verifyContentScriptIsRun();
-      });
+      expect(sinonChrome.tabs.insertCSS.withArgs(tabId, {file: 'styles.css'})).to.have.been.calledOnce;
+      expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
+      expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(tabId, {file: 'vendor.js'});
+      expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
     });
 
-    function resetStubHistories(): void {
-      sinonChrome.tabs.insertCSS.resetHistory();
-      sinonChrome.tabs.executeScript.resetHistory();
-    }
+    it('should not run the content script when not visiting a SoundCloud page', (done) => {
+      fixture.run();
 
-    function verifyContentScriptIsRun(tabId: number = defaultTabId): void {
-      expect(sinonChrome.tabs.insertCSS.withArgs(defaultTabId, {file: cssFile})).to.have.been.calledOnce;
-      expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
-      expect(sinonChrome.tabs.executeScript.firstCall)
-        .to.have.been.calledWithExactly(defaultTabId, {file: vendorFile});
-      expect(sinonChrome.tabs.executeScript.secondCall)
-        .to.have.been.calledWithExactly(defaultTabId, {file: contentFile});
-    }
+      setTimeout(() => {
+        expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
+        expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
+        expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
+        done();
+      }, this.timeout);
+    });
 
-    function createCallbackDetails(url: string, tabId: number = defaultTabId): WebNavigationTransitionCallbackDetails {
-      return {
-        frameId: 0,
-        processId: 270,
-        tabId,
-        timeStamp: 1519349308387.4,
-        transitionQualifiers: [],
-        transitionType: 'link',
-        url
-      };
-    }
   });
 
 });

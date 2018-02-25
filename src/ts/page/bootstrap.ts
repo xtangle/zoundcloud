@@ -1,15 +1,15 @@
 import * as $ from 'jquery';
 import 'rxjs/add/operator/first';
-import {elementRemoved$} from '../util/dom-observer';
+import {elementAdded$, elementRemoved$} from '../util/dom-observer';
 import {IContentPage} from './content-page';
 
 export function bootstrap(contentPage: IContentPage): void {
   if (contentPage.test()) {
     if (!idTagIsInDOM(contentPage.id)) {
       const idTag = createIdTag(contentPage.id);
-      addIdTagToDOM(idTag);
+      elementAdded$((node: Node) => node.isSameNode(idTag)).first().subscribe(() => contentPage.load());
       elementRemoved$(idTag).first().subscribe(() => contentPage.unload());
-      contentPage.load();
+      addIdTagToDOM(idTag);
     }
   } else {
     removeIdTagFromDOM(contentPage.id);

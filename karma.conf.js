@@ -6,16 +6,19 @@ module.exports = function (config) {
       'src/ts/**/*.ts'
     ],
     exclude: [
+      'src/ts/background.ts',
+      'src/ts/content.ts'
     ],
     preprocessors: {
       'src/ts/**/*.ts': ['karma-typescript']
     },
     client: {
+      captureConsole: false,
       mocha: {
         opts: 'mocha.opts'
       }
     },
-    reporters: ['mocha'],
+    reporters: ['spec'],
     karmaTypescriptConfig: {
       bundlerOptions: {
         entrypoints: /\.spec\.ts$/

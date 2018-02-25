@@ -17,11 +17,14 @@ describe('bootstrap function', () => {
     document.body.innerHTML = '<body></body>';
   });
 
-  it('should bootstrap the content page when test passes and id tag is not in DOM', () => {
+  it('should bootstrap the content page when test passes and id tag is not in DOM', (done) => {
     initContentPage(true);
     bootstrap(contentPage);
     verifyIdTagAddedToDOM();
-    expect(spyLoad).to.have.been.calledOnce;
+    setTimeout(() => {
+      expect(spyLoad).to.have.been.calledOnce;
+      done();
+    }, this.timeout);
   });
 
   it('should not bootstrap the content page when test passes and id tag is in DOM', () => {

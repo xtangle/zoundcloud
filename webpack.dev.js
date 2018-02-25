@@ -5,7 +5,7 @@ const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
 const argv = require('yargs').argv;
 
 module.exports = merge(common, {
-  devtool: 'inline-source-map',
+  devtool: 'eval-source-map',
   plugins: getPlugins()
 });
 
