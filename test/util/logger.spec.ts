@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import {expect} from 'chai';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {logger} from './logger';
+import {logger} from '../../src/util/logger';
 
 /* tslint:disable:no-unused-expression */
 describe('logger', () => {

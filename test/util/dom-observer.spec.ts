@@ -5,7 +5,7 @@ import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {elementAdded$, elementExist$, elementRemoved$} from './dom-observer';
+import {elementAdded$, elementExist$, elementRemoved$} from '../../src/util/dom-observer';
 
 /* tslint:disable:no-unused-expression */
 describe('dom observer', () => {

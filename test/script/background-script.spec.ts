@@ -8,9 +8,9 @@ import {Subscription} from 'rxjs/Subscription';
 import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import * as sinonChrome from 'sinon-chrome';
-import {SC_URL_PATTERN} from '../constants';
-import {doNothingIfMatch} from '../util/test-utils';
-import {BackgroundScript} from './background-script';
+import {SC_URL_PATTERN} from '../../src/constants';
+import {BackgroundScript} from '../../src/script/background-script';
+import {doNothingIfMatch} from '../test-utils';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 /* tslint:disable:no-unused-expression */

@@ -3,14 +3,16 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['mocha', 'karma-typescript'],
     files: [
-      'src/ts/**/*.ts'
+      'src/**/*.ts',
+      'test/**/*.ts',
     ],
     exclude: [
-      'src/ts/background.ts',
-      'src/ts/content.ts'
+      'src/background.ts',
+      'src/content.ts'
     ],
     preprocessors: {
-      'src/ts/**/*.ts': ['karma-typescript']
+      'src/**/*.ts': ['karma-typescript'],
+      'test/**/*.ts': ['karma-typescript']
     },
     client: {
       captureConsole: false,

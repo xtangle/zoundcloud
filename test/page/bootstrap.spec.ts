@@ -3,8 +3,8 @@ import {expect} from 'chai';
 import * as $ from 'jquery';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {bootstrap} from './bootstrap';
-import {IContentPage} from './content-page';
+import {bootstrap} from '../../src/page/bootstrap';
+import {IContentPage} from '../../src/page/content-page';
 
 /* tslint:disable:no-unused-expression */
 describe('bootstrap function', () => {

@@ -5,8 +5,8 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   entry: {
-    background: path.join(__dirname, 'src/ts/background.ts'),
-    content: path.join(__dirname, 'src/ts/content.ts'),
+    background: path.join(__dirname, 'src/background.ts'),
+    content: path.join(__dirname, 'src/content.ts'),
     vendor: ['jquery']
   },
   output: {
@@ -33,7 +33,7 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     // copy assets
     new CopyWebpackPlugin([{
-      context: 'src',
+      context: 'src/resources',
       from: '*.*'
     }]),
     /** todo: Use official repo to dl the plugin once Webpack 4 support is merged
