@@ -3,9 +3,7 @@ node_js:
   - "node"
   - "lts/*"
 script:
-  - yarn run test:coverage
-  - yarn run build
-  - yarn run build:prod
+  - yarn run ci
 sudo: required
 addons:
   chrome: stable
