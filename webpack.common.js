@@ -36,8 +36,6 @@ module.exports = {
       context: 'src/resources',
       from: '*.*'
     }]),
-    /** todo: Use official repo to dl the plugin once Webpack 4 support is merged
-        see https://github.com/TypeStrong/fork-ts-checker-webpack-plugin */
     new ForkTsCheckerWebpackPlugin({
       tslint: true
     })
