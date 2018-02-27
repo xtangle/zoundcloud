@@ -1,5 +1,7 @@
 import {expect} from 'chai';
+import * as $ from 'jquery';
 import {stub} from 'sinon';
+import {ZC_DL_BUTTON_CLASS} from '../../src/constants';
 import {TrackContentPage} from '../../src/page/track-content-page';
 
 describe('track content page', () => {
@@ -7,11 +9,15 @@ describe('track content page', () => {
   let fixture: TrackContentPage;
 
   beforeEach(() => {
-    fixture = new TrackContentPage();
     document.body.innerHTML = '<body></body>';
+    fixture = new TrackContentPage();
   });
 
-  context('when to load the content page', () => {
+  afterEach(() => {
+    fixture.unload();
+  });
+
+  describe('deciding when it should be loaded', () => {
 
     const trackPageUrls = [
       'https://soundcloud.com/some-user/some-track',
@@ -62,6 +68,48 @@ describe('track content page', () => {
         expect(fixture.test()).to.be.false;
       });
     });
+
+  });
+
+  describe('loading of the content page', () => {
+
+    const innerTestHTML = `
+      <div class="listenEngagement sc-clearfix">
+        <div class="soundActions sc-button-toolbar soundActions__medium">
+          <div><button id="button-1"/><button id="button-2"/></div>
+        </div>
+      </div>
+    `;
+
+    const testHTML = `<body>${innerTestHTML}</body>`;
+
+    it('should inject the download button when listen engagement toolbar already exists', () => {
+      document.body.innerHTML = testHTML;
+      fixture.load();
+      verifyDlButtonIsInjected();
+    });
+
+    it('should inject the download button when listen engagement toolbar is added', (done) => {
+      const innerNodes = $.parseHTML(innerTestHTML);
+      fixture.load();
+      setTimeout(() => {
+        verifyDlButtonIsNotInjected();
+        $('body').append(innerNodes);
+        setTimeout(() => {
+          console.log(document.body.innerHTML);
+          verifyDlButtonIsInjected();
+          done();
+        }, 100);
+      }, this.timeout - 100);
+    });
+
+    function verifyDlButtonIsInjected() {
+      expect($(`.${ZC_DL_BUTTON_CLASS}`).length).to.be.equal(1);
+    }
+
+    function verifyDlButtonIsNotInjected() {
+      expect($(`.${ZC_DL_BUTTON_CLASS}`).length).to.be.equal(0);
+    }
 
   });
 

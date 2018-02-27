@@ -48,24 +48,18 @@ export class TrackContentPage implements IContentPage {
 
 function injectDlButton(listenEngagement: Node): void {
   const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
-  const dlButton = createDlButton(soundActions);
+  const dlButton = createDlButton();
   dlButton.on('click', () => logger.log('Clicked track download button'));
   addDlButton(soundActions, dlButton);
 }
 
-function createDlButton(soundActions: JQuery<HTMLElement>): JQuery<HTMLElement> {
-  const dlButton = $('<button/>')
-    .addClass(['sc-button', 'sc-button-medium'])
+function createDlButton(): JQuery<HTMLElement> {
+  return $('<button/>')
+    .addClass(['sc-button', 'sc-button-medium', 'sc-button-responsive'])
     .addClass(ZC_DL_BUTTON_CLASS)
     .attr('id', ZC_TRACK_DL_BUTTON_ID)
-    .prop('title', 'Download this track');
-  if ($(soundActions).find('.sc-button-responsive').length) {
-    dlButton.addClass('sc-button-responsive');
-    dlButton.html('Download');
-  } else {
-    dlButton.addClass('sc-button-icon');
-  }
-  return dlButton;
+    .prop('title', 'Download this track')
+    .html('Download');
 }
 
 function addDlButton(soundActions: JQuery<HTMLElement>, dlButton: JQuery<HTMLElement>): void {

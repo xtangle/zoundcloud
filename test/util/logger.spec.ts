@@ -26,7 +26,7 @@ describe('logger', () => {
     expect(spyConsoleLog.withArgs(`${expectedMsgPrefix}: some message`, 1, 'arg-two')).to.have.been.calledOnce;
   });
 
-  it('should log message if not in development mode', () => {
+  it('should not log message if not in development mode', () => {
     process.env.NODE_ENV = 'production';
     logger.log('some message');
     expect(spyConsoleLog).to.not.have.been.called;
