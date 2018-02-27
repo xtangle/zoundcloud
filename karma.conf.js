@@ -26,6 +26,17 @@ module.exports = function (config) {
         entrypoints: /\.spec\.ts$/
       },
       compilerOptions: require('./tsconfig').compilerOptions,
+      coverageOptions: {
+        threshold: {
+          // todo: raise these values higher once rest of the tests are implemented
+          global: {
+            statements: 79,
+            branches: 60,
+            functions: 60,
+            lines: 79,
+          }
+        },
+      },
       reports: {
         'html': 'coverage',
         'text': ''

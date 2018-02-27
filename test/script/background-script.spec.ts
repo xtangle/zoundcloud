@@ -13,7 +13,6 @@ import {BackgroundScript} from '../../src/script/background-script';
 import {doNothingIfMatch} from '../test-utils';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
-/* tslint:disable:no-unused-expression */
 describe('background script', () => {
   chai.use(sinonChai);
 
@@ -76,12 +75,12 @@ describe('background script', () => {
     const scUrls = [
       'https://soundcloud.com/',
       'https://soundcloud.com/some-user/some-track',
-      'https://soundcloud.com/abcdefg/7-track?in=user/sets/playlist',
+      'https://soundcloud.com/abcdefg/some-track?in=user/sets/playlist',
       'https://soundcloud.com/search?q=qwe%20rty'
     ];
 
     const nonScUrls = [
-      'https://not-soundcloud.com/',
+      'https://not.soundcloud.com/',
       'https://soundcloud.org/',
       'https://soundcloud.com.abc/',
     ];

@@ -4,7 +4,6 @@ import {match, stub} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import {doNothingIfMatch} from './test-utils';
 
-/* tslint:disable:no-unused-expression */
 describe('test utils', () => {
   chai.use(sinonChai);
 

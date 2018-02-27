@@ -7,7 +7,6 @@ import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import {elementAdded$, elementExist$, elementRemoved$} from '../../src/util/dom-observer';
 
-/* tslint:disable:no-unused-expression */
 describe('dom observer', () => {
   chai.use(sinonChai);
   let callback: SinonSpy;

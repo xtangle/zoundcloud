@@ -4,7 +4,6 @@ import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import {logger} from '../../src/util/logger';
 
-/* tslint:disable:no-unused-expression */
 describe('logger', () => {
   chai.use(sinonChai);
   const prevNodeEnv = process.env.NODE_ENV; // Previous stored value in NODE_ENV

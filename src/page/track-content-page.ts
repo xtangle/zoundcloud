@@ -15,10 +15,12 @@ export class TrackContentPage implements IContentPage {
 
   public test(): boolean {
     const TRACK_URL_PATTERN = /^[^:]*:\/\/soundcloud\.com\/([^\/]+)\/([^\/]+)(?:\?in=.+)?$/;
-    const TRACK_URL_BLACKLIST_1 = ['you', 'charts', 'pages', 'settings', 'jobs', 'tags', 'stations'];
-    const TRACK_URL_BLACKLIST_2 = ['stats'];
-    const matchResults = TRACK_URL_PATTERN.exec(document.location.href);
-    return matchResults &&
+    const TRACK_URL_BLACKLIST_1 = ['you', 'charts', 'jobs', 'messages', 'mobile',
+      'pages', 'pro', 'search', 'stations', 'settings', 'tags'];
+    const TRACK_URL_BLACKLIST_2 = ['albums', 'comments', 'followers', 'following', 'likes',
+      'playlists', 'reposts', 'stats', 'tracks'];
+    const matchResults = TRACK_URL_PATTERN.exec(this.getCurrentURL());
+    return (matchResults !== null) &&
       (TRACK_URL_BLACKLIST_1.indexOf(matchResults[1]) < 0) &&
       (TRACK_URL_BLACKLIST_2.indexOf(matchResults[2]) < 0);
   }
@@ -36,6 +38,11 @@ export class TrackContentPage implements IContentPage {
     removeDlButton();
     this.subscriptions.unsubscribe();
     logger.log('Unloaded track content page');
+  }
+
+  // noinspection JSMethodCanBeStatic
+  public getCurrentURL(): string {
+    return document.location.href;
   }
 }
 

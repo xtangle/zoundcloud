@@ -6,7 +6,6 @@ import * as sinonChai from 'sinon-chai';
 import {bootstrap} from '../../src/page/bootstrap';
 import {IContentPage} from '../../src/page/content-page';
 
-/* tslint:disable:no-unused-expression */
 describe('bootstrap function', () => {
   chai.use(sinonChai);
   let contentPage: DummyContentPage;
