@@ -3,6 +3,7 @@ import 'rxjs/add/observable/merge';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {ZC_DL_BUTTON_CLASS} from '../constants';
+import {UrlService} from '../service/url-service';
 import {elementAdded$, elementExist$} from '../util/dom-observer';
 import {logger} from '../util/logger';
 import {IContentPage} from './content-page';
@@ -10,7 +11,6 @@ import {IContentPage} from './content-page';
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
 export class TrackContentPage implements IContentPage {
-
   public readonly id = 'zc-track-content';
   private readonly subscriptions: Subscription = new Subscription();
 
@@ -20,7 +20,7 @@ export class TrackContentPage implements IContentPage {
       'pages', 'pro', 'search', 'stations', 'settings', 'tags'];
     const TRACK_URL_BLACKLIST_2 = ['albums', 'comments', 'followers', 'following', 'likes',
       'playlists', 'reposts', 'stats', 'tracks'];
-    const matchResults = TRACK_URL_PATTERN.exec(this.getCurrentURL());
+    const matchResults = TRACK_URL_PATTERN.exec(UrlService.getCurrentUrl());
     return (matchResults !== null) &&
       (TRACK_URL_BLACKLIST_1.indexOf(matchResults[1]) < 0) &&
       (TRACK_URL_BLACKLIST_2.indexOf(matchResults[2]) < 0);
@@ -40,8 +40,6 @@ export class TrackContentPage implements IContentPage {
     this.subscriptions.unsubscribe();
     logger.log('Unloaded track content page');
   }
-
-  private getCurrentURL = () => document.location.href;
 }
 
 function injectDlButton(listenEngagement: Node): void {

@@ -2,10 +2,11 @@ import {expect} from 'chai';
 import * as chai from 'chai';
 import * as $ from 'jquery';
 import {Subscription} from 'rxjs/Subscription';
-import {spy, stub} from 'sinon';
+import {SinonStub, spy, stub} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import {ZC_DL_BUTTON_CLASS} from '../../src/constants';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '../../src/page/track-content-page';
+import {UrlService} from '../../src/service/url-service';
 
 describe('track content page', () => {
   chai.use(sinonChai);
@@ -31,6 +32,20 @@ describe('track content page', () => {
   });
 
   describe('deciding when it should be loaded', () => {
+    let stubGetUrl: SinonStub;
+
+    before(() => {
+      stubGetUrl = stub(UrlService, 'getCurrentUrl');
+    });
+
+    beforeEach(() => {
+      stubGetUrl.resetHistory();
+      stubGetUrl.resetBehavior();
+    });
+
+    after(() => {
+      stubGetUrl.restore();
+    });
 
     const trackPageUrls = [
       'https://soundcloud.com/some-user/some-track',
@@ -67,17 +82,15 @@ describe('track content page', () => {
     ];
 
     it('should load when URL matches a track page', () => {
-      const stubGetURL = stub(fixture as any, 'getCurrentURL');
       trackPageUrls.forEach((url, index) => {
-        stubGetURL.onCall(index).returns(url);
+        stubGetUrl.onCall(index).returns(url);
         expect(fixture.test()).to.be.true;
       });
     });
 
     it('should not load when URL does not match a track page', () => {
-      const stubGetURL = stub(fixture as any, 'getCurrentURL');
       nonTrackPageUrls.forEach((url, index) => {
-        stubGetURL.onCall(index).returns(url);
+        stubGetUrl.onCall(index).returns(url);
         expect(fixture.test()).to.be.false;
       });
     });

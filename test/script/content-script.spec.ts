@@ -5,6 +5,7 @@ import * as sinonChai from 'sinon-chai';
 import {IContentPage} from '../../src/page/content-page';
 import {TrackContentPage} from '../../src/page/track-content-page';
 import {ContentScript} from '../../src/script/content-script';
+import {BootstrapService} from '../../src/service/bootstrap-service';
 
 describe('content script', () => {
   chai.use(sinonChai);
@@ -13,7 +14,7 @@ describe('content script', () => {
   let spyBootstrap: SinonSpy;
 
   before(() => {
-    spyBootstrap = spy(ContentScript as any, 'bootstrap');
+    spyBootstrap = spy(BootstrapService, 'bootstrap');
   });
 
   after(() => {
@@ -29,5 +30,4 @@ describe('content script', () => {
     fixture.run();
     expect(spyBootstrap.withArgs(isTrackContentPage)).to.be.calledOnce;
   });
-
 });

@@ -1,11 +1,9 @@
-import {bootstrap} from '../page/bootstrap';
 import {TrackContentPage} from '../page/track-content-page';
+import {BootstrapService} from '../service/bootstrap-service';
 import {IRunnable} from './runnable';
 
 export class ContentScript implements IRunnable {
-  private static bootstrap = bootstrap;
-
   public run(): void {
-    ContentScript.bootstrap(new TrackContentPage());
+    BootstrapService.bootstrap(new TrackContentPage());
   }
 }

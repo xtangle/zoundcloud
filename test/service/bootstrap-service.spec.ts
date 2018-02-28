@@ -3,11 +3,13 @@ import {expect} from 'chai';
 import * as $ from 'jquery';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {bootstrap} from '../../src/page/bootstrap';
 import {IContentPage} from '../../src/page/content-page';
+import {BootstrapService} from '../../src/service/bootstrap-service';
 
-describe('bootstrap function', () => {
+describe('bootstrap service', () => {
   chai.use(sinonChai);
+
+  const fixture = BootstrapService;
   let contentPage: DummyContentPage;
   let spyLoad: SinonSpy;
   let spyUnload: SinonSpy;
@@ -18,7 +20,7 @@ describe('bootstrap function', () => {
 
   it('should bootstrap the content page when test passes and id tag is not in DOM', (done) => {
     initContentPage(true);
-    bootstrap(contentPage);
+    fixture.bootstrap(contentPage);
     verifyIdTagAddedToDOM();
     setTimeout(() => {
       expect(spyLoad).to.have.been.calledOnce;
@@ -29,20 +31,20 @@ describe('bootstrap function', () => {
   it('should not bootstrap the content page when test passes and id tag is in DOM', () => {
     initContentPage(true);
     document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
-    bootstrap(contentPage);
+    fixture.bootstrap(contentPage);
     expect(spyLoad).to.not.have.been.called;
   });
 
   it('should remove the id tag when test fails', () => {
     initContentPage(false);
     document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
-    bootstrap(contentPage);
+    fixture.bootstrap(contentPage);
     verifyIdTagRemovedFromDOM();
   });
 
   it('should unload the content page when the id tag is removed from the DOM after bootstrapping', (done) => {
     initContentPage(true);
-    bootstrap(contentPage);
+    fixture.bootstrap(contentPage);
     removeIdTagFromDOM();
     setTimeout(() => {
       expect(spyUnload).to.have.been.calledOnce;
