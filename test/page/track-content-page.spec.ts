@@ -13,14 +13,15 @@ describe('track content page', () => {
 
   let fixture: TrackContentPage;
 
-  const innerTestHtml = `
-    <div class="listenEngagement sc-clearfix">
-      <div class="soundActions sc-button-toolbar soundActions__medium">
-        <div id="button-group"><button id="button-1"/><button id="button-2"/></div>
+  const testHtml = `
+    <body>
+      <div class="listenEngagement sc-clearfix">
+        <div class="soundActions sc-button-toolbar soundActions__medium">
+          <div id="button-group"><button id="button-1"/><button id="button-2"/></div>
+        </div>
       </div>
-    </div>
+    </body>
   `;
-  const testHtml = `<body>${innerTestHtml}</body>`;
 
   beforeEach(() => {
     document.body.innerHTML = '<body></body>';
@@ -102,18 +103,17 @@ describe('track content page', () => {
     it('should inject the download button when listen engagement toolbar already exists', () => {
       document.body.innerHTML = testHtml;
       fixture.load();
-      verifyDlButtonIsInjected();
+      verifyDlButtonIsInDOM();
     });
 
     it('should inject the download button when listen engagement toolbar is added', (done) => {
-      const innerNodes = $.parseHTML(innerTestHtml);
+      const listenEngagement = $(testHtml).filter('.listenEngagement');
       fixture.load();
       setTimeout(() => {
-        verifyDlButtonIsNotInjected();
-        $('body').append(innerNodes);
+        verifyDlButtonIsNotInDOM();
+        $('body').append(listenEngagement);
         setTimeout(() => {
-          console.log(document.body.innerHTML);
-          verifyDlButtonIsInjected();
+          verifyDlButtonIsInDOM();
           done();
         }, 100);
       }, this.timeout - 100);
@@ -123,7 +123,7 @@ describe('track content page', () => {
       document.body.innerHTML = testHtml;
       $(`#button-group`).remove();
       fixture.load();
-      verifyDlButtonIsNotInjected();
+      verifyDlButtonIsNotInDOM();
     });
 
     context('the download button', () => {
@@ -174,7 +174,7 @@ describe('track content page', () => {
 
     it('should remove the download button', () => {
       fixture.unload();
-      verifyDlButtonIsNotInjected();
+      verifyDlButtonIsNotInDOM();
     });
 
     it('should unsubscribe from all subscriptions', () => {
@@ -189,11 +189,11 @@ describe('track content page', () => {
     return $(`#${ZC_TRACK_DL_BUTTON_ID}`);
   }
 
-  function verifyDlButtonIsInjected() {
-    expect(getDlButton().length).to.be.equal(1, 'download button is not injected when it should');
+  function verifyDlButtonIsInDOM() {
+    expect(getDlButton().length).to.be.equal(1, 'download button is not in DOM when it should be');
   }
 
-  function verifyDlButtonIsNotInjected() {
-    expect(getDlButton().length).to.be.equal(0, 'download button is injected when it should not be');
+  function verifyDlButtonIsNotInDOM() {
+    expect(getDlButton().length).to.be.equal(0, 'download button is in DOM when it should not be');
   }
 });
