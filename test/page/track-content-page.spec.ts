@@ -1,12 +1,25 @@
 import {expect} from 'chai';
+import * as chai from 'chai';
 import * as $ from 'jquery';
-import {stub} from 'sinon';
+import {Subscription} from 'rxjs/Subscription';
+import {spy, stub} from 'sinon';
+import * as sinonChai from 'sinon-chai';
 import {ZC_DL_BUTTON_CLASS} from '../../src/constants';
-import {TrackContentPage} from '../../src/page/track-content-page';
+import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '../../src/page/track-content-page';
 
 describe('track content page', () => {
+  chai.use(sinonChai);
 
   let fixture: TrackContentPage;
+
+  const innerTestHtml = `
+    <div class="listenEngagement sc-clearfix">
+      <div class="soundActions sc-button-toolbar soundActions__medium">
+        <div id="button-group"><button id="button-1"/><button id="button-2"/></div>
+      </div>
+    </div>
+  `;
+  const testHtml = `<body>${innerTestHtml}</body>`;
 
   beforeEach(() => {
     document.body.innerHTML = '<body></body>';
@@ -54,7 +67,7 @@ describe('track content page', () => {
     ];
 
     it('should load when URL matches a track page', () => {
-      const stubGetURL = stub(fixture, 'getCurrentURL');
+      const stubGetURL = stub(fixture as any, 'getCurrentURL');
       trackPageUrls.forEach((url, index) => {
         stubGetURL.onCall(index).returns(url);
         expect(fixture.test()).to.be.true;
@@ -62,7 +75,7 @@ describe('track content page', () => {
     });
 
     it('should not load when URL does not match a track page', () => {
-      const stubGetURL = stub(fixture, 'getCurrentURL');
+      const stubGetURL = stub(fixture as any, 'getCurrentURL');
       nonTrackPageUrls.forEach((url, index) => {
         stubGetURL.onCall(index).returns(url);
         expect(fixture.test()).to.be.false;
@@ -73,24 +86,14 @@ describe('track content page', () => {
 
   describe('loading of the content page', () => {
 
-    const innerTestHTML = `
-      <div class="listenEngagement sc-clearfix">
-        <div class="soundActions sc-button-toolbar soundActions__medium">
-          <div><button id="button-1"/><button id="button-2"/></div>
-        </div>
-      </div>
-    `;
-
-    const testHTML = `<body>${innerTestHTML}</body>`;
-
     it('should inject the download button when listen engagement toolbar already exists', () => {
-      document.body.innerHTML = testHTML;
+      document.body.innerHTML = testHtml;
       fixture.load();
       verifyDlButtonIsInjected();
     });
 
     it('should inject the download button when listen engagement toolbar is added', (done) => {
-      const innerNodes = $.parseHTML(innerTestHTML);
+      const innerNodes = $.parseHTML(innerTestHtml);
       fixture.load();
       setTimeout(() => {
         verifyDlButtonIsNotInjected();
@@ -103,14 +106,81 @@ describe('track content page', () => {
       }, this.timeout - 100);
     });
 
-    function verifyDlButtonIsInjected() {
-      expect($(`.${ZC_DL_BUTTON_CLASS}`).length).to.be.equal(1);
-    }
+    it('should not inject the download button when the button group cannot be found', () => {
+      document.body.innerHTML = testHtml;
+      $(`#button-group`).remove();
+      fixture.load();
+      verifyDlButtonIsNotInjected();
+    });
 
-    function verifyDlButtonIsNotInjected() {
-      expect($(`.${ZC_DL_BUTTON_CLASS}`).length).to.be.equal(0);
-    }
+    context('the download button', () => {
+      beforeEach(() => {
+        document.body.innerHTML = testHtml;
+      });
+
+      it('should have the correct classes', () => {
+        fixture.load();
+        expect(getDlButton().is(`.sc-button.sc-button-medium.sc-button-responsive.${ZC_DL_BUTTON_CLASS}`))
+          .to.be.true;
+      });
+
+      it('should have the correct label', () => {
+        fixture.load();
+        expect(getDlButton().html()).to.be.equal('Download');
+      });
+
+      it('should have the correct title', () => {
+        fixture.load();
+        expect(getDlButton().prop('title')).to.be.equal('Download this track');
+      });
+
+      it('should be added as the last child of the button group ' +
+        'if the last button is not the \'More\' button', () => {
+        fixture.load();
+        expect($('#button-group').find('button:last-child').is(getDlButton())).to.be.true;
+      });
+
+      it('should be added as the second-to-last child of the button group ' +
+        'if the last button is the \'More\' button', () => {
+        const btnGroup = $('#button-group');
+        const moreBtn = $('<button/>').addClass('sc-button-more');
+        btnGroup.append(moreBtn);
+        fixture.load();
+        expect(btnGroup.find('button:nth-last-child(2)').is(getDlButton())).to.be.true;
+      });
+    });
 
   });
 
+  describe('unloading of the content page', () => {
+    beforeEach(() => {
+      document.body.innerHTML = testHtml;
+      const dlButton = $('<button/>').attr('id', ZC_TRACK_DL_BUTTON_ID);
+      $(`#button-group`).append(dlButton);
+    });
+
+    it('should remove the download button', () => {
+      fixture.unload();
+      verifyDlButtonIsNotInjected();
+    });
+
+    it('should unsubscribe from all subscriptions', () => {
+      const SUBS_PROP = 'subscriptions';
+      const spyUnsubscribe = spy((fixture as any)[SUBS_PROP] as Subscription, 'unsubscribe');
+      fixture.unload();
+      expect(spyUnsubscribe).to.be.called;
+    });
+  });
+
+  function getDlButton(): JQuery<HTMLElement> {
+    return $(`#${ZC_TRACK_DL_BUTTON_ID}`);
+  }
+
+  function verifyDlButtonIsInjected() {
+    expect(getDlButton().length).to.be.equal(1, 'download button is not injected when it should');
+  }
+
+  function verifyDlButtonIsNotInjected() {
+    expect(getDlButton().length).to.be.equal(0, 'download button is injected when it should not be');
+  }
 });

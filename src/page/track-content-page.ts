@@ -7,9 +7,10 @@ import {elementAdded$, elementExist$} from '../util/dom-observer';
 import {logger} from '../util/logger';
 import {IContentPage} from './content-page';
 
-const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
+export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
 export class TrackContentPage implements IContentPage {
+
   public readonly id = 'zc-track-content';
   private readonly subscriptions: Subscription = new Subscription();
 
@@ -40,10 +41,7 @@ export class TrackContentPage implements IContentPage {
     logger.log('Unloaded track content page');
   }
 
-  // noinspection JSMethodCanBeStatic
-  public getCurrentURL(): string {
-    return document.location.href;
-  }
+  private getCurrentURL = () => document.location.href;
 }
 
 function injectDlButton(listenEngagement: Node): void {

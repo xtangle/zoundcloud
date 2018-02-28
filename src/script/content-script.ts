@@ -3,7 +3,9 @@ import {TrackContentPage} from '../page/track-content-page';
 import {IRunnable} from './runnable';
 
 export class ContentScript implements IRunnable {
+  private static bootstrap = bootstrap;
+
   public run(): void {
-    bootstrap(new TrackContentPage());
+    ContentScript.bootstrap(new TrackContentPage());
   }
 }

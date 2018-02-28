@@ -21,11 +21,7 @@ export function elementRemoved$(elem: Node): Observable<boolean> {
       });
       return mutationObserver;
     },
-    () => {
-      if (mutationObserver) {
-        mutationObserver.disconnect();
-      }
-    }
+    () => mutationObserver.disconnect()
   );
 }
 
@@ -49,11 +45,7 @@ export function elementAdded$(test: (node: Node) => boolean): Observable<Node> {
       });
       return mutationObserver;
     },
-    () => {
-      if (mutationObserver) {
-        mutationObserver.disconnect();
-      }
-    }
+    () => mutationObserver.disconnect()
   );
 }
 
