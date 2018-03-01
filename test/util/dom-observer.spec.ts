@@ -29,33 +29,27 @@ describe('dom observer', () => {
 
   describe('element removed observable', () => {
     let removeMe: HTMLElement;
-    let fixture: Observable<boolean>;
+    let fixture: Observable<any>;
 
     beforeEach(() => {
       removeMe = $('#removeMe')[0];
       fixture = elementRemoved$(removeMe);
     });
 
-    it('should emit true when element is removed directly', (done) => {
-      subscription = fixture.subscribe((val) => {
-        expect(val).to.be.true;
-        done();
-      });
+    it('should emit when element is removed directly', (done) => {
+      subscription = fixture.subscribe(() => done());
       removeMe.remove();
     });
 
-    it('should emit true when element is removed indirectly through parent', (done) => {
+    it('should emit when element is removed indirectly through parent', (done) => {
       const ul: HTMLElement = $('ul')[0];
-      subscription = fixture.subscribe((val) => {
-        expect(val).to.be.true;
-        done();
-      });
+      subscription = fixture.subscribe(() => done());
       ul.remove();
     });
 
-    it('should not emit any value when element is not removed', (done) => {
+    it('should not emit when element is not removed', (done) => {
       const span: HTMLElement = $('span')[0];
-      subscription = fixture.subscribe((val) => callback(val));
+      subscription = fixture.subscribe(() => callback());
       setTimeout(() => {
         expect(callback).to.not.have.been.called;
         done();

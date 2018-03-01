@@ -174,4 +174,32 @@ describe('background script', () => {
 
   });
 
+  context('unloading the background script', () => {
+
+    it('should trigger when the onSuspend event is emitted', (done) => {
+      const spyCleanUp = spy(fixture, 'cleanUp');
+      fixture.run();
+
+      setTimeout(() => {
+        expect(spyCleanUp).to.not.have.been.called;
+        sinonChrome.runtime.onSuspend.trigger();
+        setTimeout(() => {
+          expect(spyCleanUp).to.have.been.called;
+          done();
+        }, 100);
+      }, this.timeout - 100);
+    });
+
+    it('should unsubscribe from all subscriptions', () => {
+      const SUBS_PROP = 'subscriptions';
+      const spyUnsubscribe = spy(fixture[SUBS_PROP], 'unsubscribe');
+
+      fixture.run();
+      fixture.cleanUp();
+
+      expect(spyUnsubscribe).to.have.been.called;
+    });
+
+  });
+
 });

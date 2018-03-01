@@ -13,6 +13,9 @@ export class BackgroundScript implements IRunnable {
 
   public scPageVisited$: Observable<WebNavigationUrlCallbackDetails>;
 
+  private onSuspend$: Observable<any> = Observable.fromEventPattern<any>(
+    (handler: () => void) => chrome.runtime.onSuspend.addListener(handler));
+
   private scWebNavOnCompleted$: Observable<WebNavigationUrlCallbackDetails> =
     Observable.fromEventPattern<WebNavigationUrlCallbackDetails>(
       (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
@@ -27,7 +30,7 @@ export class BackgroundScript implements IRunnable {
     Observable.fromEventPattern<WebNavigationUrlCallbackDetails>(
       (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
         chrome.webNavigation.onHistoryStateUpdated.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-    ).debounceTime(50);
+    ).debounceTime(20);
 
   private subscriptions: Subscription = new Subscription();
 
@@ -36,6 +39,7 @@ export class BackgroundScript implements IRunnable {
   }
 
   public cleanUp(): void {
+    logger.log('Unloading background script');
     this.subscriptions.unsubscribe();
   }
 
@@ -46,5 +50,6 @@ export class BackgroundScript implements IRunnable {
       chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
       chrome.tabs.executeScript(details.tabId, {file: 'content.js'});
     }));
+    this.subscriptions.add(this.onSuspend$.subscribe(() => this.cleanUp()));
   }
 }

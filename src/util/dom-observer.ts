@@ -3,15 +3,15 @@ import 'rxjs/add/observable/fromEventPattern';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 
-export function elementRemoved$(elem: Node): Observable<boolean> {
+export function elementRemoved$(elem: Node): Observable<any> {
   let mutationObserver: MutationObserver;
-  return Observable.fromEventPattern<boolean>(
-    (handler: (signal: boolean) => void) => {
+  return Observable.fromEventPattern<any>(
+    (handler: () => void) => {
       mutationObserver = new MutationObserver((mutations: MutationRecord[]) => {
         mutations.forEach((mutation: MutationRecord) => {
           const nodes = $.makeArray(mutation.removedNodes);
           if (nodes.some((node: Node) => node.contains(elem))) {
-            handler(true);
+            handler();
           }
         });
       });
