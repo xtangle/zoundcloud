@@ -1,7 +1,7 @@
+import {IContentPage} from '@src/page/content-page';
+import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
 import 'rxjs/add/operator/first';
-import {IContentPage} from '../page/content-page';
-import {elementAdded$, elementRemoved$} from '../util/dom-observer';
 
 /**
  * Bootstraps a content-page to the DOM.

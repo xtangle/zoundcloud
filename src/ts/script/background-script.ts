@@ -1,12 +1,12 @@
+import {SC_URL_PATTERN} from '@src/constants';
+import {IRunnable} from '@src/script/runnable';
+import {logger} from '@src/util/logger';
 import 'rxjs/add/observable/fromEventPattern';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilKeyChanged';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
-import {SC_URL_PATTERN} from '../constants';
-import {logger} from '../util/logger';
-import {IRunnable} from './runnable';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 export class BackgroundScript implements IRunnable {

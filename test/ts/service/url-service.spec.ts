@@ -1,5 +1,5 @@
+import {UrlService} from '@src/service/url-service';
 import {expect} from 'chai';
-import {UrlService} from '../../src/service/url-service';
 
 describe('url service', () => {
   const fixture = UrlService;

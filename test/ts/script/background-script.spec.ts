@@ -1,3 +1,6 @@
+import {SC_URL_PATTERN} from '@src/constants';
+import {BackgroundScript} from '@src/script/background-script';
+import {doNothingIfMatch, tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';
 import 'rxjs/add/observable/interval';
@@ -8,9 +11,6 @@ import {Subscription} from 'rxjs/Subscription';
 import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import * as sinonChrome from 'sinon-chrome';
-import {SC_URL_PATTERN} from '../../src/constants';
-import {BackgroundScript} from '../../src/script/background-script';
-import {doNothingIfMatch, tick} from '../test-utils';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 const forEach = require('mocha-each');

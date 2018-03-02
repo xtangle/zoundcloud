@@ -4,7 +4,12 @@
     "moduleResolution": "node",
     "noImplicitAny": true,
     "sourceMap": true,
-    "rootDir": "src",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/ts/*"],
+      "@test/*": ["test/ts/*"]
+    },
     "outDir": "dist"
   }
 }

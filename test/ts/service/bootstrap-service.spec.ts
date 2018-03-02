@@ -1,11 +1,11 @@
+import {IContentPage} from '@src/page/content-page';
+import {BootstrapService} from '@src/service/bootstrap-service';
+import {tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';
 import * as $ from 'jquery';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {IContentPage} from '../../src/page/content-page';
-import {BootstrapService} from '../../src/service/bootstrap-service';
-import {tick} from '../test-utils';
 
 describe('bootstrap service', () => {
   chai.use(sinonChai);

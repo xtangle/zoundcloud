@@ -1,8 +1,8 @@
+import {logger} from '@src/util/logger';
 import * as chai from 'chai';
 import {expect} from 'chai';
 import {SinonStub, stub} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {logger} from '../../src/util/logger';
 
 describe('logger', () => {
   chai.use(sinonChai);

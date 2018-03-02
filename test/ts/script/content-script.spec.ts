@@ -1,11 +1,11 @@
+import {IContentPage} from '@src/page/content-page';
+import {TrackContentPage} from '@src/page/track-content-page';
+import {ContentScript} from '@src/script/content-script';
+import {BootstrapService} from '@src/service/bootstrap-service';
 import * as chai from 'chai';
 import {expect} from 'chai';
 import {match, SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {IContentPage} from '../../src/page/content-page';
-import {TrackContentPage} from '../../src/page/track-content-page';
-import {ContentScript} from '../../src/script/content-script';
-import {BootstrapService} from '../../src/service/bootstrap-service';
 
 describe('content script', () => {
   chai.use(sinonChai);

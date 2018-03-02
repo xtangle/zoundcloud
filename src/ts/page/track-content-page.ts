@@ -1,12 +1,12 @@
+import {ZC_DL_BUTTON_CLASS} from '@src/constants';
+import {IContentPage} from '@src/page/content-page';
+import {UrlService} from '@src/service/url-service';
+import {elementAdded$, elementExist$} from '@src/util/dom-observer';
+import {logger} from '@src/util/logger';
 import * as $ from 'jquery';
 import 'rxjs/add/observable/merge';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
-import {ZC_DL_BUTTON_CLASS} from '../constants';
-import {UrlService} from '../service/url-service';
-import {elementAdded$, elementExist$} from '../util/dom-observer';
-import {logger} from '../util/logger';
-import {IContentPage} from './content-page';
 
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 

@@ -1,11 +1,11 @@
+import {DownloadService} from '@src/service/download-service';
+import {noop, tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import * as sinonChrome from 'sinon-chrome';
-import {DownloadService} from '../../src/service/download-service';
-import {noop, tick} from '../test-utils';
 
 describe('download service', () => {
   chai.use(sinonChai);

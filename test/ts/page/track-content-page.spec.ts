@@ -1,13 +1,13 @@
-import {expect} from 'chai';
+import {ZC_DL_BUTTON_CLASS} from '@src/constants';
+import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
+import {UrlService} from '@src/service/url-service';
+import {tick} from '@test/test-utils';
 import * as chai from 'chai';
+import {expect} from 'chai';
 import * as $ from 'jquery';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonStub, spy, stub} from 'sinon';
 import * as sinonChai from 'sinon-chai';
-import {ZC_DL_BUTTON_CLASS} from '../../src/constants';
-import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '../../src/page/track-content-page';
-import {UrlService} from '../../src/service/url-service';
-import {tick} from '../test-utils';
 
 const forEach = require('mocha-each');
 
