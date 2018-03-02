@@ -7,6 +7,7 @@ import * as sinonChai from 'sinon-chai';
 import {ZC_DL_BUTTON_CLASS} from '../../src/constants';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '../../src/page/track-content-page';
 import {UrlService} from '../../src/service/url-service';
+import {tick} from '../test-utils';
 
 const forEach = require('mocha-each');
 
@@ -106,17 +107,16 @@ describe('track content page', () => {
       verifyDlButtonIsInDOM();
     });
 
-    it('should inject the download button when listen engagement toolbar is added', (done) => {
+    it('should inject the download button when listen engagement toolbar is added', async () => {
       const listenEngagement = $(testHtml).filter('.listenEngagement');
       fixture.load();
-      setTimeout(() => {
-        verifyDlButtonIsNotInDOM();
-        $('body').append(listenEngagement);
-        setTimeout(() => {
-          verifyDlButtonIsInDOM();
-          done();
-        }, 100);
-      }, this.timeout - 100);
+      await tick();
+
+      verifyDlButtonIsNotInDOM();
+      $('body').append(listenEngagement);
+      await tick();
+
+      verifyDlButtonIsInDOM();
     });
 
     it('should not inject the download button when the button group cannot be found', () => {

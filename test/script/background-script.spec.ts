@@ -10,7 +10,7 @@ import * as sinonChai from 'sinon-chai';
 import * as sinonChrome from 'sinon-chrome';
 import {SC_URL_PATTERN} from '../../src/constants';
 import {BackgroundScript} from '../../src/script/background-script';
-import {doNothingIfMatch} from '../test-utils';
+import {doNothingIfMatch, tick} from '../test-utils';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 const forEach = require('mocha-each');
@@ -83,7 +83,7 @@ describe('background script', () => {
     const invalidScUrls = [
       'https://not.soundcloud.com/',
       'https://soundcloud.org/',
-      'https://soundcloud.com.abc/',
+      'https://soundcloud.com.abc/'
     ];
 
     context('through the Web Navigation On Completed event', () => {
@@ -103,38 +103,31 @@ describe('background script', () => {
     });
 
     context('through the Web Navigation On History Updated event', () => {
-      const debounceWaitTime = 25;
+      const debounceWaitTime = 25; // ms
 
       forEach(validScUrls)
-        .it('should trigger when the URL is %s', (url: string, done: MochaDone) => {
+        .it('should trigger when the URL is %s', async (url: string) => {
           const details = {tabId: 1, timeStamp: 123, url};
           sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-          setTimeout(() => {
-            expect(callback).to.have.been.calledOnce.calledWithExactly(details);
-            done();
-          }, debounceWaitTime);
+          await tick(debounceWaitTime);
+          expect(callback).to.have.been.calledOnce.calledWithExactly(details);
         });
 
       forEach(invalidScUrls)
-        .it('should not trigger when the URL is %s', (url: string, done: MochaDone) => {
+        .it('should not trigger when the URL is %s', async (url: string) => {
           const details = {tabId: 1, timeStamp: 123, url};
           sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-          setTimeout(() => {
-            expect(callback).to.not.have.been.called;
-            done();
-          }, debounceWaitTime);
+          await tick(debounceWaitTime);
+          expect(callback).to.not.have.been.called;
         });
 
-      it('should de-bounce events when they are emitted close together', (done) => {
+      it('should de-bounce events when they are emitted close together', async () => {
         validScUrls.forEach((url) => {
           sinonChrome.webNavigation.onHistoryStateUpdated.trigger({tabId: 1, timeStamp: 123, url});
         });
-
         const expectedDetails = {tabId: 1, timeStamp: 123, url: validScUrls[validScUrls.length - 1]};
-        setTimeout(() => {
-          expect(callback).to.have.been.calledOnce.calledWithExactly(expectedDetails);
-          done();
-        }, debounceWaitTime);
+        await tick(debounceWaitTime);
+        expect(callback).to.have.been.calledOnce.calledWithExactly(expectedDetails);
       });
     });
 
@@ -142,7 +135,7 @@ describe('background script', () => {
 
   context('running the content script', () => {
 
-    it('should run the content script when visiting a SoundCloud page', () => {
+    it('should run the content script when visiting a SoundCloud page', async () => {
       const tabId = 123;
       const scPageVisited$: Subject<WebNavigationUrlCallbackDetails> = new Subject<WebNavigationUrlCallbackDetails>();
       fixture.scPageVisited$ = scPageVisited$;
@@ -156,33 +149,29 @@ describe('background script', () => {
       expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
     });
 
-    it('should not run the content script when not visiting a SoundCloud page', (done) => {
+    it('should not run the content script when not visiting a SoundCloud page', async () => {
       fixture.run();
+      await tick();
 
-      setTimeout(() => {
-        expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
-        expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
-        expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
-        done();
-      }, this.timeout);
+      expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
+      expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
+      expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
     });
 
   });
 
   context('unloading the background script', () => {
 
-    it('should trigger when the onSuspend event is emitted', (done) => {
+    it('should trigger when the onSuspend event is emitted', async () => {
       const spyCleanUp = spy(fixture, 'cleanUp');
       fixture.run();
+      await tick();
 
-      setTimeout(() => {
-        expect(spyCleanUp).to.not.have.been.called;
-        sinonChrome.runtime.onSuspend.trigger();
-        setTimeout(() => {
-          expect(spyCleanUp).to.have.been.called;
-          done();
-        }, 100);
-      }, this.timeout - 100);
+      expect(spyCleanUp).to.not.have.been.called;
+      sinonChrome.runtime.onSuspend.trigger();
+      await tick();
+
+      expect(spyCleanUp).to.have.been.called;
     });
 
     it('should unsubscribe from all subscriptions', () => {

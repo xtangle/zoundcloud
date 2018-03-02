@@ -6,3 +6,11 @@ export function doNothingIfMatch(sinonStub: SinonStub, sinonMatcher: SinonMatche
   sinonStub.withArgs(sinonMatcher).callsFake(noop);
   sinonStub.callThrough();
 }
+
+export async function tick(delay: number = 0) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, delay);
+  });
+}

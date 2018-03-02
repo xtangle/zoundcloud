@@ -5,7 +5,7 @@ import {SinonSpy, spy} from 'sinon';
 import * as sinonChai from 'sinon-chai';
 import * as sinonChrome from 'sinon-chrome';
 import {DownloadService} from '../../src/service/download-service';
-import {noop} from '../test-utils';
+import {noop, tick} from '../test-utils';
 
 describe('download service', () => {
   chai.use(sinonChai);
@@ -46,33 +46,29 @@ describe('download service', () => {
         subscription.unsubscribe();
       });
 
-      it('should emit the download id and complete if the download started successfully', (done) => {
+      it('should emit the download id and complete if the download started successfully', async () => {
         const downloadId = 123;
         sinonChrome.downloads.download.callsArgWithAsync(1, downloadId);
 
         subscription = fixture.downloadTrack('example.mp3').subscribe(callback);
-
         expect(callback).to.not.have.been.called;
-        setTimeout(() => {
-          expect(callback).to.have.been.calledOnce.calledWithExactly(downloadId);
-          expect(subscription.closed).to.be.true;
-          done();
-        }, 0);
+        await tick();
+
+        expect(callback).to.have.been.calledOnce.calledWithExactly(downloadId);
+        expect(subscription.closed).to.be.true;
       });
 
-      it('should emit an error with the lastError message if the download didn\'t start successfully', (done) => {
+      it('should emit an error with the lastError message if the download didn\'t start successfully', async () => {
         const errorMsg = 'error message';
         sinonChrome.downloads.download.callsArgWithAsync(1, undefined);
         sinonChrome.runtime.lastError = {message: errorMsg};
 
         subscription = fixture.downloadTrack('example.mp3').subscribe(noop, callback);
-
         expect(callback).to.not.have.been.called;
-        setTimeout(() => {
-          expect(callback).to.have.been.calledOnce.calledWithExactly(errorMsg);
-          expect(subscription.closed).to.be.true;
-          done();
-        }, 0);
+        await tick();
+
+        expect(callback).to.have.been.calledOnce.calledWithExactly(errorMsg);
+        expect(subscription.closed).to.be.true;
       });
     });
 
