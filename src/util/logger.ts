@@ -1,3 +1,4 @@
+/* tslint:disable no-console */
 class Logger {
   private readonly MSG_PREFIX = 'ZC';
   public log(message?: any, ...optionalParams: any[]): void {

@@ -9,9 +9,8 @@
     "arrow-return-shorthand": [true, "multiline"],
     "indent": [true, "spaces"],
     "max-line-length": [true, 120],
-    "no-console": false,
-    "no-empty": false,
     "no-unused-expression": false,
+    "no-var-requires": false,
     "quotemark": [true, "single"],
     "ter-indent": [true, 2],
     "trailing-comma": false

@@ -37,19 +37,19 @@ describe('dom observer', () => {
     });
 
     it('should emit when element is removed directly', (done) => {
-      subscription = fixture.subscribe(() => done());
+      subscription = fixture.subscribe(done);
       removeMe.remove();
     });
 
     it('should emit when element is removed indirectly through parent', (done) => {
       const ul: HTMLElement = $('ul')[0];
-      subscription = fixture.subscribe(() => done());
+      subscription = fixture.subscribe(done);
       ul.remove();
     });
 
     it('should not emit when element is not removed', (done) => {
       const span: HTMLElement = $('span')[0];
-      subscription = fixture.subscribe(() => callback());
+      subscription = fixture.subscribe(callback);
       setTimeout(() => {
         expect(callback).to.not.have.been.called;
         done();
@@ -77,7 +77,7 @@ describe('dom observer', () => {
 
     it('should not emit any value when node is added but does not pass test', (done) => {
       fixture = elementAdded$((node: Node) => node.textContent === 'Dosu');
-      subscription = fixture.subscribe((val) => callback(val));
+      subscription = fixture.subscribe(callback);
       setTimeout(() => {
         expect(callback).to.not.have.been.called;
         done();
@@ -87,7 +87,7 @@ describe('dom observer', () => {
 
     it('should not emit any value when no nodes are added', (done) => {
       fixture = elementAdded$(() => true);
-      subscription = fixture.subscribe((val) => callback(val));
+      subscription = fixture.subscribe(callback);
       setTimeout(() => {
         expect(callback).to.not.have.been.called;
         done();
@@ -98,7 +98,7 @@ describe('dom observer', () => {
       const addMe2 = $('<span/>').text('Dosu')[0];
       const addMe3 = $('<div/>')[0];
       fixture = elementAdded$((node: Node) => node.textContent === 'Dos' || node.nodeName === 'DIV');
-      subscription = fixture.subscribe((val) => callback(val));
+      subscription = fixture.subscribe(callback);
       setTimeout(() => {
         expect(callback).to.have.been.calledTwice;
         expect(callback.firstCall).calledWithExactly(addMe);
@@ -117,8 +117,7 @@ describe('dom observer', () => {
     });
 
     it('should emit node and complete when node exists and matches selector', (done) => {
-      subscription = elementExist$('.iExist')
-        .subscribe((val) => callback(val));
+      subscription = elementExist$('.iExist').subscribe(callback);
       setTimeout(() => {
         expect(callback).to.have.been.calledOnce;
         expect(callback.firstCall).calledWithExactly(iExist);
@@ -128,8 +127,7 @@ describe('dom observer', () => {
     });
 
     it('should not emit any value and complete when no node matches selector', (done) => {
-      subscription = elementExist$('.iDoNotExist')
-        .subscribe((val) => callback(val));
+      subscription = elementExist$('.iDoNotExist').subscribe(callback);
       setTimeout(() => {
         expect(callback).to.not.have.been.called;
         expect(subscription.closed).to.be.true;
@@ -140,8 +138,7 @@ describe('dom observer', () => {
     it('should emit first node and complete when multiple nodes matches selector', (done) => {
       const iExist2 = $('<li/>').addClass('iExist')[0];
       $('ul').prepend(iExist2);
-      subscription = elementExist$('.iExist')
-        .subscribe((val) => callback(val));
+      subscription = elementExist$('.iExist').subscribe(callback);
       setTimeout(() => {
         expect(callback).to.have.been.calledOnce;
         expect(callback.firstCall).calledWithExactly(iExist2);

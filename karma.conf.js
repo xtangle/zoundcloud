@@ -15,7 +15,7 @@ module.exports = function (config) {
       'test/**/*.ts': ['karma-typescript']
     },
     client: {
-      captureConsole: false,
+      captureConsole: true,
       mocha: {
         opts: 'mocha.opts'
       }

@@ -1,8 +1,8 @@
 import * as chai from 'chai';
 import {expect} from 'chai';
 import 'rxjs/add/observable/interval';
+import 'rxjs/add/observable/timer';
 import 'rxjs/add/operator/take';
-import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
@@ -12,6 +12,8 @@ import {SC_URL_PATTERN} from '../../src/constants';
 import {BackgroundScript} from '../../src/script/background-script';
 import {doNothingIfMatch} from '../test-utils';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
+
+const forEach = require('mocha-each');
 
 describe('background script', () => {
   chai.use(sinonChai);
@@ -39,8 +41,6 @@ describe('background script', () => {
   context('triggering the SoundCloud page visited observable', () => {
 
     const callback: SinonSpy = spy();
-    const expectedDebounceTime = 50;
-
     let stubOnCompleted: SinonStub;
     let stubOnHistoryStateUpdated: SinonStub;
     let subscription: Subscription;
@@ -48,18 +48,19 @@ describe('background script', () => {
     before(() => {
       /**
        * Do not emit event (by doing a noop) if url does not match an SoundCloud url.
-       * This has to be patched in manually because sinon-chrome's addListener does not implement event filters.
+       * This has to be patched in manually because sinon-chrome's addListeners do not implement event filters.
        */
-      const doesNotHaveScUrl: SinonMatcher = match((details: WebNavigationUrlCallbackDetails) =>
+      const doesNotMatchScUrl: SinonMatcher = match((details: WebNavigationUrlCallbackDetails) =>
         !details.url.match(SC_URL_PATTERN));
       stubOnCompleted = stub(sinonChrome.webNavigation.onCompleted, 'trigger');
       stubOnHistoryStateUpdated = stub(sinonChrome.webNavigation.onHistoryStateUpdated, 'trigger');
-      doNothingIfMatch(stubOnCompleted, doesNotHaveScUrl);
-      doNothingIfMatch(stubOnHistoryStateUpdated, doesNotHaveScUrl);
+      doNothingIfMatch(stubOnCompleted, doesNotMatchScUrl);
+      doNothingIfMatch(stubOnHistoryStateUpdated, doesNotMatchScUrl);
     });
 
     beforeEach(() => {
-      subscription = fixture.scPageVisited$.subscribe((val) => callback(val));
+      subscription = fixture.scPageVisited$.subscribe(callback);
+      fixture.run();
     });
 
     afterEach(() => {
@@ -72,75 +73,69 @@ describe('background script', () => {
       stubOnHistoryStateUpdated.restore();
     });
 
-    const scUrls = [
+    const validScUrls = [
       'https://soundcloud.com/',
       'https://soundcloud.com/some-user/some-track',
       'https://soundcloud.com/abcdefg/some-track?in=user/sets/playlist',
-      'https://soundcloud.com/search?q=qwe%20rty'
+      'https://soundcloud.com/search?q=qwe%20rty',
     ];
 
-    const nonScUrls = [
+    const invalidScUrls = [
       'https://not.soundcloud.com/',
       'https://soundcloud.org/',
       'https://soundcloud.com.abc/',
     ];
 
-    it('should trigger when Web Navigation On Completed emits with a SoundCloud URL', () => {
-      fixture.run();
-      scUrls.forEach((url, index) => {
-        const details = {tabId: index, timeStamp: 123, url};
-        sinonChrome.webNavigation.onCompleted.trigger(details);
-        expect(callback.withArgs(details)).to.have.been.calledOnce;
-      });
-    });
+    context('through the Web Navigation On Completed event', () => {
+      forEach(validScUrls)
+        .it('should trigger when the URL is %s', (url: string) => {
+          const details = {tabId: 1, timeStamp: 123, url};
+          sinonChrome.webNavigation.onCompleted.trigger(details);
+          expect(callback).to.have.been.calledOnce.calledWithExactly(details);
+        });
 
-    it('should not trigger when Web Navigation On Completed doesn\'t emit with a SoundCloud URL', () => {
-      fixture.run();
-      nonScUrls.forEach((url, index) => {
-        sinonChrome.webNavigation.onCompleted.trigger({tabId: index, timeStamp: 123, url});
-      });
-      expect(callback).to.not.have.been.called;
-    });
-
-    it('should trigger when Web Navigation On History Updated emits a SoundCloud URL', (done) => {
-      fixture.run();
-      /**
-       * Wait 'expectedDebounceTime' ms between each test so that no events are filtered by the de-bounce
-       */
-      Observable.interval(expectedDebounceTime)
-        .take(scUrls.length)
-        .forEach((index) => {
-          const details = {tabId: index, timeStamp: 123, url: scUrls[index]};
-          sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-          expect(callback.withArgs(details)).to.have.been.calledOnce;
-        })
-        .then(() => done())
-        .catch(() => done());
-    });
-
-    it('should not trigger when Web Navigation On History Updated doesn\'t emit with a SoundCloud URL', (done) => {
-      fixture.run();
-      Observable.interval(expectedDebounceTime)
-        .take(nonScUrls.length)
-        .forEach((index) => {
-          sinonChrome.webNavigation.onHistoryStateUpdated
-            .trigger({tabId: index, timeStamp: 123, url: nonScUrls[index]});
-        })
-        .then(() => {
+      forEach(invalidScUrls)
+        .it('should not trigger when the URL is %s', (url: string) => {
+          const details = {tabId: 1, timeStamp: 123, url};
+          sinonChrome.webNavigation.onCompleted.trigger(details);
           expect(callback).to.not.have.been.called;
-          done();
-        })
-        .catch(() => done());
+        });
     });
 
-    it('should de-bounce events emitted by Web Navigation On History Updated', () => {
-      fixture.run();
-      scUrls.forEach((url, index) => {
-        sinonChrome.webNavigation.onCompleted.trigger({tabId: index, timeStamp: 123, url});
+    context('through the Web Navigation On History Updated event', () => {
+      const debounceWaitTime = 25;
+
+      forEach(validScUrls)
+        .it('should trigger when the URL is %s', (url: string, done: MochaDone) => {
+          const details = {tabId: 1, timeStamp: 123, url};
+          sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
+          setTimeout(() => {
+            expect(callback).to.have.been.calledOnce.calledWithExactly(details);
+            done();
+          }, debounceWaitTime);
+        });
+
+      forEach(invalidScUrls)
+        .it('should not trigger when the URL is %s', (url: string, done: MochaDone) => {
+          const details = {tabId: 1, timeStamp: 123, url};
+          sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
+          setTimeout(() => {
+            expect(callback).to.not.have.been.called;
+            done();
+          }, debounceWaitTime);
+        });
+
+      it('should de-bounce events when they are emitted close together', (done) => {
+        validScUrls.forEach((url) => {
+          sinonChrome.webNavigation.onHistoryStateUpdated.trigger({tabId: 1, timeStamp: 123, url});
+        });
+
+        const expectedDetails = {tabId: 1, timeStamp: 123, url: validScUrls[validScUrls.length - 1]};
+        setTimeout(() => {
+          expect(callback).to.have.been.calledOnce.calledWithExactly(expectedDetails);
+          done();
+        }, debounceWaitTime);
       });
-      const expectedDetails = {tabId: scUrls.length - 1, timeStamp: 123, url: scUrls[scUrls.length - 1]};
-      expect(callback).to.not.have.been.calledOnce;
-      expect(callback).to.have.been.calledWithExactly(expectedDetails);
     });
 
   });
@@ -199,7 +194,6 @@ describe('background script', () => {
 
       expect(spyUnsubscribe).to.have.been.called;
     });
-
   });
 
 });

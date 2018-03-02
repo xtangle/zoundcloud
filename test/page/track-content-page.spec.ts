@@ -8,6 +8,8 @@ import {ZC_DL_BUTTON_CLASS} from '../../src/constants';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '../../src/page/track-content-page';
 import {UrlService} from '../../src/service/url-service';
 
+const forEach = require('mocha-each');
+
 describe('track content page', () => {
   chai.use(sinonChai);
 
@@ -48,12 +50,12 @@ describe('track content page', () => {
       stubGetUrl.restore();
     });
 
-    const trackPageUrls = [
+    const validTrackPageUrls = [
       'https://soundcloud.com/some-user/some-track',
       'https://soundcloud.com/abcdefg/some-track?in=user/sets/playlist',
     ];
 
-    const nonTrackPageUrls = [
+    const invalidTrackPageUrls = [
       'https://soundcloud.com/you/sets',
       'https://soundcloud.com/charts/top',
       'https://soundcloud.com/jobs/2017-12-18-ux-prototyper-berlin',
@@ -82,19 +84,17 @@ describe('track content page', () => {
       'https://soundcloud.com/discover/sets/new-for-you:140983555'
     ];
 
-    it('should load when URL matches a track page', () => {
-      trackPageUrls.forEach((url, index) => {
-        stubGetUrl.onCall(index).returns(url);
+    forEach(validTrackPageUrls)
+      .it('should test true when the URL is %s', (url: string) => {
+        stubGetUrl.onFirstCall().returns(url);
         expect(fixture.test()).to.be.true;
       });
-    });
 
-    it('should not load when URL does not match a track page', () => {
-      nonTrackPageUrls.forEach((url, index) => {
-        stubGetUrl.onCall(index).returns(url);
+    forEach(invalidTrackPageUrls)
+      .it('should test false when the URL is %s', (url: string) => {
+        stubGetUrl.onFirstCall().returns(url);
         expect(fixture.test()).to.be.false;
       });
-    });
 
   });
 
