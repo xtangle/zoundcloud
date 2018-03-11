@@ -1,18 +1,26 @@
 import {ZC_DL_BUTTON_CLASS} from '@src/constants';
 import {IContentPage} from '@src/page/content-page';
+import {ITrackInfo} from '@src/service/download-info/download-info';
+import {DownloadInfoService} from '@src/service/download-info/download-info-service';
 import {UrlService} from '@src/service/url-service';
 import {elementAdded$, elementExist$} from '@src/util/dom-observer';
 import {logger} from '@src/util/logger';
 import * as $ from 'jquery';
+import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/throttleTime';
 import {Observable} from 'rxjs/Observable';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Subscription} from 'rxjs/Subscription';
 
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
 export class TrackContentPage implements IContentPage {
+
   public readonly id = 'zc-track-content';
   private readonly subscriptions: Subscription = new Subscription();
+  private readonly trackInfo$: ReplaySubject<ITrackInfo> = new ReplaySubject<ITrackInfo>(1);
 
   public test(): boolean {
     const TRACK_URL_PATTERN = /^[^:]*:\/\/soundcloud\.com\/([^\/]+)\/([^\/]+)(?:\?in=.+)?$/;
@@ -28,10 +36,15 @@ export class TrackContentPage implements IContentPage {
 
   public load(): void {
     const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
-    this.subscriptions.add(Observable.merge(
-      elementExist$(listenEngagementSelector),
-      elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
-    ).subscribe(injectDlButton.bind(this)));
+    this.subscriptions.add(
+      Observable.merge(
+        elementExist$(listenEngagementSelector),
+        elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
+      ).subscribe(injectDlButton.bind(this))
+    );
+    this.subscriptions.add(
+      DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
+    );
     logger.log('Loaded track content page');
   }
 
@@ -45,7 +58,16 @@ export class TrackContentPage implements IContentPage {
 function injectDlButton(listenEngagement: Node): void {
   const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
   const dlButton = createDlButton();
-  dlButton.on('click', () => logger.log('Clicked track download button'));
+  const downloadClick$ = Observable.fromEvent(dlButton[0], 'click').throttleTime(3000);
+  this.subscriptions.add(
+    downloadClick$.subscribe(() => {
+      logger.log('Clicked track download button');
+      this.trackInfo$.first().subscribe(
+        (info: ITrackInfo) => logger.log('Download started!', info),
+        (err: string) => logger.log('Error starting download!', err)
+      );
+    })
+  );
   addDlButton(soundActions, dlButton);
 }
 
