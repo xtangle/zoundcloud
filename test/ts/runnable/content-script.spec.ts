@@ -1,7 +1,7 @@
 import {IContentPage} from '@src/page/content-page';
 import {TrackContentPage} from '@src/page/track-content-page';
-import {ContentScript} from '@src/script/content-script';
-import {BootstrapService} from '@src/service/bootstrap-service';
+import {ContentScript} from '@src/runnable/content-script';
+import {Bootstrapper} from '@src/util/bootstrap-service';
 import * as chai from 'chai';
 import {expect} from 'chai';
 import {match, SinonSpy, spy} from 'sinon';
@@ -14,7 +14,7 @@ describe('content script', () => {
   let spyBootstrap: SinonSpy;
 
   before(() => {
-    spyBootstrap = spy(BootstrapService, 'bootstrap');
+    spyBootstrap = spy(Bootstrapper, 'bootstrap');
   });
 
   after(() => {

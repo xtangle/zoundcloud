@@ -1,6 +1,6 @@
 import {ZC_DL_BUTTON_CLASS} from '@src/constants';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
-import {UrlService} from '@src/service/url-service';
+import {UrlService} from '@src/util/url-service';
 import {tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';

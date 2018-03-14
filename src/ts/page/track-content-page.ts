@@ -1,26 +1,31 @@
 import {ZC_DL_BUTTON_CLASS} from '@src/constants';
+import {ITrackInfo} from '@src/download/download-info';
+import {DownloadInfoService} from '@src/download/download-info-service';
+import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
+import {IMessageHandlerArgs} from '@src/messaging/messenger';
+import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
+import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {IContentPage} from '@src/page/content-page';
-import {ITrackInfo} from '@src/service/download-info/download-info';
-import {DownloadInfoService} from '@src/service/download-info/download-info-service';
-import {UrlService} from '@src/service/url-service';
 import {elementAdded$, elementExist$} from '@src/util/dom-observer';
 import {logger} from '@src/util/logger';
+import {UrlService} from '@src/util/url-service';
 import * as $ from 'jquery';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/throttleTime';
+import 'rxjs/add/operator/withLatestFrom';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Observable} from 'rxjs/Observable';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Subscription} from 'rxjs/Subscription';
 
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
 export class TrackContentPage implements IContentPage {
-
   public readonly id = 'zc-track-content';
   private readonly subscriptions: Subscription = new Subscription();
-  private readonly trackInfo$: ReplaySubject<ITrackInfo> = new ReplaySubject<ITrackInfo>(1);
+  private readonly trackInfo$: BehaviorSubject<ITrackInfo | null> = new BehaviorSubject<ITrackInfo>(null);
 
   public test(): boolean {
     const TRACK_URL_PATTERN = /^[^:]*:\/\/soundcloud\.com\/([^\/]+)\/([^\/]+)(?:\?in=.+)?$/;
@@ -36,14 +41,20 @@ export class TrackContentPage implements IContentPage {
 
   public load(): void {
     const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
+    this.updateTrackInfo();
     this.subscriptions.add(
       Observable.merge(
         elementExist$(listenEngagementSelector),
         elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
-      ).subscribe(injectDlButton.bind(this))
+      ).subscribe(injectDlButton.bind(this, this.trackInfo$))
     );
     this.subscriptions.add(
-      DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
+      ContentPageMessenger.onMessage(ReloadContentPageMessage.TYPE).subscribe(
+        (args: IMessageHandlerArgs<ReloadContentPageMessage>) => {
+          if (args.message.contentPageId === this.id) {
+            this.reload();
+          }
+        })
     );
     logger.log('Loaded track content page');
   }
@@ -53,19 +64,30 @@ export class TrackContentPage implements IContentPage {
     this.subscriptions.unsubscribe();
     logger.log('Unloaded track content page');
   }
+
+  private reload(): void {
+    this.trackInfo$.next(null);
+    this.updateTrackInfo();
+  }
+
+  private updateTrackInfo(): void {
+    DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(
+      (trackInfo: ITrackInfo) => {
+        this.trackInfo$.next(trackInfo);
+        logger.log('Updated track info', this.trackInfo$.getValue());
+      });
+  }
 }
 
-function injectDlButton(listenEngagement: Node): void {
+function injectDlButton(trackInfo$: BehaviorSubject<ITrackInfo>, listenEngagement: Node): void {
   const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
   const dlButton = createDlButton();
   const downloadClick$ = Observable.fromEvent(dlButton[0], 'click').throttleTime(3000);
   this.subscriptions.add(
-    downloadClick$.subscribe(() => {
-      logger.log('Clicked track download button');
-      this.trackInfo$.first().subscribe(
-        (info: ITrackInfo) => logger.log('Download started!', info),
-        (err: string) => logger.log('Error starting download!', err)
-      );
+    downloadClick$.map(() => trackInfo$.getValue()).subscribe((trackInfo: ITrackInfo) => {
+      if (trackInfo) {
+        ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
+      }
     })
   );
   addDlButton(soundActions, dlButton);

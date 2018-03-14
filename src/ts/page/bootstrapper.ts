@@ -1,3 +1,5 @@
+import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
+import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {IContentPage} from '@src/page/content-page';
 import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
@@ -17,12 +19,12 @@ import 'rxjs/add/operator/first';
  * Do note that to prevent state of the subscription being stored, only the first event of the id tag
  * being added/removed will be listened to; any subsequent event after that will be ignored.
  */
-export interface IBootstrapService {
+export interface IBootstrapper {
   // noinspection JSUnusedLocalSymbols
   bootstrap(contentPage: IContentPage): void;
 }
 
-export const BootstrapService: IBootstrapService = {
+export const Bootstrapper: IBootstrapper = {
   bootstrap(contentPage: IContentPage): void {
     if (contentPage.test()) {
       if (!idTagIsInDOM(contentPage.id)) {
@@ -30,6 +32,8 @@ export const BootstrapService: IBootstrapService = {
         elementAdded$((node: Node) => node.isSameNode(idTag)).first().subscribe(() => contentPage.load());
         elementRemoved$(idTag).first().subscribe(() => contentPage.unload());
         addIdTagToDOM(idTag);
+      } else {
+        ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage(contentPage.id));
       }
     } else {
       removeIdTagFromDOM(contentPage.id);

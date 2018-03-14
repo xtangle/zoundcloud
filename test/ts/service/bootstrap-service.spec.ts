@@ -1,5 +1,5 @@
 import {IContentPage} from '@src/page/content-page';
-import {BootstrapService} from '@src/service/bootstrap-service';
+import {Bootstrapper} from '@src/util/bootstrap-service';
 import {tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';
@@ -10,7 +10,7 @@ import * as sinonChai from 'sinon-chai';
 describe('bootstrap service', () => {
   chai.use(sinonChai);
 
-  const fixture = BootstrapService;
+  const fixture = Bootstrapper;
   let contentPage: DummyContentPage;
   let spyLoad: SinonSpy;
   let spyUnload: SinonSpy;

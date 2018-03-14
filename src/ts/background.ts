@@ -1,3 +1,3 @@
-import {BackgroundScript} from '@src/script/background-script';
+import {BackgroundScript} from '@src/runnable/background-script';
 
 new BackgroundScript().run();

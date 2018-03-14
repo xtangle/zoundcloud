@@ -1,5 +1,5 @@
 import {SC_URL_PATTERN} from '@src/constants';
-import {BackgroundScript} from '@src/script/background-script';
+import {BackgroundScript} from '@src/runnable/background-script';
 import {doNothingIfMatch, tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';

@@ -1,4 +1,4 @@
-import {UrlService} from '@src/service/url-service';
+import {UrlService} from '@src/util/url-service';
 import {expect} from 'chai';
 
 describe('url service', () => {

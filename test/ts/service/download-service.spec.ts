@@ -1,4 +1,4 @@
-import {DownloadService} from '@src/service/download-service';
+import {DownloadService} from '@src/download/download-service';
 import {noop, tick} from '@test/test-utils';
 import * as chai from 'chai';
 import {expect} from 'chai';
