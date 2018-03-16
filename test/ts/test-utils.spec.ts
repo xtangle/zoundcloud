@@ -1,11 +1,10 @@
+import {useSinonChai} from '@test/test-initializers';
 import {doNothingIfMatch, tick} from '@test/test-utils';
-import * as chai from 'chai';
-import {expect} from 'chai';
 import {match, spy, stub} from 'sinon';
-import * as sinonChai from 'sinon-chai';
+
+const expect = useSinonChai();
 
 describe('test utils', () => {
-  chai.use(sinonChai);
 
   describe('the doNothingIfMatch function', () => {
     const obj = {hello: (arg: any) => `hello ${arg}`};

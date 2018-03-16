@@ -1,15 +1,14 @@
+import {Bootstrapper} from '@src/page/bootstrapper';
 import {IContentPage} from '@src/page/content-page';
-import {Bootstrapper} from '@src/util/bootstrap-service';
+import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import * as chai from 'chai';
-import {expect} from 'chai';
 import * as $ from 'jquery';
 import {SinonSpy, spy} from 'sinon';
-import * as sinonChai from 'sinon-chai';
 
-describe('bootstrap service', () => {
-  chai.use(sinonChai);
+const expect = useSinonChai();
 
+describe('bootstrapper', () => {
+  const sinonChrome = useSinonChrome.call(this);
   const fixture = Bootstrapper;
   let contentPage: DummyContentPage;
   let spyLoad: SinonSpy;

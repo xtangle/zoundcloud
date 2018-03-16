@@ -1,19 +1,17 @@
 import {ZC_DL_BUTTON_CLASS} from '@src/constants';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
 import {UrlService} from '@src/util/url-service';
+import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import * as chai from 'chai';
-import {expect} from 'chai';
 import * as $ from 'jquery';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonStub, spy, stub} from 'sinon';
-import * as sinonChai from 'sinon-chai';
 
 const forEach = require('mocha-each');
+const expect = useSinonChai();
 
 describe('track content page', () => {
-  chai.use(sinonChai);
-
+  const sinonChrome = useSinonChrome.call(this);
   let fixture: TrackContentPage;
 
   const testHtml = `

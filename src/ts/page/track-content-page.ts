@@ -71,11 +71,13 @@ export class TrackContentPage implements IContentPage {
   }
 
   private updateTrackInfo(): void {
-    DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(
-      (trackInfo: ITrackInfo) => {
-        this.trackInfo$.next(trackInfo);
-        logger.log('Updated track info', this.trackInfo$.getValue());
-      });
+    this.subscriptions.add(
+      DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(
+        (trackInfo: ITrackInfo) => {
+          this.trackInfo$.next(trackInfo);
+          logger.log('Updated track info', this.trackInfo$.getValue());
+        })
+    );
   }
 }
 

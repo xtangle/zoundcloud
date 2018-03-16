@@ -1,15 +1,14 @@
 import {elementAdded$, elementExist$, elementRemoved$} from '@src/util/dom-observer';
+import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import * as chai from 'chai';
-import {expect} from 'chai';
 import * as $ from 'jquery';
 import {Observable} from 'rxjs/Observable';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonSpy, spy} from 'sinon';
-import * as sinonChai from 'sinon-chai';
+
+const expect = useSinonChai();
 
 describe('dom observer', () => {
-  chai.use(sinonChai);
   const callback: SinonSpy = spy();
   let subscription: Subscription;
 

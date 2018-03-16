@@ -4,9 +4,6 @@ import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
-/**
- * Downloads tracks when given a download url
- */
 export interface IDownloadService {
   // noinspection JSUnusedLocalSymbols
   downloadTrack(trackInfo: ITrackInfo): Observable<number>;

@@ -1,28 +1,21 @@
 import {SC_URL_PATTERN} from '@src/constants';
 import {BackgroundScript} from '@src/runnable/background-script';
+import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {doNothingIfMatch, tick} from '@test/test-utils';
-import * as chai from 'chai';
-import {expect} from 'chai';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/timer';
 import 'rxjs/add/operator/take';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
-import * as sinonChai from 'sinon-chai';
-import * as sinonChrome from 'sinon-chrome';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 const forEach = require('mocha-each');
+const expect = useSinonChai();
 
 describe('background script', () => {
-  chai.use(sinonChai);
-
+  const sinonChrome = useSinonChrome.call(this);
   let fixture: BackgroundScript;
-
-  before(() => {
-    (global as any).chrome = sinonChrome;
-  });
 
   beforeEach(() => {
     fixture = new BackgroundScript();
@@ -30,12 +23,6 @@ describe('background script', () => {
 
   afterEach(() => {
     fixture.cleanUp();
-    sinonChrome.flush();
-    sinonChrome.reset();
-  });
-
-  after(() => {
-    delete (global as any).chrome;
   });
 
   context('triggering the SoundCloud page visited observable', () => {

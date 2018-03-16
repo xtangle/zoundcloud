@@ -1,15 +1,13 @@
+import {Bootstrapper} from '@src/page/bootstrapper';
 import {IContentPage} from '@src/page/content-page';
 import {TrackContentPage} from '@src/page/track-content-page';
 import {ContentScript} from '@src/runnable/content-script';
-import {Bootstrapper} from '@src/util/bootstrap-service';
-import * as chai from 'chai';
-import {expect} from 'chai';
+import {useSinonChai} from '@test/test-initializers';
 import {match, SinonSpy, spy} from 'sinon';
-import * as sinonChai from 'sinon-chai';
+
+const expect = useSinonChai();
 
 describe('content script', () => {
-  chai.use(sinonChai);
-
   let fixture: ContentScript;
   let spyBootstrap: SinonSpy;
 
@@ -17,12 +15,12 @@ describe('content script', () => {
     spyBootstrap = spy(Bootstrapper, 'bootstrap');
   });
 
-  after(() => {
-    spyBootstrap.restore();
-  });
-
   beforeEach(() => {
     fixture = new ContentScript();
+  });
+
+  after(() => {
+    spyBootstrap.restore();
   });
 
   it('should bootstrap the track content page', () => {

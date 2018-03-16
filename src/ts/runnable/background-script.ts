@@ -2,9 +2,9 @@ import {SC_URL_PATTERN} from '@src/constants';
 import {DownloadService} from '@src/download/download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
+import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
-import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {IRunnable} from '@src/runnable/runnable';
 import {logger} from '@src/util/logger';
 import 'rxjs/add/observable/fromEventPattern';
@@ -52,7 +52,7 @@ export class BackgroundScript implements IRunnable {
   public run(): void {
     this.subscriptions.add(this.onSuspend$.subscribe(() => this.cleanUp()));
     this.subscriptions.add(this.scPageVisited$.subscribe((details: WebNavigationUrlCallbackDetails) => {
-      logger.log('Bootstrapped content script', details);
+      logger.log('Loading content script', details);
       chrome.tabs.insertCSS(details.tabId, {file: 'styles.css'});
       chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
       chrome.tabs.executeScript(details.tabId, {file: 'content.js'});

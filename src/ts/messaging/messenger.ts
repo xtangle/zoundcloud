@@ -39,7 +39,6 @@ export abstract class MessengerImpl implements IMessenger {
     } else {
       chrome.runtime.onMessage.addListener(
         (message: Message, sender: MessageSender) => {
-          logger.log('In addListener', message.type, messageType, message.type === messageType);
           if (message.type === messageType) {
             handlerArgs$.next({message, sender});
           }

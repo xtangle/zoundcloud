@@ -1,13 +1,11 @@
 import {logger} from '@src/util/logger';
-import * as chai from 'chai';
-import {expect} from 'chai';
+import {useSinonChai} from '@test/test-initializers';
 import {SinonStub, stub} from 'sinon';
-import * as sinonChai from 'sinon-chai';
+
+const expect = useSinonChai();
 
 describe('logger', () => {
-  chai.use(sinonChai);
   const prevNodeEnv = process.env.NODE_ENV; // Previous stored value in NODE_ENV
-
   const stubConsoleLog: SinonStub = stub(console, 'log');
   const expectedMsgPrefix = 'ZC';
 
