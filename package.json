@@ -16,6 +16,7 @@
     "start": "yarn run build:watch",
     "test": "karma start karma.conf.js",
     "test:coverage": "karma start karma.conf.js --reporters spec,karma-typescript",
+    "test:stability": "yarn run test && yarn run test && yarn run test && yarn run test && yarn run test && yarn run test && yarn run test && yarn run test && yarn run test && yarn run test",
     "test:watch": "karma start karma.conf.js --single-run false"
   },
   "pre-commit": "ci",

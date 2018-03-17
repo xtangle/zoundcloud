@@ -115,6 +115,7 @@ describe('track content page', () => {
       fakeTrackInfo$ = new Subject<ITrackInfo>();
       stubGetTrackInfo = stub(DownloadInfoService, 'getTrackInfo');
       stubGetTrackInfo.withArgs(UrlService.getCurrentUrl()).returns(fakeTrackInfo$);
+      stubGetTrackInfo.callThrough();
     });
 
     afterEach(() => {
@@ -142,6 +143,7 @@ describe('track content page', () => {
         fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
         stubOnMessage = stub(ContentPageMessenger, 'onMessage');
         stubOnMessage.withArgs(ReloadContentPageMessage.TYPE).returns(fakeMessageHandlerArgs$);
+        stubOnMessage.callThrough();
       });
 
       beforeEach('load fixture and populate initial track info', () => {

@@ -1,12 +1,12 @@
 import {useSinonChai} from '@test/test-initializers';
-import {doNothingIfMatch, tick} from '@test/test-utils';
+import {doNothingIf, tick} from '@test/test-utils';
 import {match, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('test utils', () => {
 
-  describe('the doNothingIfMatch function', () => {
+  describe('the doNothingIf function', () => {
     const obj = {hello: (arg: any) => `hello ${arg}`};
     const sinonStub = stub(obj, 'hello');
 
@@ -15,12 +15,12 @@ describe('test utils', () => {
     });
 
     it('should not do anything if arguments match matcher', () => {
-      doNothingIfMatch(sinonStub, match(42));
+      doNothingIf(sinonStub, match(42));
       expect(obj.hello(42)).to.be.undefined;
     });
 
     it('should call through if arguments do not match matcher', () => {
-      doNothingIfMatch(sinonStub, match(42));
+      doNothingIf(sinonStub, match(42));
       expect(obj.hello(3)).to.be.equal('hello 3');
     });
   });

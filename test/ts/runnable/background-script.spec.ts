@@ -1,20 +1,27 @@
-import {SC_URL_PATTERN} from '@src/constants';
+import {ITrackInfo} from '@src/download/download-info';
+import {DownloadService} from '@src/download/download-service';
+import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
+import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
+import {Message} from '@src/messaging/message';
+import {IMessageHandlerArgs} from '@src/messaging/messenger';
+import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
+import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {BackgroundScript} from '@src/runnable/background-script';
+import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {doNothingIfMatch, tick} from '@test/test-utils';
+import {tick} from '@test/test-utils';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/timer';
 import 'rxjs/add/operator/take';
 import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
-import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {SinonSpy, SinonStub, spy, stub} from 'sinon';
+import Tab = chrome.tabs.Tab;
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
-const forEach = require('mocha-each');
 const expect = useSinonChai();
 
 describe('background script', () => {
-  const sinonChrome = useSinonChrome.call(this);
+  const sinonChrome = useSinonChrome();
   let fixture: BackgroundScript;
 
   beforeEach(() => {
@@ -25,151 +32,125 @@ describe('background script', () => {
     fixture.cleanUp();
   });
 
-  context('triggering the SoundCloud page visited observable', () => {
+  context('when background script has run', () => {
+    describe('running the content script', () => {
+      let scPageVisited$: Subject<WebNavigationUrlCallbackDetails>;
+      let stubScPageVisitedCreate: SinonStub;
 
-    const callback: SinonSpy = spy();
-    let stubOnCompleted: SinonStub;
-    let stubOnHistoryStateUpdated: SinonStub;
-    let subscription: Subscription;
+      beforeEach(() => {
+        scPageVisited$ = new Subject<WebNavigationUrlCallbackDetails>();
+        stubScPageVisitedCreate = stub(ScPageVisitedObservableFactory, 'create');
+        stubScPageVisitedCreate.returns(scPageVisited$);
+        fixture.run();
+      });
 
-    before(() => {
-      /**
-       * Do not emit event (by doing a noop) if url does not match an SoundCloud url.
-       * This has to be patched in manually because sinon-chrome's addListeners do not implement event filters.
-       */
-      const doesNotMatchScUrl: SinonMatcher = match((details: WebNavigationUrlCallbackDetails) =>
-        !details.url.match(SC_URL_PATTERN));
-      stubOnCompleted = stub(sinonChrome.webNavigation.onCompleted, 'trigger');
-      stubOnHistoryStateUpdated = stub(sinonChrome.webNavigation.onHistoryStateUpdated, 'trigger');
-      doNothingIfMatch(stubOnCompleted, doesNotMatchScUrl);
-      doNothingIfMatch(stubOnHistoryStateUpdated, doesNotMatchScUrl);
-    });
+      afterEach(() => {
+        stubScPageVisitedCreate.restore();
+      });
 
-    beforeEach(() => {
-      subscription = fixture.scPageVisited$.subscribe(callback);
-      fixture.run();
-    });
+      it('should run when visiting a SoundCloud page', () => {
+        const tabId = 123;
+        scPageVisited$.next({tabId, timeStamp: 432.1, url: 'some-url'});
 
-    afterEach(() => {
-      subscription.unsubscribe();
-      callback.resetHistory();
-    });
+        expect(sinonChrome.tabs.insertCSS.withArgs(tabId, {file: 'styles.css'})).to.have.been.calledOnce;
+        expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
+        expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(tabId, {file: 'vendor.js'});
+        expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
+      });
 
-    after(() => {
-      stubOnCompleted.restore();
-      stubOnHistoryStateUpdated.restore();
-    });
-
-    const validScUrls = [
-      'https://soundcloud.com/',
-      'https://soundcloud.com/some-user/some-track',
-      'https://soundcloud.com/abcdefg/some-track?in=user/sets/playlist',
-      'https://soundcloud.com/search?q=qwe%20rty',
-    ];
-
-    const invalidScUrls = [
-      'https://not.soundcloud.com/',
-      'https://soundcloud.org/',
-      'https://soundcloud.com.abc/'
-    ];
-
-    context('through the Web Navigation On Completed event', () => {
-      forEach(validScUrls)
-        .it('should trigger when the URL is %s', (url: string) => {
-          const details = {tabId: 1, timeStamp: 123, url};
-          sinonChrome.webNavigation.onCompleted.trigger(details);
-          expect(callback).to.have.been.calledOnce.calledWithExactly(details);
-        });
-
-      forEach(invalidScUrls)
-        .it('should not trigger when the URL is %s', (url: string) => {
-          const details = {tabId: 1, timeStamp: 123, url};
-          sinonChrome.webNavigation.onCompleted.trigger(details);
-          expect(callback).to.not.have.been.called;
-        });
-    });
-
-    context('through the Web Navigation On History Updated event', () => {
-      const debounceWaitTime = 25; // ms
-
-      forEach(validScUrls)
-        .it('should trigger when the URL is %s', async (url: string) => {
-          const details = {tabId: 1, timeStamp: 123, url};
-          sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-          await tick(debounceWaitTime);
-          expect(callback).to.have.been.calledOnce.calledWithExactly(details);
-        });
-
-      forEach(invalidScUrls)
-        .it('should not trigger when the URL is %s', async (url: string) => {
-          const details = {tabId: 1, timeStamp: 123, url};
-          sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-          await tick(debounceWaitTime);
-          expect(callback).to.not.have.been.called;
-        });
-
-      it('should de-bounce events when they are emitted close together', async () => {
-        validScUrls.forEach((url) => {
-          sinonChrome.webNavigation.onHistoryStateUpdated.trigger({tabId: 1, timeStamp: 123, url});
-        });
-        const expectedDetails = {tabId: 1, timeStamp: 123, url: validScUrls[validScUrls.length - 1]};
-        await tick(debounceWaitTime);
-        expect(callback).to.have.been.calledOnce.calledWithExactly(expectedDetails);
+      it('should not run when not visiting a SoundCloud page', () => {
+        expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
+        expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
       });
     });
 
+    describe('downloading a track', () => {
+      let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
+      let stubOnMessage: SinonStub;
+      let spyDownloadTrack: SinonSpy;
+
+      beforeEach(() => {
+        fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
+        stubOnMessage = stub(ExtensionMessenger, 'onMessage');
+        stubOnMessage.withArgs(RequestTrackDownloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
+        stubOnMessage.callThrough();
+        spyDownloadTrack = spy(DownloadService, 'downloadTrack');
+        fixture.run();
+      });
+
+      afterEach(() => {
+        stubOnMessage.restore();
+        spyDownloadTrack.restore();
+      });
+
+      it('should download a track when a request track download message is received', () => {
+        const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, title: 'title'};
+        fakeMessageHandlerArgs$.next({message: new RequestTrackDownloadMessage(fakeTrackInfo), sender: null});
+        expect(spyDownloadTrack).to.have.been.calledOnce.calledWithExactly(fakeTrackInfo);
+      });
+
+      it('should not download a track when a request track download message is not received', () => {
+        expect(spyDownloadTrack).to.not.have.been.called;
+      });
+    });
+
+    describe('sending the reload content page message', () => {
+      let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
+      let stubOnMessage: SinonStub;
+      let spySendToContentPage: SinonSpy;
+
+      beforeEach(() => {
+        fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
+        stubOnMessage = stub(ExtensionMessenger, 'onMessage');
+        stubOnMessage.withArgs(RequestContentPageReloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
+        stubOnMessage.callThrough();
+        spySendToContentPage = spy(ExtensionMessenger, 'sendToContentPage');
+        fixture.run();
+      });
+
+      afterEach(() => {
+        stubOnMessage.restore();
+        spySendToContentPage.restore();
+      });
+
+      it('should send a message when a request content page reload message is received', () => {
+        const contentPageId = 'content-page-id';
+        const fakeTab = {id: 123} as Tab;
+        fakeMessageHandlerArgs$.next({
+          message: new RequestContentPageReloadMessage(contentPageId),
+          sender: {tab: fakeTab}
+        });
+        expect(spySendToContentPage).to.have.been.calledOnce
+          .calledWithExactly(fakeTab.id, new ReloadContentPageMessage(contentPageId));
+      });
+
+      it('should not send a message when a request content page reload message is not received', () => {
+        expect(spySendToContentPage).to.not.have.been.called;
+      });
+    });
+
+    describe('cleaning up', () => {
+      it('should clean up when the onSuspend event is emitted', async () => {
+        const spyCleanUp = spy(fixture, 'cleanUp');
+        fixture.run();
+        await tick();
+
+        expect(spyCleanUp).to.not.have.been.called;
+        sinonChrome.runtime.onSuspend.trigger();
+        await tick();
+
+        expect(spyCleanUp).to.have.been.called;
+      });
+
+      it('should unsubscribe from all subscriptions', () => {
+        const SUBS_PROP = 'subscriptions';
+        const spyUnsubscribe = spy(fixture[SUBS_PROP], 'unsubscribe');
+
+        fixture.run();
+        fixture.cleanUp();
+
+        expect(spyUnsubscribe).to.have.been.called;
+      });
+    });
   });
-
-  context('running the content script', () => {
-
-    it('should run the content script when visiting a SoundCloud page', async () => {
-      const tabId = 123;
-      const scPageVisited$: Subject<WebNavigationUrlCallbackDetails> = new Subject<WebNavigationUrlCallbackDetails>();
-      fixture.scPageVisited$ = scPageVisited$;
-
-      fixture.run();
-      scPageVisited$.next({tabId, timeStamp: 432.1, url: 'some-url'});
-
-      expect(sinonChrome.tabs.insertCSS.withArgs(tabId, {file: 'styles.css'})).to.have.been.calledOnce;
-      expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
-      expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(tabId, {file: 'vendor.js'});
-      expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
-    });
-
-    it('should not run the content script when not visiting a SoundCloud page', async () => {
-      fixture.run();
-      await tick();
-
-      expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
-      expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
-      expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
-    });
-
-  });
-
-  context('unloading the background script', () => {
-
-    it('should trigger when the onSuspend event is emitted', async () => {
-      const spyCleanUp = spy(fixture, 'cleanUp');
-      fixture.run();
-      await tick();
-
-      expect(spyCleanUp).to.not.have.been.called;
-      sinonChrome.runtime.onSuspend.trigger();
-      await tick();
-
-      expect(spyCleanUp).to.have.been.called;
-    });
-
-    it('should unsubscribe from all subscriptions', () => {
-      const SUBS_PROP = 'subscriptions';
-      const spyUnsubscribe = spy(fixture[SUBS_PROP], 'unsubscribe');
-
-      fixture.run();
-      fixture.cleanUp();
-
-      expect(spyUnsubscribe).to.have.been.called;
-    });
-  });
-
 });

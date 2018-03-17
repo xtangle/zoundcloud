@@ -45,7 +45,7 @@ export class TrackContentPage implements IContentPage {
       Observable.merge(
         elementExist$(listenEngagementSelector),
         elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
-      ).subscribe(injectDlButton.bind(this, this.trackInfo$))
+      ).subscribe(this.injectDlButton.bind(this))
     );
     this.subscriptions.add(
       ContentPageMessenger.onMessage(ReloadContentPageMessage.TYPE).subscribe(
@@ -78,20 +78,20 @@ export class TrackContentPage implements IContentPage {
       DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
     );
   }
-}
 
-function injectDlButton(trackInfo$: BehaviorSubject<ITrackInfo>, listenEngagement: Node): void {
-  const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
-  const dlButton = createDlButton();
-  const downloadClick$ = Observable.fromEvent(dlButton[0], 'click').throttleTime(3000);
-  this.subscriptions.add(
-    downloadClick$.map(() => trackInfo$.getValue()).subscribe((trackInfo: ITrackInfo) => {
-      if (trackInfo) {
-        ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
-      }
-    })
-  );
-  addDlButton(soundActions, dlButton);
+  private injectDlButton(listenEngagement: Node): void {
+    const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
+    const dlButton = createDlButton();
+    const downloadClick$ = Observable.fromEvent(dlButton[0], 'click').throttleTime(3000);
+    this.subscriptions.add(
+      downloadClick$.map(() => this.trackInfo$.getValue()).subscribe((trackInfo: ITrackInfo) => {
+        if (trackInfo) {
+          ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
+        }
+      })
+    );
+    addDlButton(soundActions, dlButton);
+  }
 }
 
 function createDlButton(): JQuery<HTMLElement> {
