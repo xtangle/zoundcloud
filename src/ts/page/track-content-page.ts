@@ -41,7 +41,6 @@ export class TrackContentPage implements IContentPage {
 
   public load(): void {
     const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
-    this.updateTrackInfo();
     this.subscriptions.add(
       Observable.merge(
         elementExist$(listenEngagementSelector),
@@ -56,6 +55,10 @@ export class TrackContentPage implements IContentPage {
           }
         })
     );
+    this.subscriptions.add(
+      this.trackInfo$.subscribe((trackInfo: ITrackInfo) => logger.log('Updated track info', trackInfo))
+    );
+    this.updateTrackInfo();
     logger.log('Loaded track content page');
   }
 
@@ -72,11 +75,7 @@ export class TrackContentPage implements IContentPage {
 
   private updateTrackInfo(): void {
     this.subscriptions.add(
-      DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(
-        (trackInfo: ITrackInfo) => {
-          this.trackInfo$.next(trackInfo);
-          logger.log('Updated track info', this.trackInfo$.getValue());
-        })
+      DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
     );
   }
 }

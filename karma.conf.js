@@ -4,7 +4,7 @@ module.exports = function (config) {
     frameworks: ['mocha', 'karma-typescript'],
     files: [
       'src/ts/**/*.ts',
-      'test/ts/**/*.ts',
+      'test/ts/**/*.ts'
     ],
     exclude: [
       'src/ts/background.ts',
@@ -33,9 +33,9 @@ module.exports = function (config) {
             statements: 60,
             branches: 60,
             functions: 60,
-            lines: 60,
+            lines: 60
           }
-        },
+        }
       },
       reports: {
         'html': 'coverage',

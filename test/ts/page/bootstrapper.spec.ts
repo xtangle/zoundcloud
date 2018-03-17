@@ -1,14 +1,15 @@
+import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
+import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {Bootstrapper} from '@src/page/bootstrapper';
 import {IContentPage} from '@src/page/content-page';
-import {useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {SinonSpy, spy} from 'sinon';
+import {SinonSpy, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('bootstrapper', () => {
-  const sinonChrome = useSinonChrome.call(this);
   const fixture = Bootstrapper;
   let contentPage: DummyContentPage;
   let spyLoad: SinonSpy;
@@ -18,42 +19,67 @@ describe('bootstrapper', () => {
     document.body.innerHTML = '<body></body>';
   });
 
-  it('should bootstrap the content page when test passes and id tag is not in DOM', async () => {
-    initContentPage(true);
-    fixture.bootstrap(contentPage);
-    verifyIdTagAddedToDOM();
-    await tick();
-    expect(spyLoad).to.have.been.calledOnce;
+  context('when the content page should be loaded and the id tag is not in the DOM', () => {
+    it('should bootstrap the content page', async () => {
+      setupMocks(true);
+      fixture.bootstrap(contentPage);
+      verifyIdTagAddedToDOM();
+      await tick();
+      expect(spyLoad).to.have.been.calledOnce;
+    });
   });
 
-  it('should not bootstrap the content page when test passes and id tag is in DOM', async () => {
-    initContentPage(true);
-    document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
-    fixture.bootstrap(contentPage);
-    await tick();
-    expect(spyLoad).to.not.have.been.called;
+  context('when the content page should be loaded and the id tag is in the DOM', () => {
+    const stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+
+    beforeEach(() => {
+      setupMocks(true);
+      document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
+    });
+
+    afterEach(() => {
+      stubSendToExtension.resetHistory();
+    });
+
+    after(() => {
+      stubSendToExtension.restore();
+    });
+
+    it('should not bootstrap the content page', async () => {
+      fixture.bootstrap(contentPage);
+      await tick();
+      expect(spyLoad).to.not.have.been.called;
+    });
+
+    it('should send a message to the background script to reload the content page', async () => {
+      fixture.bootstrap(contentPage);
+      await tick();
+      expect(stubSendToExtension).to.have.been.calledOnce
+        .calledWithExactly(new RequestContentPageReloadMessage(contentPage.id));
+    });
   });
 
-  it('should remove the id tag when test fails', () => {
-    initContentPage(false);
-    document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
-    fixture.bootstrap(contentPage);
-    verifyIdTagRemovedFromDOM();
+  context('when the content page should not be loaded', () => {
+    it('should remove the id tag', () => {
+      setupMocks(false);
+      document.body.innerHTML = `<body><div id="${contentPage.id}"></div></body>`;
+      fixture.bootstrap(contentPage);
+      verifyIdTagRemovedFromDOM();
+    });
   });
 
   it('should unload the content page when the id tag is removed from the DOM after bootstrapping', async () => {
-    initContentPage(true);
+    setupMocks(true);
     fixture.bootstrap(contentPage);
     removeIdTagFromDOM();
     await tick();
     expect(spyUnload).to.have.been.calledOnce;
   });
 
-  function initContentPage(testValue: boolean): DummyContentPage {
-    contentPage = new DummyContentPage(testValue);
+  function setupMocks(shouldLoadContentPage: boolean) {
+    contentPage = new DummyContentPage(shouldLoadContentPage);
     spyLoad = spy(contentPage, 'load');
     spyUnload = spy(contentPage, 'unload');
-    return contentPage;
   }
 
   function verifyIdTagAddedToDOM() {

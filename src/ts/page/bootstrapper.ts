@@ -9,8 +9,10 @@ import 'rxjs/add/operator/first';
  * Bootstraps a content-page to the DOM.
  *
  * It first tests if the content page should be loaded using the test() function of the content page;
- * if it should be loaded, then it adds an id tag unique to the content page to the DOM,
- * otherwise, it removes the id tag from the DOM if it already exists.
+ * if it should be loaded, then it adds an id tag (unique per type of content page) to the content page to the DOM
+ * if it doesn't exist. If it should be loaded and the id tag already exists, then a message will be sent to the
+ * extension (background page) signalling for the existing content page to be reloaded.
+ * If the content page should not be loaded, then the id tag is removed from the DOM if it already exists.
  *
  * The status of the id tag is directly related and is the source of truth to the status of the content page.
  * When the id tag is added, the content page is signalled to load.

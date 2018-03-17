@@ -1,9 +1,12 @@
 import {ZC_DL_BUTTON_CLASS} from '@src/constants';
+import {ITrackInfo} from '@src/download/download-info';
+import {DownloadInfoService} from '@src/download/download-info-service';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
 import {UrlService} from '@src/util/url-service';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
+import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonStub, spy, stub} from 'sinon';
 
@@ -11,8 +14,8 @@ const forEach = require('mocha-each');
 const expect = useSinonChai();
 
 describe('track content page', () => {
-  const sinonChrome = useSinonChrome.call(this);
   let fixture: TrackContentPage;
+  useSinonChrome.call(this);
 
   const testHtml = `
     <body>
@@ -33,14 +36,14 @@ describe('track content page', () => {
     fixture.unload();
   });
 
-  describe('deciding when it should be loaded', () => {
+  context('deciding when it should be loaded', () => {
     let stubGetUrl: SinonStub;
 
     before(() => {
       stubGetUrl = stub(UrlService, 'getCurrentUrl');
     });
 
-    beforeEach(() => {
+    afterEach(() => {
       stubGetUrl.resetHistory();
       stubGetUrl.resetBehavior();
     });
@@ -97,11 +100,30 @@ describe('track content page', () => {
 
   });
 
-  describe('loading of the content page', () => {
+  context('when the content page is loaded', () => {
+    const fakeTrackInfo: ITrackInfo = {
+      downloadable: false,
+      id: 123,
+      title: 'title'
+    };
+    let stubGetTrackInfoSubject: Subject<ITrackInfo>;
+    let stubGetTrackInfo: SinonStub;
 
-    it('should inject the download button when listen engagement toolbar already exists', () => {
+    beforeEach(() => {
+      stubGetTrackInfoSubject = new Subject<ITrackInfo>();
+      stubGetTrackInfo = stub(DownloadInfoService, 'getTrackInfo');
+      stubGetTrackInfo.withArgs(UrlService.getCurrentUrl()).returns(stubGetTrackInfoSubject);
+    });
+
+    afterEach(() => {
+      stubGetTrackInfo.restore();
+    });
+
+    it('should inject the download button when listen engagement toolbar already exists', async () => {
       document.body.innerHTML = testHtml;
       fixture.load();
+      await tick();
+
       verifyDlButtonIsInDOM();
     });
 
@@ -124,7 +146,23 @@ describe('track content page', () => {
       verifyDlButtonIsNotInDOM();
     });
 
-    context('the download button', () => {
+    it('should fetch the track info', () => {
+      fixture.load();
+
+    });
+
+    context('reloading the content page', () => {
+
+/*      it('should reload the content page when reload content page message is received', () => {
+
+      });
+
+      it('should not reload the content page when reload content page message is not received', () => {
+
+      });*/
+    });
+
+    describe('the download button', () => {
       beforeEach(() => {
         document.body.innerHTML = testHtml;
       });
@@ -163,7 +201,7 @@ describe('track content page', () => {
 
   });
 
-  describe('unloading of the content page', () => {
+  context('when the content page is unloaded', () => {
     beforeEach(() => {
       document.body.innerHTML = testHtml;
       const dlButton = $('<button/>').attr('id', ZC_TRACK_DL_BUTTON_ID);
