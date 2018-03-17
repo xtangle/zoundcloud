@@ -9,8 +9,8 @@ import {SinonSpy, spy} from 'sinon';
 const expect = useSinonChai();
 
 describe('download service', () => {
-  const sinonChrome = useSinonChrome.call(this);
   const fixture = DownloadService;
+  const sinonChrome = useSinonChrome();
 
   describe('downloading a track', () => {
 
@@ -85,7 +85,6 @@ describe('download service', () => {
         title: 'song-title'
       };
     }
-
   });
 
 });

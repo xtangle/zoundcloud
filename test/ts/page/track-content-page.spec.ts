@@ -1,11 +1,17 @@
 import {ZC_DL_BUTTON_CLASS} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
+import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
+import {Message} from '@src/messaging/message';
+import {IMessageHandlerArgs} from '@src/messaging/messenger';
+import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
+import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
 import {UrlService} from '@src/util/url-service';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {SinonStub, spy, stub} from 'sinon';
@@ -15,7 +21,7 @@ const expect = useSinonChai();
 
 describe('track content page', () => {
   let fixture: TrackContentPage;
-  useSinonChrome.call(this);
+  useSinonChrome();
 
   const testHtml = `
     <body>
@@ -101,108 +107,191 @@ describe('track content page', () => {
   });
 
   context('when the content page is loaded', () => {
-    const fakeTrackInfo: ITrackInfo = {
-      downloadable: false,
-      id: 123,
-      title: 'title'
-    };
-    let stubGetTrackInfoSubject: Subject<ITrackInfo>;
+    const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, title: 'title'};
+    let fakeTrackInfo$: Subject<ITrackInfo>;
     let stubGetTrackInfo: SinonStub;
 
     beforeEach(() => {
-      stubGetTrackInfoSubject = new Subject<ITrackInfo>();
+      fakeTrackInfo$ = new Subject<ITrackInfo>();
       stubGetTrackInfo = stub(DownloadInfoService, 'getTrackInfo');
-      stubGetTrackInfo.withArgs(UrlService.getCurrentUrl()).returns(stubGetTrackInfoSubject);
+      stubGetTrackInfo.withArgs(UrlService.getCurrentUrl()).returns(fakeTrackInfo$);
     });
 
     afterEach(() => {
       stubGetTrackInfo.restore();
     });
 
-    it('should inject the download button when listen engagement toolbar already exists', async () => {
-      document.body.innerHTML = testHtml;
-      fixture.load();
-      await tick();
-
-      verifyDlButtonIsInDOM();
-    });
-
-    it('should inject the download button when listen engagement toolbar is added', async () => {
-      const listenEngagement = $(testHtml).filter('.listenEngagement');
-      fixture.load();
-      await tick();
-
-      verifyDlButtonIsNotInDOM();
-      $('body').append(listenEngagement);
-      await tick();
-
-      verifyDlButtonIsInDOM();
-    });
-
-    it('should not inject the download button when the button group cannot be found', () => {
-      document.body.innerHTML = testHtml;
-      $(`#button-group`).remove();
-      fixture.load();
-      verifyDlButtonIsNotInDOM();
-    });
-
-    it('should fetch the track info', () => {
-      fixture.load();
-
-    });
-
-    context('reloading the content page', () => {
-
-/*      it('should reload the content page when reload content page message is received', () => {
-
+    describe('fetching of the track info', () => {
+      it('should have null track info initially', () => {
+        fixture.load();
+        verifyTrackInfoIs(null);
       });
 
-      it('should not reload the content page when reload content page message is not received', () => {
-
-      });*/
+      it('should fetch the track info', () => {
+        fixture.load();
+        fakeTrackInfo$.next(fakeTrackInfo);
+        verifyTrackInfoIs(fakeTrackInfo);
+      });
     });
 
-    describe('the download button', () => {
+    describe('reloading the content page', () => {
+      let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
+      let stubOnMessage: SinonStub;
+
       beforeEach(() => {
+        fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
+        stubOnMessage = stub(ContentPageMessenger, 'onMessage');
+        stubOnMessage.withArgs(ReloadContentPageMessage.TYPE).returns(fakeMessageHandlerArgs$);
+      });
+
+      beforeEach('load fixture and populate initial track info', () => {
+        fixture.load();
+        fakeTrackInfo$.next(fakeTrackInfo);
+      });
+
+      afterEach(() => {
+        stubOnMessage.restore();
+      });
+
+      it('should reload when a reload message is received and id matches', () => {
+        fakeMessageHandlerArgs$.next({message: new ReloadContentPageMessage(fixture.id), sender: null});
+        verifyContentPageIsReloaded();
+      });
+
+      it('should not reload when reload message is received and id does not match', () => {
+        const differentId = fixture.id + 'X';
+        fakeMessageHandlerArgs$.next({message: new ReloadContentPageMessage(differentId), sender: null});
+        verifyContentPageIsNotReloaded();
+      });
+
+      it('should not reload when no reload message is received', () => {
+        verifyContentPageIsNotReloaded();
+      });
+
+      function verifyContentPageIsReloaded() {
+        verifyTrackInfoIs(null);
+        fakeTrackInfo$.next(fakeTrackInfo);
+        verifyTrackInfoIs(fakeTrackInfo);
+      }
+
+      function verifyContentPageIsNotReloaded() {
+        verifyTrackInfoIs(fakeTrackInfo);
+      }
+    });
+
+    describe('the download button injection', () => {
+      it('should be injected when the listen engagement toolbar already exists', () => {
         document.body.innerHTML = testHtml;
+        fixture.load();
+        verifyDlButtonIsInDOM();
+      });
+
+      it('should be injected when the listen engagement toolbar is added', async () => {
+        fixture.load();
+        await tick();
+
+        verifyDlButtonIsNotInDOM();
+        const listenEngagement = $(testHtml).filter('.listenEngagement');
+        $('body').append(listenEngagement);
+        await tick();
+
+        verifyDlButtonIsInDOM();
+      });
+
+      it('should not be injected when the button group cannot be found', () => {
+        document.body.innerHTML = testHtml;
+        $(`#button-group`).remove();
+        fixture.load();
+        verifyDlButtonIsNotInDOM();
+      });
+    });
+
+    describe('the download button behavior', () => {
+      beforeEach('ensure download button is injected', () => {
+        document.body.innerHTML = testHtml;
+        fixture.load();
       });
 
       it('should have the correct classes', () => {
-        fixture.load();
-        expect(getDlButton().is(`.sc-button.sc-button-medium.sc-button-responsive.${ZC_DL_BUTTON_CLASS}`))
-          .to.be.true;
+        expect(getDlButton().is(`.sc-button.sc-button-medium.sc-button-responsive.${ZC_DL_BUTTON_CLASS}`)).to.be.true;
       });
 
       it('should have the correct label', () => {
-        fixture.load();
         expect(getDlButton().html()).to.be.equal('Download');
       });
 
       it('should have the correct title', () => {
-        fixture.load();
         expect(getDlButton().prop('title')).to.be.equal('Download this track');
       });
 
-      it('should be added as the last child of the button group ' +
-        'if the last button is not the \'More\' button', () => {
-        fixture.load();
+      it('should be added as the last child of the button group if the last button is not the More button', () => {
         expect($('#button-group').find('button:last-child').is(getDlButton())).to.be.true;
       });
 
       it('should be added as the second-to-last child of the button group ' +
-        'if the last button is the \'More\' button', () => {
+        'if the last button is the More button', () => {
+        fixture.unload();
         const btnGroup = $('#button-group');
         const moreBtn = $('<button/>').addClass('sc-button-more');
         btnGroup.append(moreBtn);
         fixture.load();
         expect(btnGroup.find('button:nth-last-child(2)').is(getDlButton())).to.be.true;
       });
+
+      describe('the behavior when clicked', () => {
+        let stubSendToExtension: SinonStub;
+
+        before(() => {
+          stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+        });
+
+        afterEach(() => {
+          stubSendToExtension.resetHistory();
+        });
+
+        after(() => {
+          stubSendToExtension.restore();
+        });
+
+        it('should send a request download message if track info is not null', () => {
+          fakeTrackInfo$.next(fakeTrackInfo);
+          getDlButton().trigger('click');
+          expect(stubSendToExtension).to.have.been.calledOnce
+            .calledWithExactly(new RequestTrackDownloadMessage(fakeTrackInfo));
+        });
+
+        it('should not send a request download message if there is no track info', () => {
+          getDlButton().trigger('click');
+          expect(stubSendToExtension).to.not.have.been.called;
+        });
+
+        it('should not send a request download message when not clicked', () => {
+          fakeTrackInfo$.next(fakeTrackInfo);
+          expect(stubSendToExtension).to.not.have.been.called;
+        });
+
+        it('should throttle clicks that are within 3s of each other', async () => {
+          fakeTrackInfo$.next(fakeTrackInfo);
+          getDlButton().trigger('click');
+          await tick(2900);
+          getDlButton().trigger('click');
+          expect(stubSendToExtension).to.have.been.calledOnce;
+
+          await tick(100);
+          getDlButton().trigger('click');
+          expect(stubSendToExtension).to.have.been.calledTwice;
+        });
+      });
     });
 
+    function verifyTrackInfoIs(trackInfo: ITrackInfo) {
+      const TRACK_INFO_PROP = 'trackInfo$';
+      expect((fixture[TRACK_INFO_PROP] as BehaviorSubject<ITrackInfo>).getValue()).to.be.equal(trackInfo);
+    }
   });
 
   context('when the content page is unloaded', () => {
-    beforeEach(() => {
+    beforeEach('add download button to DOM', () => {
       document.body.innerHTML = testHtml;
       const dlButton = $('<button/>').attr('id', ZC_TRACK_DL_BUTTON_ID);
       $(`#button-group`).append(dlButton);

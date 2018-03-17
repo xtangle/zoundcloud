@@ -5,7 +5,7 @@ import {IContentPage} from '@src/page/content-page';
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {SinonSpy, spy, stub} from 'sinon';
+import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
@@ -30,7 +30,11 @@ describe('bootstrapper', () => {
   });
 
   context('when the content page should be loaded and the id tag is in the DOM', () => {
-    const stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+    let stubSendToExtension: SinonStub;
+
+    before(() => {
+      stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+    });
 
     beforeEach(() => {
       setupMocks(true);

@@ -1,6 +1,5 @@
 import {Message, MessageType} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
-import {logger} from '@src/util/logger';
 import 'rxjs/add/operator/first';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';

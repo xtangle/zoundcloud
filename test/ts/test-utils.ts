@@ -1,4 +1,4 @@
-import {SinonMatcher, SinonStub} from 'sinon';
+import {SinonMatcher, SinonStub, stub} from 'sinon';
 
 export const noop: () => void = () => undefined;
 
