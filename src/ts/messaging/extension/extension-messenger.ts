@@ -1,11 +1,11 @@
 import {Message} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
-import {MessengerImpl} from '@src/messaging/messenger';
+import {DefaultMessenger} from '@src/messaging/messenger';
 import 'rxjs/add/observable/empty';
 import {Observable} from 'rxjs/Observable';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
 
-class ExtensionMessengerImpl extends MessengerImpl {
+class ExtensionMessengerImpl extends DefaultMessenger {
   public sendToContentPage<T extends MessageResponse = undefined>(tabId: number,
                                                                   message: Message,
                                                                   expectResponse: boolean = false): Observable<T> {

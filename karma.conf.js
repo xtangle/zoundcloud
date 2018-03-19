@@ -28,12 +28,12 @@ module.exports = function (config) {
       compilerOptions: require('./tsconfig').compilerOptions,
       coverageOptions: {
         threshold: {
-          // todo: Add more tests and bump coverage back to 95%
+          // todo: Add more tests and bump coverage back to 98%
           global: {
-            statements: 60,
-            branches: 60,
-            functions: 60,
-            lines: 60
+            statements: 90,
+            branches: 80,
+            functions: 90,
+            lines: 90
           }
         }
       },

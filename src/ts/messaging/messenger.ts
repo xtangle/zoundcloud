@@ -2,7 +2,6 @@ import {Message, MessageType} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
 import 'rxjs/add/operator/first';
 import {Observable} from 'rxjs/Observable';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {Subject} from 'rxjs/Subject';
 import MessageSender = chrome.runtime.MessageSender;
 
@@ -13,15 +12,16 @@ export interface IMessageHandlerArgs<T extends Message, U extends MessageRespons
 }
 
 export interface IMessenger {
-  onMessage(messageType: MessageType, sendResponse: boolean): Observable<IMessageHandlerArgs<Message, MessageResponse>>;
+  onMessage(messageType: MessageType,
+            sendResponse?: boolean): Observable<IMessageHandlerArgs<Message, MessageResponse>>;
 }
 
-export abstract class MessengerImpl implements IMessenger {
+export abstract class DefaultMessenger implements IMessenger {
   public onMessage(messageType: MessageType,
                    doSendResponse: boolean = false): Observable<IMessageHandlerArgs<Message, MessageResponse>> {
 
-    const handlerArgs$: ReplaySubject<IMessageHandlerArgs<Message, MessageResponse>> =
-      new ReplaySubject<IMessageHandlerArgs<Message, MessageResponse>>(1);
+    const handlerArgs$: Subject<IMessageHandlerArgs<Message, MessageResponse>> =
+      new Subject<IMessageHandlerArgs<Message, MessageResponse>>();
 
     if (doSendResponse) {
       const response$: Subject<MessageResponse> = new Subject<MessageResponse>();
