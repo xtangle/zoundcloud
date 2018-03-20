@@ -3,7 +3,7 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {DefaultMessenger} from '@src/messaging/messenger';
 import 'rxjs/add/observable/empty';
 import {Observable} from 'rxjs/Observable';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
+import {Subject} from 'rxjs/Subject';
 
 class ExtensionMessengerImpl extends DefaultMessenger {
   public sendToContentPage<T extends MessageResponse = undefined>(tabId: number,
@@ -12,15 +12,15 @@ class ExtensionMessengerImpl extends DefaultMessenger {
     let response$: Observable<T>;
 
     if (expectResponse) {
-      const responseSubject$: ReplaySubject<T> = new ReplaySubject<T>(1);
+      const responseSubject$: Subject<T> = new Subject<T>();
       response$ = responseSubject$.asObservable();
 
-      chrome.tabs.sendMessage(tabId, message, (response: T) => {
+      chrome.tabs.sendMessage(tabId, message, (response?: T) => {
         if (response !== undefined) {
           responseSubject$.next(response);
           responseSubject$.complete();
         } else {
-          responseSubject$.error(chrome.runtime.lastError);
+          responseSubject$.error(chrome.runtime.lastError.message);
         }
       });
 
