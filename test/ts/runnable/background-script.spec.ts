@@ -1,5 +1,5 @@
 import {ITrackInfo} from '@src/download/download-info';
-import {DownloadService} from '@src/download/download-service';
+import {TrackDownloadService} from '@src/download/track-download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
 import {Message} from '@src/messaging/message';
@@ -74,7 +74,7 @@ describe('background script', () => {
         stubOnMessage = stub(ExtensionMessenger, 'onMessage');
         stubOnMessage.withArgs(RequestTrackDownloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
         stubOnMessage.callThrough();
-        spyDownloadTrack = spy(DownloadService, 'downloadTrack');
+        spyDownloadTrack = spy(TrackDownloadService, 'downloadTrack');
         fixture.run();
       });
 
@@ -84,7 +84,7 @@ describe('background script', () => {
       });
 
       it('should download a track when a request track download message is received', () => {
-        const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, title: 'title'};
+        const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, original_format: 'mp3', title: 'title'};
         fakeMessageHandlerArgs$.next({message: new RequestTrackDownloadMessage(fakeTrackInfo), sender: null});
         expect(spyDownloadTrack).to.have.been.calledOnce.calledWithExactly(fakeTrackInfo);
       });

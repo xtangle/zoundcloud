@@ -11,7 +11,7 @@ import MessageSender = chrome.runtime.MessageSender;
 
 const expect = useSinonChai();
 
-describe('messenger', () => {
+describe('default messenger', () => {
   const sinonChrome = useSinonChrome();
 
   let fixture: IMessenger;

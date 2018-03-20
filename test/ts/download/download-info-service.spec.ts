@@ -48,7 +48,7 @@ describe('download info service', () => {
     });
 
     it('should fetch track track info and complete when url has been resolved', async () => {
-      const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, title: 'some-track'};
+      const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, original_format: 'mp3', title: 'some-track'};
       deferredTrackInfo.resolve(fakeTrackInfo);
       await tick();
       verifyDownloadInfoFetched(fakeTrackInfo);

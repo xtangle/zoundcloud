@@ -1,4 +1,4 @@
-import {DownloadService} from '@src/download/download-service';
+import {TrackDownloadService} from '@src/download/track-download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
 import {IMessageHandlerArgs} from '@src/messaging/messenger';
@@ -39,7 +39,7 @@ export class BackgroundScript implements IRunnable {
     this.subscriptions.add(
       ExtensionMessenger.onMessage(RequestTrackDownloadMessage.TYPE).subscribe(
         (args: IMessageHandlerArgs<RequestTrackDownloadMessage>) => {
-          DownloadService.downloadTrack(args.message.trackInfo);
+          TrackDownloadService.downloadTrack(args.message.trackInfo);
         })
     );
     this.subscriptions.add(
