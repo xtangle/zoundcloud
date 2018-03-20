@@ -1,46 +1,36 @@
 # ZoundCloud
 
+[![Build Status](https://travis-ci.org/xtangle/ZoundCloud.svg?branch=master)](https://travis-ci.org/xtangle/ZoundCloud)
+
 ## Description
 
-A Google Chrome extension that adds download buttons to playlist pages, track pages, 
-and beside lists of tracks on SoundCloud. It is currently a work in progress.
+A Google Chrome extension that adds a download button to any SoundCloud web page that has
+a track as its main content.
 
-For playlists, it will download every track in the playlist sequentially in the same order 
-as listed in the playlist. It will attempt to download a track in its uploaded format and 
-best quality, and will resort to download the streamable 128kb mp3 version if no better 
-quality is available.
+It will attempt to download a track in its uploaded format and will resort to the 
+stream-able 128kb mp3 version if no better quality is available.
 
-Single tracks will be downloaded in the Downloads folder with the name:
-
-* [artist] - [track_title]
-
-Tracks in playlists will be downloaded to the folder:
-
-* Downloads/[user] - [playlist_name]
-
-where [user] is the username of the owner of the playlist.
-
-Once a playlist download is queued, the user can stop the sequence of downloads at any time. 
-One playlist can be downloaded at any given time.
+Tracks will be downloaded to the Downloads folder with the track title as its name.
+Special characters in the name will be replaced by an underscore (unless it's a tilda, in which
+case it will be replaced by a dash).
 
 ## Installation
 
-The project is a Node.js project and the extension does not come pre-packaged. To
-install, you will have to build it. Make sure you have Node.js (version >= 6.9.2)
-installed and the npm package `gulp-cli` installed globally before continuing.
+The extension is created as a Node.js project and does not come pre-packaged. 
+To build, make sure Node.js (version >= 7.6) and yarn is installed.
 
 - Clone the project to a local directory.
-- In the project root, run `npm install`.
-- Run the command `gulp` to pack the extension.
-- Navigate to `chrome://extensions` in the Chrome browser.
-- Drag the `ZoundCloud.crx` file in the `dist` folder to the extensions page.
+- In the project root, run `yarn install`.
+- Run `yarn run build`.
+- Open Chrome and navigate to `chrome://extensions`.
+- Click `Load Unpacked` and choose the `dist` folder in this project.
 
-## Change Log
+There are other yarn run scripts under `package.json` that are useful for developing purposes.
 
-### 1.1.1
+## Additional Features
 
-- Add individual download buttons to playlist tracks when on a playlist page.
+The following features will be added in the future.
 
-### 1.1.0
-
-- Added individual track download functionality.
+- Download button on playlist pages
+- Download buttons for lists of tracks
+- Download button on user pages
