@@ -37,13 +37,10 @@ module.exports = function (config) {
         }
       },
       reports: {
-        'html': 'coverage',
+        'html': reportDestinationConfig,
+        'lcovonly': reportDestinationConfig,
         'text': ''
       }
-    },
-    coverageReporter: {
-      type: 'lcov',
-      dir: 'coverage/'
     },
     port: 9876,
     colors: true,
@@ -53,4 +50,9 @@ module.exports = function (config) {
     singleRun: true,
     concurrency: Infinity
   });
+};
+
+const reportDestinationConfig = {
+  'directory': 'coverage',
+  'subdirectory': 'HeadlessChrome'
 };
