@@ -11,7 +11,7 @@ describe('test utils', () => {
     const sinonStub = stub(obj, 'hello');
 
     afterEach(() => {
-      sinonStub.reset();
+      sinonStub.resetHistory();
     });
 
     it('should not do anything if arguments match matcher', () => {

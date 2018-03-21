@@ -9,10 +9,7 @@ import {Observable} from 'rxjs/Observable';
  * Fetches the download information when given a tab url
  */
 export interface IDownloadInfoService {
-  // noinspection JSUnusedLocalSymbols
   getTrackInfo(url: string): Observable<ITrackInfo>;
-
-  // noinspection JSUnusedLocalSymbols
   getPlaylistInfo(url: string): Observable<IPlaylistInfo>;
 }
 

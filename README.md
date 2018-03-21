@@ -36,3 +36,7 @@ The following features will be added in the future.
 - Download button on playlist pages
 - Download buttons for lists of tracks
 - Download button on user pages
+
+## Todo
+
+- Need to clean up tests. There is too much boilerplate setup/cleanup of stubs, making the test bloated and hard to read.

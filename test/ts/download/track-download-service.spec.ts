@@ -1,83 +1,41 @@
-import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
-import {ITrackInfo} from '@src/download/download-info';
+import {ITrackDownloadMethod} from '@src/download/track-download-method';
+import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {FilenameService} from '@src/util/filename-service';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {noop, tick} from '@test/test-utils';
 import * as path from 'path';
+import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
-import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
+// todo: add additional tests
 describe('track download service', () => {
   const fixture = TrackDownloadService;
   const sinonChrome = useSinonChrome();
 
   describe('downloading a track', () => {
+    const trackInfo = {downloadable: false, id: 123, original_format: 'wav', title: 'song-title'};
+    const downloadMethod = {fileExtension: 'mp3', url: 'download-method-url'};
+    let downloadMethod$: Subject<ITrackDownloadMethod>;
+    let stubGetDownloadMethod: SinonStub;
 
-    context('finding which download method to use', () => {
-      describe('using the download url', () => {
-        const trackInfo = createTrackInfo();
-
-        beforeEach(() => {
-          fixture.downloadTrack(trackInfo);
-        });
-
-        it('should download using the download url if possible', () => {
-          const expectedUrl = `${trackInfo.download_url}?client_id=${CLIENT_ID}`;
-          expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(match.has('url', expectedUrl));
-        });
-
-        it('should set the file extension to the original format', () => {
-          expect(sinonChrome.downloads.download).calledOnce
-            .calledWithMatch(fileExtensionMatching(trackInfo.original_format));
-        });
-      });
-
-      describe('using the stream url', () => {
-        const trackInfo = createTrackInfo(false);
-
-        beforeEach(() => {
-          fixture.downloadTrack(trackInfo);
-        });
-
-        it('should download using the stream url if download url cannot be used', () => {
-          const expectedUrl = `${trackInfo.stream_url}?client_id=${CLIENT_ID}`;
-          expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(match.has('url', expectedUrl));
-        });
-
-        it('should set the file extension to mp3', () => {
-          expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(fileExtensionMatching('mp3'));
-        });
-      });
-
-      describe('using the i1 api stream url', () => {
-        const trackInfo = createTrackInfo(false, false);
-
-        beforeEach(() => {
-          fixture.downloadTrack(trackInfo);
-        });
-
-        it('should download using the i1 api stream url if both download url and stream url cannot be used', () => {
-          const expectedUrl = `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
-          expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(match.has('url', expectedUrl));
-        });
-
-        it('should set the file extension to mp3', () => {
-          expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(fileExtensionMatching('mp3'));
-        });
-      });
-
-      function fileExtensionMatching(extension: string): SinonMatcher {
-        return match.has('filename', match((filename: string) => filename.endsWith(`.${extension}`)));
-      }
+    beforeEach(() => {
+      downloadMethod$ = new Subject<ITrackDownloadMethod>();
+      stubGetDownloadMethod = stub(TrackDownloadMethodService, 'getDownloadMethod');
+      stubGetDownloadMethod.withArgs(trackInfo).returns(downloadMethod$);
     });
 
-    context('download properties', () => {
-      const trackInfo = createTrackInfo();
+    afterEach(() => {
+      downloadMethod$.complete();
+      stubGetDownloadMethod.restore();
+    });
+
+    context('properties of the download', () => {
       const trackTitleNoSpecialChars = 'track-title-with-no-special-chars';
-      const expectedFilename = `${trackTitleNoSpecialChars}.${trackInfo.original_format}`;
+      const expectedFilename = `${trackTitleNoSpecialChars}.${downloadMethod.fileExtension}`;
       let stubRemoveSpecialCharacters: SinonStub;
 
       beforeEach(() => {
@@ -90,13 +48,23 @@ describe('track download service', () => {
         stubRemoveSpecialCharacters.restore();
       });
 
+      it('should use the url in the download method', () => {
+        fixture.downloadTrack(trackInfo);
+        downloadMethod$.next(downloadMethod);
+        expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(match.has('url', downloadMethod.url));
+
+      });
+
       it('should not ask the user where to download', () => {
         fixture.downloadTrack(trackInfo);
+        downloadMethod$.next(downloadMethod);
         expect(sinonChrome.downloads.download).calledOnce.calledWithMatch(match.has('saveAs', false));
       });
 
-      it('should use the track title with special characters trimmed as the file name', () => {
+      it('should use the track title with special characters trimmed ' +
+        'with the file extension from the download method as the file name', () => {
         fixture.downloadTrack(trackInfo);
+        downloadMethod$.next(downloadMethod);
         expect(sinonChrome.downloads.download).calledOnce
           .calledWithMatch(match.has('filename', expectedFilename));
       });
@@ -104,6 +72,7 @@ describe('track download service', () => {
       it('should download to the specified download location if provided', () => {
         const downloadLocation = 'parentDir';
         fixture.downloadTrack(trackInfo, downloadLocation);
+        downloadMethod$.next(downloadMethod);
         expect(sinonChrome.downloads.download).calledOnce
           .calledWithMatch(match.has('filename', path.join(downloadLocation, expectedFilename)));
       });
@@ -126,7 +95,8 @@ describe('track download service', () => {
         const downloadId = 123;
         sinonChrome.downloads.download.callsArgWithAsync(1, downloadId);
 
-        subscription = fixture.downloadTrack(createTrackInfo()).subscribe(callback);
+        subscription = fixture.downloadTrack(trackInfo).subscribe(callback);
+        downloadMethod$.next(downloadMethod);
         expect(callback).to.not.have.been.called;
         await tick();
 
@@ -139,7 +109,8 @@ describe('track download service', () => {
         sinonChrome.downloads.download.callsArgWithAsync(1, undefined);
         sinonChrome.runtime.lastError = {message: errorMsg};
 
-        subscription = fixture.downloadTrack(createTrackInfo()).subscribe(noop, callback);
+        subscription = fixture.downloadTrack(trackInfo).subscribe(noop, callback);
+        downloadMethod$.next(downloadMethod);
         expect(callback).to.not.have.been.called;
         await tick();
 
@@ -147,18 +118,5 @@ describe('track download service', () => {
         expect(subscription.closed).to.be.true;
       });
     });
-
-    function createTrackInfo(downloadable: boolean = true,
-                             hasStreamUrl: boolean = true): ITrackInfo {
-      return {
-        download_url: 'https://api.soundcloud.com/tracks/208094428/download',
-        downloadable,
-        id: 123,
-        original_format: 'wav',
-        stream_url: hasStreamUrl ? 'https://api.soundcloud.com/tracks/208094428/stream' : undefined,
-        title: 'song-title'
-      };
-    }
   });
-
 });

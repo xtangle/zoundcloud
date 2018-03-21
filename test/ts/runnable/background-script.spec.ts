@@ -67,30 +67,30 @@ describe('background script', () => {
     describe('downloading a track', () => {
       let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
       let stubOnMessage: SinonStub;
-      let spyDownloadTrack: SinonSpy;
+      let stubDownloadTrack: SinonStub;
 
       beforeEach(() => {
         fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
         stubOnMessage = stub(ExtensionMessenger, 'onMessage');
         stubOnMessage.withArgs(RequestTrackDownloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
         stubOnMessage.callThrough();
-        spyDownloadTrack = spy(TrackDownloadService, 'downloadTrack');
+        stubDownloadTrack = stub(TrackDownloadService, 'downloadTrack');
         fixture.run();
       });
 
       afterEach(() => {
         stubOnMessage.restore();
-        spyDownloadTrack.restore();
+        stubDownloadTrack.restore();
       });
 
       it('should download a track when a request track download message is received', () => {
         const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, original_format: 'mp3', title: 'title'};
         fakeMessageHandlerArgs$.next({message: new RequestTrackDownloadMessage(fakeTrackInfo), sender: null});
-        expect(spyDownloadTrack).to.have.been.calledOnce.calledWithExactly(fakeTrackInfo);
+        expect(stubDownloadTrack).to.have.been.calledOnce.calledWithExactly(fakeTrackInfo);
       });
 
       it('should not download a track when a request track download message is not received', () => {
-        expect(spyDownloadTrack).to.not.have.been.called;
+        expect(stubDownloadTrack).to.not.have.been.called;
       });
     });
 
