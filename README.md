@@ -1,6 +1,8 @@
 # ZoundCloud
 
-[![Build Status](https://travis-ci.org/xtangle/ZoundCloud.svg?branch=master)](https://travis-ci.org/xtangle/ZoundCloud)
+[![Build Status](https://img.shields.io/travis/xtangle/ZoundCloud/master.svg)](https://travis-ci.org/xtangle/ZoundCloud) 
+[![devDependencies Status](https://img.shields.io/david/dev/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud?type=dev)
+[![Coverage Status](https://img.shields.io/coveralls/github/xtangle/ZoundCloud/master.svg)](https://coveralls.io/github/xtangle/ZoundCloud?branch=master)
 
 ## Description
 
