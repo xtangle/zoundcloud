@@ -22,7 +22,7 @@ export const TrackDownloadService: ITrackDownloadService = {
 
     downloadMethod$
       .first()
-      .timeout(3000)
+      .timeout(10000)
       .map((downloadMethod: ITrackDownloadMethod) => ({
         filename: getFilename(trackInfo.title, downloadMethod.fileExtension, downloadLocation),
         saveAs: false,

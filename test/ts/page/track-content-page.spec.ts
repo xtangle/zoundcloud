@@ -14,7 +14,7 @@ import * as $ from 'jquery';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
-import {SinonStub, spy, stub} from 'sinon';
+import {SinonFakeTimers, SinonStub, spy, stub, useFakeTimers} from 'sinon';
 
 const forEach = require('mocha-each');
 const expect = useSinonChai();
@@ -209,9 +209,16 @@ describe('track content page', () => {
     });
 
     describe('the download button behavior', () => {
+      let fakeTimer: SinonFakeTimers;
+
       beforeEach('ensure download button is injected', () => {
+        fakeTimer = useFakeTimers();
         document.body.innerHTML = testHtml;
         fixture.load();
+      });
+
+      afterEach(() => {
+        fakeTimer.restore();
       });
 
       it('should have the correct classes', () => {
@@ -272,14 +279,14 @@ describe('track content page', () => {
           expect(stubSendToExtension).to.not.have.been.called;
         });
 
-        it('should throttle clicks that are within 3s of each other', async () => {
+        it('should throttle clicks that are within 3s of each other', () => {
           fakeTrackInfo$.next(fakeTrackInfo);
           getDlButton().trigger('click');
-          await tick(2900);
+          fakeTimer.tick(2900);
           getDlButton().trigger('click');
           expect(stubSendToExtension).to.have.been.calledOnce;
 
-          await tick(100);
+          fakeTimer.tick(101);
           getDlButton().trigger('click');
           expect(stubSendToExtension).to.have.been.calledTwice;
         });
