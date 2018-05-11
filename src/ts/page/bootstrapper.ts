@@ -3,7 +3,7 @@ import {RequestContentPageReloadMessage} from '@src/messaging/page/request-conte
 import {IContentPage} from '@src/page/content-page';
 import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
-import 'rxjs/add/operator/first';
+import {first} from 'rxjs/operators';
 
 /**
  * Bootstraps a content-page to the DOM.
@@ -31,8 +31,10 @@ export const Bootstrapper: IBootstrapper = {
     if (contentPage.test()) {
       if (!idTagIsInDOM(contentPage.id)) {
         const idTag = createIdTag(contentPage.id);
-        elementAdded$((node: Node) => node.isSameNode(idTag)).first().subscribe(() => contentPage.load());
-        elementRemoved$(idTag).first().subscribe(() => contentPage.unload());
+        elementAdded$((node: Node) => node.isSameNode(idTag)).pipe(first())
+          .subscribe(() => contentPage.load());
+        elementRemoved$(idTag).pipe(first())
+          .subscribe(() => contentPage.unload());
         addIdTagToDOM(idTag);
       } else {
         ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage(contentPage.id));

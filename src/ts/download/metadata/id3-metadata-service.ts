@@ -4,13 +4,8 @@ import {TrackMetadataService} from '@src/download/metadata/track-metadata-servic
 import {logger} from '@src/util/logger';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import * as _ from 'lodash';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/timeout';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
+import {catchError, first, map, switchMap, timeout} from 'rxjs/operators';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const ID3Writer = require('browser-id3-writer');
@@ -23,23 +18,25 @@ export interface IID3MetadataService {
 export const ID3MetadataService: IID3MetadataService = {
   addID3V2Metadata(trackInfo: ITrackInfo, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
     const metadata = TrackMetadataService.toTrackMetadata(trackInfo);
-    return XhrRequestService.getArrayBuffer$(downloadOptions.url)
-      .first()
-      .switchMap(writeMetadata.bind(null, metadata))
-      .map((writer: typeof ID3Writer) => ({...downloadOptions, url: writer.getURL()}))
-      .timeout(30000)
-      .catch((err) => {
+    return XhrRequestService.getArrayBuffer$(downloadOptions.url).pipe(
+      first(),
+      switchMap(writeMetadata.bind(null, metadata)),
+      map((writer: typeof ID3Writer) => ({...downloadOptions, url: writer.getURL()})),
+      timeout(30000),
+      catchError((err: any) => {
         logger.error(err);
-        return Observable.of(downloadOptions);
-      });
+        return of(downloadOptions);
+      })
+    );
   }
 };
 
 function writeMetadata(metadata: ITrackMetadata, arrayBuffer: ArrayBuffer): Observable<typeof ID3Writer> {
-  return Observable.of(new ID3Writer(arrayBuffer))
-    .map(withTextualMetadata.bind(null, metadata))
-    .switchMap(withCoverArt.bind(null, metadata))
-    .map(withTagAdded);
+  return of(new ID3Writer(arrayBuffer)).pipe(
+    map(withTextualMetadata.bind(null, metadata)),
+    switchMap(withCoverArt.bind(null, metadata)),
+    map(withTagAdded)
+  );
 }
 
 function withTextualMetadata(metadata: ITrackMetadata, writer: typeof ID3Writer): typeof ID3Writer {
@@ -64,22 +61,23 @@ function withTextualMetadata(metadata: ITrackMetadata, writer: typeof ID3Writer)
 
 function withCoverArt(metadata: ITrackMetadata, writer: typeof ID3Writer): Observable<typeof ID3Writer> {
   if (_.isNil(metadata.cover_url)) {
-    return Observable.of(writer);
+    return of(writer);
   }
-  return XhrRequestService.getArrayBuffer$(metadata.cover_url)
-    .first()
-    .map((arrayBuffer) =>
+  return XhrRequestService.getArrayBuffer$(metadata.cover_url).pipe(
+    first(),
+    map((arrayBuffer: ArrayBuffer) =>
       writer.setFrame('APIC', {
         data: arrayBuffer,
         description: 'Soundcloud artwork',
         type: 3,
         useUnicodeEncoding: false
-      }))
-    .timeout(10000)
-    .catch((err) => {
+      })),
+    timeout(10000),
+    catchError((err: any) => {
       logger.error(err);
-      return Observable.of(writer);
-    });
+      return of(writer);
+    })
+  );
 }
 
 function withTagAdded(writer: typeof ID3Writer): typeof ID3Writer {

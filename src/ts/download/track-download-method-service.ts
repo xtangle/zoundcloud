@@ -2,8 +2,8 @@ import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {ITrackDownloadMethod} from '@src/download/track-download-method';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import 'rxjs/add/observable/of';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 export interface IScI1ApiTrackDownloadInfo {
   http_mp3_128_url?: string;
@@ -28,14 +28,14 @@ export const TrackDownloadMethodService: ITrackDownloadMethodService = {
 };
 
 function getDownloadUrlMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
-  return Observable.of({
+  return of({
     fileExtension: trackInfo.original_format,
     url: `${trackInfo.download_url}?client_id=${CLIENT_ID}`
   });
 }
 
 function getStreamUrlMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
-  return Observable.of({
+  return of({
     fileExtension: 'mp3',
     url: `${trackInfo.stream_url}?client_id=${CLIENT_ID}`
   });
@@ -43,8 +43,8 @@ function getStreamUrlMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMet
 
 function getScI1ApiMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   const dlInfoEndpoint = `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
-  return XhrRequestService.getJSON$<IScI1ApiTrackDownloadInfo>(dlInfoEndpoint)
-    .map((downloadInfo: IScI1ApiTrackDownloadInfo) => {
+  return XhrRequestService.getJSON$<IScI1ApiTrackDownloadInfo>(dlInfoEndpoint).pipe(
+    map((downloadInfo: IScI1ApiTrackDownloadInfo) => {
       if (downloadInfo.http_mp3_128_url) {
         return {
           fileExtension: 'mp3',
@@ -53,5 +53,6 @@ function getScI1ApiMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMetho
       } else {
         throw new Error('No download URL found in i1 api endpoint response');
       }
-    });
+    })
+  );
 }

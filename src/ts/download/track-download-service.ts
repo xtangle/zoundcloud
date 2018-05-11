@@ -3,15 +3,11 @@ import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {FilenameService} from '@src/util/filename-service';
-import DownloadOptions = chrome.downloads.DownloadOptions;
 import * as _ from 'lodash';
 import * as path from 'path';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/timeout';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
+import {Observable, Subject} from 'rxjs';
+import {first, map, switchMap, timeout} from 'rxjs/operators';
+import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export interface ITrackDownloadService {
   downloadTrack(trackInfo: ITrackInfo, downloadLocation?: string): Observable<number>;
@@ -22,12 +18,12 @@ export const TrackDownloadService: ITrackDownloadService = {
     const downloadId$: Subject<number> = new Subject<number>();
     const downloadMethod$: Observable<ITrackDownloadMethod> = TrackDownloadMethodService.getDownloadMethod(trackInfo);
 
-    downloadMethod$
-      .first()
-      .timeout(10000)
-      .map(toDownloadOptions.bind(null, trackInfo, downloadLocation))
-      .switchMap(MetadataAdapter.addMetadata$.bind(null, trackInfo))
-      .subscribe(doDownload.bind(null, downloadId$));
+    downloadMethod$.pipe(
+      first(),
+      timeout(10000),
+      map(toDownloadOptions.bind(null, trackInfo, downloadLocation)),
+      switchMap(MetadataAdapter.addMetadata$.bind(null, trackInfo)),
+    ).subscribe(doDownload.bind(null, downloadId$));
 
     return downloadId$.asObservable();
   }

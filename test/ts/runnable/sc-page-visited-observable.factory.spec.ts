@@ -2,7 +2,7 @@ import {SC_URL_PATTERN} from '@src/constants';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {doNothingIf, tick} from '@test/test-utils';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
@@ -32,7 +32,7 @@ describe('sc page visited observable factory', () => {
   });
 
   beforeEach(() => {
-    subscription = fixture.create().subscribe(callback);
+    subscription = fixture.create$().subscribe(callback);
   });
 
   afterEach(() => {

@@ -1,8 +1,7 @@
 import {Message, MessageType} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
-import 'rxjs/add/operator/first';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
+import {Observable, Subject} from 'rxjs';
+import {first} from 'rxjs/operators';
 import MessageSender = chrome.runtime.MessageSender;
 
 export interface IMessageHandlerArgs<T extends Message, U extends MessageResponse = undefined> {
@@ -29,7 +28,7 @@ export abstract class DefaultMessenger implements IMessenger {
         (message: Message, sender: MessageSender, sendResponse: (response: MessageResponse) => void) => {
           if (message.type === messageType) {
             handlerArgs$.next({message, sender, response$});
-            response$.first().subscribe(sendResponse);
+            response$.pipe(first()).subscribe(sendResponse);
             return true;
           }
         }

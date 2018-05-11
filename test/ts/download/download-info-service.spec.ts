@@ -4,8 +4,7 @@ import {DownloadInfoService} from '@src/download/download-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
+import {Subject, Subscription} from 'rxjs';
 import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
@@ -39,7 +38,7 @@ describe('download info service', () => {
     beforeEach(() => {
       jsonResponse$ = new Subject<ITrackInfo>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
-      subscription = fixture.getTrackInfo(url).subscribe(successCallback, failCallback);
+      subscription = fixture.getTrackInfo$(url).subscribe(successCallback, failCallback);
     });
 
     it('should not emit anything when url has yet to be resolved', async () => {
@@ -75,7 +74,7 @@ describe('download info service', () => {
     beforeEach(() => {
       jsonResponse$ = new Subject<IPlaylistInfo>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
-      subscription = fixture.getPlaylistInfo(url).subscribe(successCallback, failCallback);
+      subscription = fixture.getPlaylistInfo$(url).subscribe(successCallback, failCallback);
     });
 
     it('should not emit anything when url has yet to be resolved', async () => {

@@ -4,8 +4,7 @@ import {IScI1ApiTrackDownloadInfo, TrackDownloadMethodService} from '@src/downlo
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
+import {Subject, Subscription} from 'rxjs';
 import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();

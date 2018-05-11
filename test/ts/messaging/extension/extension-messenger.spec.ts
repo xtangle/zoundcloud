@@ -4,7 +4,7 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {match, SinonSpy, spy} from 'sinon';
 
 const expect = useSinonChai();

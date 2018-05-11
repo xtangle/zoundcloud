@@ -1,6 +1,6 @@
 import {ITrackInfo} from '@src/download/download-info';
 import {ID3MetadataService} from '@src/download/metadata/id3-metadata-service';
-import {Observable} from 'rxjs/Observable';
+import {Observable, of} from 'rxjs';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export interface IMetadataAdapter {
@@ -14,7 +14,7 @@ export const MetadataAdapter: IMetadataAdapter = {
       case 'mp3':
         return ID3MetadataService.addID3V2Metadata(trackInfo, downloadOptions);
       default:
-        return Observable.of(downloadOptions);
+        return of(downloadOptions);
     }
   }
 };

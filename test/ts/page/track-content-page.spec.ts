@@ -11,10 +11,8 @@ import {UrlService} from '@src/util/url-service';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
-import {SinonFakeTimers, SinonStub, spy, stub, useFakeTimers} from 'sinon';
+import {BehaviorSubject, Subject, Subscription} from 'rxjs';
+import {SinonFakeTimers, SinonStub, spy, stub} from 'sinon';
 
 const forEach = require('mocha-each');
 const expect = useSinonChai();
@@ -119,7 +117,7 @@ describe('track content page', () => {
 
     beforeEach(() => {
       fakeTrackInfo$ = new Subject<ITrackInfo>();
-      stubGetTrackInfo = stub(DownloadInfoService, 'getTrackInfo');
+      stubGetTrackInfo = stub(DownloadInfoService, 'getTrackInfo$');
       stubGetTrackInfo.withArgs(UrlService.getCurrentUrl()).returns(fakeTrackInfo$);
       stubGetTrackInfo.callThrough();
     });
@@ -215,10 +213,11 @@ describe('track content page', () => {
     });
 
     describe('the download button behavior', () => {
+      const sinon = require('sinon');
       let fakeTimer: SinonFakeTimers;
 
       beforeEach('ensure download button is injected', () => {
-        fakeTimer = useFakeTimers();
+        fakeTimer = sinon.useFakeTimers();
         document.body.innerHTML = testHtml;
         fixture.load();
       });

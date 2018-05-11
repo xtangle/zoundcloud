@@ -1,11 +1,12 @@
 import {SC_URL_PATTERN} from '@src/constants';
-import {Observable} from 'rxjs/Observable';
+import {fromEventPattern, merge, Observable} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 export const ScPageVisitedObservableFactory = {
-  create(): Observable<WebNavigationUrlCallbackDetails> {
+  create$(): Observable<WebNavigationUrlCallbackDetails> {
     const scWebNavOnCompleted$: Observable<WebNavigationUrlCallbackDetails> =
-      Observable.fromEventPattern<WebNavigationUrlCallbackDetails>(
+      fromEventPattern<WebNavigationUrlCallbackDetails>(
         (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
           chrome.webNavigation.onCompleted.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
       );
@@ -15,11 +16,11 @@ export const ScPageVisitedObservableFactory = {
      * one with URL of the new page. The de-bounce ensures we only receive tha later event.
      */
     const scWebNavOnHistoryUpdated$: Observable<WebNavigationUrlCallbackDetails> =
-      Observable.fromEventPattern<WebNavigationUrlCallbackDetails>(
+      fromEventPattern<WebNavigationUrlCallbackDetails>(
         (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
           chrome.webNavigation.onHistoryStateUpdated.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-      ).debounceTime(20);
+      ).pipe(debounceTime(20));
 
-    return Observable.merge(scWebNavOnCompleted$, scWebNavOnHistoryUpdated$);
+    return merge(scWebNavOnCompleted$, scWebNavOnHistoryUpdated$);
   }
 };

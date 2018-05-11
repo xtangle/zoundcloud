@@ -7,17 +7,12 @@ import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-dow
 import {IRunnable} from '@src/runnable/runnable';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
 import {logger} from '@src/util/logger';
-import 'rxjs/add/observable/fromEventPattern';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/operator/debounceTime';
-import 'rxjs/add/operator/distinctUntilKeyChanged';
-import {Observable} from 'rxjs/Observable';
-import {Subscription} from 'rxjs/Subscription';
+import {fromEventPattern, Observable, Subscription} from 'rxjs';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 export class BackgroundScript implements IRunnable {
 
-  private onSuspend$: Observable<any> = Observable.fromEventPattern<any>(
+  private onSuspend$: Observable<any> = fromEventPattern<any>(
     (handler: () => void) => chrome.runtime.onSuspend.addListener(handler));
   private subscriptions: Subscription = new Subscription();
 
@@ -29,7 +24,7 @@ export class BackgroundScript implements IRunnable {
   public run(): void {
     this.subscriptions.add(this.onSuspend$.subscribe(() => this.cleanUp()));
     this.subscriptions.add(
-      ScPageVisitedObservableFactory.create().subscribe((details: WebNavigationUrlCallbackDetails) => {
+      ScPageVisitedObservableFactory.create$().subscribe((details: WebNavigationUrlCallbackDetails) => {
         logger.debug('Loading content script', details);
         chrome.tabs.insertCSS(details.tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});

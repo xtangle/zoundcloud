@@ -6,10 +6,8 @@ import {FilenameService} from '@src/util/filename-service';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {noop, tick} from '@test/test-utils';
 import * as path from 'path';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
-import {match, SinonFakeTimers, SinonSpy, SinonStub, spy, stub, useFakeTimers} from 'sinon';
+import {of, Subject, Subscription} from 'rxjs';
+import {match, SinonFakeTimers, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
@@ -42,8 +40,7 @@ describe('track download service', () => {
       stubRemoveSpecialCharacters.callThrough();
 
       stubAddMetadata = stub(MetadataAdapter, 'addMetadata$');
-      stubAddMetadata.withArgs(trackInfo, match.any).callsFake(
-        (_, downloadOptions) => Observable.of(downloadOptions));
+      stubAddMetadata.withArgs(trackInfo, match.any).callsFake((_, downloadOptions) => of(downloadOptions));
       stubAddMetadata.callThrough();
     });
 
@@ -88,10 +85,13 @@ describe('track download service', () => {
     });
 
     context('fetching the download method', () => {
+      // todo: Wait for issue (https://github.com/sinonjs/sinon/issues/1780) to be fixed so we do
+      // not have to require sinon object to call its useFakeTimers() method.
+      const sinon = require('sinon');
       let fakeTimer: SinonFakeTimers;
 
       beforeEach(() => {
-        fakeTimer = useFakeTimers();
+        fakeTimer = sinon.useFakeTimers();
       });
 
       afterEach(() => {
@@ -115,6 +115,7 @@ describe('track download service', () => {
         expect(() => {
           fixture.downloadTrack(trackInfo);
           downloadMethod$.error(Error(errorMsg));
+          fakeTimer.next();
         }).to.throw(errorMsg);
         expect(sinonChrome.downloads.download).to.not.have.been.called;
       });

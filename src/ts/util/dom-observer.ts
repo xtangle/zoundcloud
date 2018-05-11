@@ -1,11 +1,9 @@
 import * as $ from 'jquery';
-import 'rxjs/add/observable/fromEventPattern';
-import {Observable} from 'rxjs/Observable';
-import {Observer} from 'rxjs/Observer';
+import {fromEventPattern, Observable, Observer} from 'rxjs';
 
 export function elementRemoved$(elem: Node): Observable<any> {
   let mutationObserver: MutationObserver;
-  return Observable.fromEventPattern<any>(
+  return fromEventPattern<any>(
     (handler: () => void) => {
       mutationObserver = new MutationObserver((mutations: MutationRecord[]) => {
         mutations.forEach((mutation: MutationRecord) => {
@@ -27,7 +25,7 @@ export function elementRemoved$(elem: Node): Observable<any> {
 
 export function elementAdded$(test: (node: Node) => boolean): Observable<Node> {
   let mutationObserver: MutationObserver;
-  return Observable.fromEventPattern<Node>(
+  return fromEventPattern<Node>(
     (handler: (signal: Node) => void) => {
       mutationObserver = new MutationObserver((mutations: MutationRecord[]) => {
         mutations.forEach((mutation: MutationRecord) => {

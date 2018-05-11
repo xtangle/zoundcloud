@@ -2,8 +2,7 @@ import {elementAdded$, elementExist$, elementRemoved$} from '@src/util/dom-obser
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {Observable} from 'rxjs/Observable';
-import {Subscription} from 'rxjs/Subscription';
+import {Observable, Subscription} from 'rxjs';
 import {SinonSpy, spy} from 'sinon';
 
 const expect = useSinonChai();

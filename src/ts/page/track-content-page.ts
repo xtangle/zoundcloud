@@ -10,15 +10,8 @@ import {elementAdded$, elementExist$} from '@src/util/dom-observer';
 import {logger} from '@src/util/logger';
 import {UrlService} from '@src/util/url-service';
 import * as $ from 'jquery';
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/throttleTime';
-import 'rxjs/add/operator/withLatestFrom';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {Subscription} from 'rxjs/Subscription';
+import {BehaviorSubject, fromEvent, merge, Subscription} from 'rxjs';
+import {map, throttleTime} from 'rxjs/operators';
 
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
@@ -42,7 +35,7 @@ export class TrackContentPage implements IContentPage {
   public load(): void {
     const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
     this.subscriptions.add(
-      Observable.merge(
+      merge(
         elementExist$(listenEngagementSelector),
         elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
       ).subscribe(this.injectDlButton.bind(this))
@@ -75,20 +68,21 @@ export class TrackContentPage implements IContentPage {
 
   private updateTrackInfo(): void {
     this.subscriptions.add(
-      DownloadInfoService.getTrackInfo(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
+      DownloadInfoService.getTrackInfo$(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
     );
   }
 
   private injectDlButton(listenEngagement: Node): void {
     const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
     const dlButton = createDlButton();
-    const downloadClick$ = Observable.fromEvent(dlButton[0], 'click').throttleTime(3000);
+    const downloadClick$ = fromEvent(dlButton[0], 'click').pipe(throttleTime(3000));
     this.subscriptions.add(
-      downloadClick$.map(() => this.trackInfo$.getValue()).subscribe((trackInfo: ITrackInfo) => {
-        if (trackInfo) {
-          ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
-        }
-      })
+      downloadClick$.pipe(map(() => this.trackInfo$.getValue()))
+        .subscribe((trackInfo: ITrackInfo) => {
+          if (trackInfo) {
+            ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
+          }
+        })
     );
     addDlButton(soundActions, dlButton);
   }

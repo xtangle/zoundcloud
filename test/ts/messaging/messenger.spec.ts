@@ -4,8 +4,7 @@ import {DefaultMessenger, IMessenger} from '@src/messaging/messenger';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {Subject} from 'rxjs/Subject';
-import {Subscription} from 'rxjs/Subscription';
+import {Subject, Subscription} from 'rxjs';
 import {match, SinonSpy, spy} from 'sinon';
 import MessageSender = chrome.runtime.MessageSender;
 

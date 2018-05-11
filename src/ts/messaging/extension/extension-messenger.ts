@@ -1,9 +1,7 @@
 import {Message} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
 import {DefaultMessenger} from '@src/messaging/messenger';
-import 'rxjs/add/observable/empty';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
+import {EMPTY, Observable, Subject} from 'rxjs';
 
 class ExtensionMessengerImpl extends DefaultMessenger {
   public sendToContentPage<T extends MessageResponse = undefined>(tabId: number,
@@ -25,7 +23,7 @@ class ExtensionMessengerImpl extends DefaultMessenger {
       });
 
     } else {
-      response$ = Observable.empty();
+      response$ = EMPTY;
       chrome.tabs.sendMessage(tabId, message);
     }
 

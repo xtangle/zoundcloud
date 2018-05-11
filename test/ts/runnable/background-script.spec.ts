@@ -10,10 +10,7 @@ import {BackgroundScript} from '@src/runnable/background-script';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import 'rxjs/add/observable/interval';
-import 'rxjs/add/observable/timer';
-import 'rxjs/add/operator/take';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 import Tab = chrome.tabs.Tab;
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
@@ -39,7 +36,7 @@ describe('background script', () => {
 
       beforeEach(() => {
         scPageVisited$ = new Subject<WebNavigationUrlCallbackDetails>();
-        stubScPageVisitedCreate = stub(ScPageVisitedObservableFactory, 'create');
+        stubScPageVisitedCreate = stub(ScPageVisitedObservableFactory, 'create$');
         stubScPageVisitedCreate.returns(scPageVisited$);
         fixture.run();
       });

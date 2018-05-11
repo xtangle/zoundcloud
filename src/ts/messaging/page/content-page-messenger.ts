@@ -1,9 +1,7 @@
 import {Message} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
 import {DefaultMessenger} from '@src/messaging/messenger';
-import 'rxjs/add/observable/empty';
-import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
+import {EMPTY, Observable, Subject} from 'rxjs';
 
 class ContentPageMessengerImpl extends DefaultMessenger {
   public sendToExtension<T extends MessageResponse = undefined>(message: Message,
@@ -24,7 +22,7 @@ class ContentPageMessengerImpl extends DefaultMessenger {
       });
 
     } else {
-      response$ = Observable.empty();
+      response$ = EMPTY;
       chrome.runtime.sendMessage(message);
     }
 
