@@ -1,8 +1,7 @@
 import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {ITrackDownloadMethod} from '@src/download/track-download-method';
-import * as $ from 'jquery';
-import 'rxjs/add/observable/fromPromise';
+import {XhrRequestService} from '@src/util/xhr-request-service';
 import 'rxjs/add/observable/of';
 import {Observable} from 'rxjs/Observable';
 
@@ -44,7 +43,7 @@ function getStreamUrlMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMet
 
 function getScI1ApiMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   const dlInfoEndpoint = `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
-  return Observable.fromPromise<IScI1ApiTrackDownloadInfo>($.getJSON(dlInfoEndpoint))
+  return XhrRequestService.getJSON$<IScI1ApiTrackDownloadInfo>(dlInfoEndpoint)
     .map((downloadInfo: IScI1ApiTrackDownloadInfo) => {
       if (downloadInfo.http_mp3_128_url) {
         return {

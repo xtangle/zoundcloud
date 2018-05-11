@@ -22,7 +22,7 @@ export class BackgroundScript implements IRunnable {
   private subscriptions: Subscription = new Subscription();
 
   public cleanUp(): void {
-    logger.log('Unloading background script');
+    logger.debug('Unloading background script');
     this.subscriptions.unsubscribe();
   }
 
@@ -30,7 +30,7 @@ export class BackgroundScript implements IRunnable {
     this.subscriptions.add(this.onSuspend$.subscribe(() => this.cleanUp()));
     this.subscriptions.add(
       ScPageVisitedObservableFactory.create().subscribe((details: WebNavigationUrlCallbackDetails) => {
-        logger.log('Loading content script', details);
+        logger.debug('Loading content script', details);
         chrome.tabs.insertCSS(details.tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
         chrome.tabs.executeScript(details.tabId, {file: 'content.js'});

@@ -6,32 +6,42 @@ const expect = useSinonChai();
 
 describe('logger', () => {
   const prevNodeEnv = process.env.NODE_ENV; // Previous stored value in NODE_ENV
-  let stubConsoleLog: SinonStub;
+  let stubDebug: SinonStub;
+  let stubError: SinonStub;
 
   before(() => {
-    stubConsoleLog = stub(console, 'log');
+    stubDebug = stub(console, 'debug');
+    stubError = stub(console, 'error');
   });
 
   afterEach(() => {
-    stubConsoleLog.resetHistory();
+    stubDebug.resetHistory();
+    stubError.resetHistory();
   });
 
   after(() => {
     process.env.NODE_ENV = prevNodeEnv;
-    stubConsoleLog.restore();
+    stubDebug.restore();
+    stubError.restore();
   });
 
-  it('should log message if in development mode', () => {
+  it('should print debug message to console if in development mode', () => {
     process.env.NODE_ENV = 'development';
-    logger.log('some message', 1, 'arg-two');
-    expect(stubConsoleLog).to.have.been.calledOnce
+    logger.debug('some message', 1, 'arg-two');
+    expect(stubDebug).to.have.been.calledOnce
       .calledWithExactly(`ZC: some message`, 1, 'arg-two');
   });
 
-  it('should not log message if not in development mode', () => {
+  it('should not print debug message to console if not in development mode', () => {
     process.env.NODE_ENV = 'production';
-    logger.log('some message');
-    expect(stubConsoleLog).to.not.have.been.called;
+    logger.debug('some message');
+    expect(stubDebug).to.not.have.been.called;
   });
 
+  it('should print error message to console', () => {
+    const ev = new ErrorEvent('some error type');
+    logger.error('some error message', ev);
+    expect(stubError).to.have.been.calledOnce
+      .calledWithExactly(`ZC: some error message`, ev);
+  });
 });

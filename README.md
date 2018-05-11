@@ -9,12 +9,14 @@
 A Google Chrome extension that adds a download button to any SoundCloud web page that has
 a track as its main content.
 
-It will attempt to download a track in its uploaded format and will resort to the 
-stream-able 128kb mp3 version if no better quality is available.
+It attempts to download a track in its uploaded format (i.e. highest quality) and will only
+resort to the streamable 128kb mp3 version if no better quality is available.
 
-Tracks will be downloaded to the Downloads folder with the track title as its name.
-Special characters in the name will be replaced by an underscore (unless it's a tilda, in which
-case it will be replaced by a dash).
+Metadata information and cover art is automatically added to files in .mp3 format (in ID3v2.3).
+
+Tracks are downloaded to the Downloads folder with the **track title** as its name.
+Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
+case it is replaced by a dash (-) symbol).
 
 ## Installation
 
@@ -29,7 +31,7 @@ To build, make sure Node.js (version >= 7.6) and yarn is installed.
 
 There are other yarn run scripts under `package.json` that are useful for developing purposes.
 
-## Additional Features
+## Future Plans
 
 The following features will be added in the future.
 
@@ -39,4 +41,4 @@ The following features will be added in the future.
 
 ## Todo
 
-- Need to clean up tests. There is too much boilerplate setup/cleanup of stubs, making the test bloated and hard to read.
+- Need to clean up tests. There is too much boilerplate of setup/cleanup of stubs, making the tests bloated and hard to read.

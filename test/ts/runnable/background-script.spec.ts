@@ -84,7 +84,13 @@ describe('background script', () => {
       });
 
       it('should download a track when a request track download message is received', () => {
-        const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, original_format: 'mp3', title: 'title'};
+        const fakeTrackInfo: ITrackInfo = {
+          downloadable: false,
+          id: 123,
+          original_format: 'mp3',
+          title: 'title',
+          user: {username: 'foo'}
+        };
         fakeMessageHandlerArgs$.next({message: new RequestTrackDownloadMessage(fakeTrackInfo), sender: null});
         expect(stubDownloadTrack).to.have.been.calledOnce.calledWithExactly(fakeTrackInfo);
       });

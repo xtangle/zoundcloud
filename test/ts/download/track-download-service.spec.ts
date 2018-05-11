@@ -1,3 +1,4 @@
+import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
@@ -5,6 +6,7 @@ import {FilenameService} from '@src/util/filename-service';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {noop, tick} from '@test/test-utils';
 import * as path from 'path';
+import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {match, SinonFakeTimers, SinonSpy, SinonStub, spy, stub, useFakeTimers} from 'sinon';
@@ -16,12 +18,19 @@ describe('track download service', () => {
   const fixture = TrackDownloadService;
 
   describe('downloading a track', () => {
-    const trackInfo = {downloadable: false, id: 123, original_format: 'wav', title: 'song-title'};
+    const trackInfo = {
+      downloadable: false,
+      id: 123,
+      original_format: 'wav',
+      title: 'song-title',
+      user: {username: 'foo'}
+    };
     const downloadMethod = {fileExtension: 'mp3', url: 'download-method-url'};
     const trackTitleNoSpecialChars = 'track-title-with-no-special-chars';
     let downloadMethod$: Subject<ITrackDownloadMethod>;
     let stubGetDownloadMethod: SinonStub;
     let stubRemoveSpecialCharacters: SinonStub;
+    let stubAddMetadata: SinonStub;
 
     beforeEach(() => {
       downloadMethod$ = new Subject<ITrackDownloadMethod>();
@@ -31,11 +40,17 @@ describe('track download service', () => {
       stubRemoveSpecialCharacters = stub(FilenameService, 'removeSpecialCharacters');
       stubRemoveSpecialCharacters.withArgs(trackInfo.title).returns(trackTitleNoSpecialChars);
       stubRemoveSpecialCharacters.callThrough();
+
+      stubAddMetadata = stub(MetadataAdapter, 'addMetadata$');
+      stubAddMetadata.withArgs(trackInfo, match.any).callsFake(
+        (_, downloadOptions) => Observable.of(downloadOptions));
+      stubAddMetadata.callThrough();
     });
 
     afterEach(() => {
       stubGetDownloadMethod.restore();
       stubRemoveSpecialCharacters.restore();
+      stubAddMetadata.restore();
     });
 
     context('properties of the download', () => {

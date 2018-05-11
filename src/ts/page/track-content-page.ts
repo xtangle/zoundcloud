@@ -56,16 +56,16 @@ export class TrackContentPage implements IContentPage {
         })
     );
     this.subscriptions.add(
-      this.trackInfo$.subscribe((trackInfo: ITrackInfo) => logger.log('Updated track info', trackInfo))
+      this.trackInfo$.subscribe((trackInfo: ITrackInfo) => logger.debug('Updated track info', trackInfo))
     );
     this.updateTrackInfo();
-    logger.log('Loaded track content page');
+    logger.debug('Loaded track content page');
   }
 
   public unload(): void {
     removeDlButton();
     this.subscriptions.unsubscribe();
-    logger.log('Unloaded track content page');
+    logger.debug('Unloaded track content page');
   }
 
   private reload(): void {

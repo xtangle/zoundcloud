@@ -107,7 +107,13 @@ describe('track content page', () => {
   });
 
   context('when the content page is loaded', () => {
-    const fakeTrackInfo: ITrackInfo = {downloadable: false, id: 123, original_format: 'mp3', title: 'title'};
+    const fakeTrackInfo: ITrackInfo = {
+      downloadable: false,
+      id: 123,
+      original_format: 'mp3',
+      title: 'title',
+      user: {username: 'foo'}
+    };
     let fakeTrackInfo$: Subject<ITrackInfo>;
     let stubGetTrackInfo: SinonStub;
 

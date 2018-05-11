@@ -1,8 +1,6 @@
 import {CLIENT_ID, SC_API_URL} from '@src/constants';
 import {IPlaylistInfo, ITrackInfo} from '@src/download/download-info';
-import * as $ from 'jquery';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/first';
+import {XhrRequestService} from '@src/util/xhr-request-service';
 import {Observable} from 'rxjs/Observable';
 
 /**
@@ -22,7 +20,7 @@ export const DownloadInfoService: IDownloadInfoService = {
   }
 };
 
-function getDownloadInfo<T>(url: string): Observable<T> {
+function getDownloadInfo<T extends object>(url: string): Observable<T> {
   const jsonEndpoint = `${SC_API_URL}/resolve.json?url=${url}&client_id=${CLIENT_ID}`;
-  return Observable.fromPromise<T>($.getJSON(jsonEndpoint));
+  return XhrRequestService.getJSON$<T>(jsonEndpoint);
 }

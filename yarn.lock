@@ -36,6 +36,10 @@
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.1.tgz#55758d44d422756d6329cbf54e6d41931d7ba28f"
 
+"@types/lodash@^4.14.108":
+  version "4.14.108"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.108.tgz#02656af3add2e5b3174f830862c47421c00ef817"
+
 "@types/mocha-each@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/mocha-each/-/mocha-each-1.1.0.tgz#0def5f984f8d59a905b8c4a2a9e5f6b083632717"
@@ -1182,6 +1186,10 @@ braces@^2.3.0, braces@^2.3.1:
 brorand@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
+
+browser-id3-writer@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/browser-id3-writer/-/browser-id3-writer-4.0.0.tgz#daadf495c62c50fb849f17ccbd6861ddeeac3571"
 
 browser-pack@^6.0.1:
   version "6.0.4"
@@ -4169,6 +4177,10 @@ lodash@^3.8.0:
 lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.15.0, lodash@^4.16.3, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.3.0, lodash@^4.5.0:
   version "4.17.5"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
+
+lodash@^4.17.10:
+  version "4.17.10"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
 log-driver@^1.2.5:
   version "1.2.7"

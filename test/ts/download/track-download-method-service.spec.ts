@@ -1,12 +1,12 @@
 import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {IScI1ApiTrackDownloadInfo, TrackDownloadMethodService} from '@src/download/track-download-method-service';
+import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import * as $ from 'jquery';
+import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
 import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
-import Deferred = JQuery.Deferred;
 
 const expect = useSinonChai();
 
@@ -67,13 +67,13 @@ describe('track download method service', () => {
     describe('using the i1 api stream url if both download url and stream url methods cannot be used', () => {
       const trackInfo = createTrackInfo(false, false);
       const failCallback: SinonSpy = spy();
-      let deferredI1DownloadInfo: Deferred<IScI1ApiTrackDownloadInfo>;
+      let jsonResponse$: Subject<IScI1ApiTrackDownloadInfo>;
       let stubGetJSON: SinonStub;
 
       beforeEach(() => {
-        deferredI1DownloadInfo = $.Deferred();
-        stubGetJSON = stub($, 'getJSON');
-        stubGetJSON.returns(deferredI1DownloadInfo.promise());
+        jsonResponse$ = new Subject<IScI1ApiTrackDownloadInfo>();
+        stubGetJSON = stub(XhrRequestService, 'getJSON$');
+        stubGetJSON.returns(jsonResponse$);
         subscription = fixture.getDownloadMethod(trackInfo).subscribe(callback, failCallback);
       });
 
@@ -91,7 +91,8 @@ describe('track download method service', () => {
         const responseUrl = 'some-url-returned-by-i1-api';
 
         beforeEach(async () => {
-          deferredI1DownloadInfo.resolve({http_mp3_128_url: responseUrl});
+          jsonResponse$.next({http_mp3_128_url: responseUrl});
+          jsonResponse$.complete();
           await tick();
         });
 
@@ -109,7 +110,8 @@ describe('track download method service', () => {
       });
 
       it('should emit an error when a response without the http_mp3_128_url property is returned', async () => {
-        deferredI1DownloadInfo.resolve({});
+        jsonResponse$.next({});
+        jsonResponse$.complete();
         await tick();
         expect(callback).to.not.have.been.called;
         expect(failCallback).to.have.been.calledOnce;
@@ -130,7 +132,8 @@ describe('track download method service', () => {
         id: 123,
         original_format: 'wav',
         stream_url: hasStreamUrl ? 'https://api.soundcloud.com/tracks/208094428/stream' : undefined,
-        title: 'song-title'
+        title: 'song-title',
+        user: {username: 'foo'}
       };
     }
   });
