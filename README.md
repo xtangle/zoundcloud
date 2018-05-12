@@ -3,6 +3,7 @@
 [![Build Status](https://img.shields.io/travis/xtangle/ZoundCloud.svg)](https://travis-ci.org/xtangle/ZoundCloud)
 [![DevDependencies Status](https://img.shields.io/david/dev/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud?type=dev)
 [![Coverage Status](https://img.shields.io/coveralls/github/xtangle/ZoundCloud.svg)](https://coveralls.io/github/xtangle/ZoundCloud?branch=master)
+[![CodeFactor](https://www.codefactor.io/repository/github/xtangle/zoundcloud/badge)](https://www.codefactor.io/repository/github/xtangle/zoundcloud)
 
 ## Description
 
@@ -18,6 +19,8 @@ Tracks are downloaded to the Downloads folder with the **track title** as its na
 Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
 case it is replaced by a dash (-) symbol).
 
+[Change Log](https://github.com/xtangle/ZoundCloud/blob/master/CHANGELOG.md)
+
 ## Installation
 
 The extension is created as a Node.js project and does not come pre-packaged. 
@@ -31,14 +34,10 @@ To build, make sure Node.js (version >= 7.6) and yarn is installed.
 
 There are other yarn run scripts under `package.json` that are useful for developing purposes.
 
-## Future Plans
+## Features yet to be implemented
 
 The following features will be added in the future.
 
 - Download button on playlist pages
-- Download buttons for lists of tracks
+- Download buttons for each track within a list of tracks
 - Download button on user pages
-
-## Todo
-
-- Need to clean up tests. There is too much boilerplate of setup/cleanup of stubs, making the tests bloated and hard to read.
