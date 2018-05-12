@@ -44,11 +44,11 @@ describe('xhr request service', () => {
     });
 
     it('should error when response is other than 200', () => {
-      verifyErrorWhenStatusIsNot200('arraybuffer');
+      verifyErrorWhenStatusIsNot200();
     });
 
     it('should error when connection can not be established', () => {
-      verifyErrorWhenNoConnection('arraybuffer');
+      verifyErrorWhenNoConnection();
     });
 
     function createFakeResponse(): ArrayBuffer {
@@ -78,11 +78,11 @@ describe('xhr request service', () => {
     });
 
     it('should error when response is other than 200', () => {
-      verifyErrorWhenStatusIsNot200('json');
+      verifyErrorWhenStatusIsNot200();
     });
 
     it('should error when connection can not be established', () => {
-      verifyErrorWhenNoConnection('json');
+      verifyErrorWhenNoConnection();
     });
   });
 
@@ -99,14 +99,14 @@ describe('xhr request service', () => {
     expect((request as any)[RESPONSE_TYPE_PROP]).to.be.equal(responseType);
   }
 
-  function verifyErrorWhenStatusIsNot200(responseType: string) {
-    const expectedErrMsg = `Unable to get ${responseType}, response is Forbidden (403)`;
+  function verifyErrorWhenStatusIsNot200() {
+    const expectedErrMsg = `Unable to get from ${url}, response is Forbidden (403)`;
     getRequest().respond(403, {}, '');
     expect(failCallback).to.have.been.calledWithExactly(expectedErrMsg);
   }
 
-  function verifyErrorWhenNoConnection(responseType: string) {
-    const expectedErrMsg = `Unable to get ${responseType}, network error`;
+  function verifyErrorWhenNoConnection() {
+    const expectedErrMsg = `Unable to get from ${url}, network error`;
     getRequest().error();
     expect(failCallback).to.have.been.calledWithExactly(expectedErrMsg);
   }

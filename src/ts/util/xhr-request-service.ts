@@ -24,11 +24,11 @@ function getResponse$<T>(responseType: XMLHttpRequestResponseType, url: string):
       response$.next(xhr.response);
       response$.complete();
     } else {
-      response$.error(`Unable to get ${responseType}, response is ${xhr.statusText} (${xhr.status})`);
+      response$.error(`Unable to get from ${url}, response is ${xhr.statusText} (${xhr.status})`);
     }
   };
   xhr.onerror = () => {
-    response$.error(`Unable to get ${responseType}, network error`);
+    response$.error(`Unable to get from ${url}, network error`);
   };
   xhr.send();
   return response$;
