@@ -1,4 +1,4 @@
-import {ZC_DL_BUTTON_CLASS} from '@src/constants';
+import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
@@ -91,6 +91,7 @@ export class TrackContentPage implements IContentPage {
 function createDlButton(): JQuery<HTMLElement> {
   return $('<button/>')
     .addClass(['sc-button', 'sc-button-medium', 'sc-button-responsive'])
+    .addClass(ZC_DL_BUTTON_ICON_CLASS)
     .addClass(ZC_DL_BUTTON_CLASS)
     .attr('id', ZC_TRACK_DL_BUTTON_ID)
     .prop('title', 'Download this track')
