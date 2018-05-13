@@ -1,6 +1,10 @@
+import {Observable, Subscription} from 'rxjs';
+import {SinonSpy, spy} from 'sinon';
+
 export function useSinonChai(): Chai.ExpectStatic {
   const chai = require('chai');
   const sinonChai = require('sinon-chai');
+
   chai.use(sinonChai);
   return chai.expect;
 }
@@ -22,4 +26,35 @@ export function useSinonChrome() {
   });
 
   return sinonChrome;
+}
+
+export interface IRxTestingStatic {
+  readonly next: SinonSpy;
+  readonly error: SinonSpy;
+  readonly complete: SinonSpy;
+  subscribeTo<T>(observable: Observable<T>): void;
+}
+
+export function useRxTesting(): IRxTestingStatic {
+  let subscription: Subscription;
+
+  const rx: IRxTestingStatic = {
+    complete: spy(),
+    error: spy(),
+    next: spy(),
+    subscribeTo<T>(observable: Observable<T>) {
+      subscription = observable.subscribe(this);
+    }
+  };
+
+  afterEach('reset callbacks and unsubscribe', () => {
+    rx.next.resetHistory();
+    rx.error.resetHistory();
+    rx.complete.resetHistory();
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+  });
+
+  return rx;
 }

@@ -3,8 +3,8 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {DefaultMessenger, IMessenger} from '@src/messaging/messenger';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
-import {useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {Subject, Subscription} from 'rxjs';
+import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {Subject} from 'rxjs';
 import {match, SinonSpy, spy} from 'sinon';
 import MessageSender = chrome.runtime.MessageSender;
 
@@ -12,11 +12,9 @@ const expect = useSinonChai();
 
 describe('default messenger', () => {
   const sinonChrome = useSinonChrome();
+  const rx = useRxTesting();
 
   let fixture: IMessenger;
-  let subscription: Subscription;
-  const callback: SinonSpy = spy();
-
   const msgType1: MessageType = 'MessageType-1';
   const msgType2: MessageType = 'MessageType-2';
   const fakeMsgOfType1: Message = new DummyMessage(msgType1);
@@ -27,35 +25,30 @@ describe('default messenger', () => {
     fixture = new DummyConcreteMessenger();
   });
 
-  afterEach(() => {
-    callback.resetHistory();
-    subscription.unsubscribe();
-  });
-
   describe('listening on a message', () => {
     context('when not sending a response', () => {
       beforeEach(() => {
-        subscription = fixture.onMessage(msgType1).subscribe(callback);
+        rx.subscribeTo(fixture.onMessage(msgType1));
       });
 
       it('should emit the message and sender when message of specified type is received', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender);
-        expect(callback).to.have.been.calledOnce.calledWithExactly({message: fakeMsgOfType1, sender: fakeSender});
+        expect(rx.next).to.have.been.calledOnce.calledWithExactly({message: fakeMsgOfType1, sender: fakeSender});
       });
 
       it('should emit multiple times when message of specified type is received multiple times', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender);
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender);
-        expect(callback).to.have.been.calledTwice;
+        expect(rx.next).to.have.been.calledTwice;
       });
 
       it('should not emit anything when no message is received', () => {
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
       });
 
       it('should not emit anything when message not of specified type is received', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType2, fakeSender);
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
       });
     });
 
@@ -67,28 +60,28 @@ describe('default messenger', () => {
       });
 
       beforeEach(() => {
-        subscription = fixture.onMessage(msgType1, true).subscribe(callback);
+        rx.subscribeTo(fixture.onMessage(msgType1, true));
       });
 
       it('should emit message, sender, and response subject when message of specified type is received', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender, responseCallback);
-        expect(callback).to.have.been.calledOnce
+        expect(rx.next).to.have.been.calledOnce
           .calledWithExactly({message: fakeMsgOfType1, sender: fakeSender, response$: match.instanceOf(Subject)});
       });
 
       it('should emit multiple times when message of specified type is received multiple times', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender, responseCallback);
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender, responseCallback);
-        expect(callback).to.have.been.calledTwice;
+        expect(rx.next).to.have.been.calledTwice;
       });
 
       it('should not emit anything when no message is received', () => {
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
       });
 
       it('should not emit anything when message not of specified type is received', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType2, fakeSender, responseCallback);
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
       });
 
       describe('sending the response', () => {
@@ -97,7 +90,7 @@ describe('default messenger', () => {
 
         beforeEach(() => {
           sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender, responseCallback);
-          response$ = callback.firstCall.args[0].response$;
+          response$ = rx.next.firstCall.args[0].response$;
         });
 
         it('should send response when the response subject emits a response', () => {

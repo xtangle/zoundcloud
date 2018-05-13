@@ -7,7 +7,11 @@ class Logger {
   }
 
   public error(message: any, error?: ErrorEvent): void {
-    console.error(this.affixMessage(message), error);
+    if (error) {
+      console.error(this.affixMessage(message), error);
+    } else {
+      console.error(this.affixMessage(message));
+    }
   }
 
   private affixMessage(message: string): string {

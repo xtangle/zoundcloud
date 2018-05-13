@@ -2,22 +2,19 @@ import {CLIENT_ID, SC_API_URL} from '@src/constants';
 import {IPlaylistInfo, ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useSinonChai} from '@test/test-initializers';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import {Subject, Subscription} from 'rxjs';
-import {SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {Subject} from 'rxjs';
+import {SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('download info service', () => {
-  const url = 'some-url';
-  const resolveEndpoint = `${SC_API_URL}/resolve.json?url=${url}&client_id=${CLIENT_ID}`;
-  const successCallback: SinonSpy = spy();
-  const failCallback: SinonSpy = spy();
-  let subscription: Subscription;
-
+  const rx = useRxTesting();
   const fixture = DownloadInfoService;
 
+  const url = 'some-url';
+  const resolveEndpoint = `${SC_API_URL}/resolve.json?url=${url}&client_id=${CLIENT_ID}`;
   let stubGetJSON$: SinonStub;
 
   beforeEach(() => {
@@ -27,9 +24,6 @@ describe('download info service', () => {
 
   afterEach(() => {
     stubGetJSON$.restore();
-    successCallback.resetHistory();
-    failCallback.resetHistory();
-    subscription.unsubscribe();
   });
 
   describe('fetching track info', () => {
@@ -38,7 +32,7 @@ describe('download info service', () => {
     beforeEach(() => {
       jsonResponse$ = new Subject<ITrackInfo>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
-      subscription = fixture.getTrackInfo$(url).subscribe(successCallback, failCallback);
+      rx.subscribeTo(fixture.getTrackInfo$(url));
     });
 
     it('should not emit anything when url has yet to be resolved', async () => {
@@ -74,7 +68,7 @@ describe('download info service', () => {
     beforeEach(() => {
       jsonResponse$ = new Subject<IPlaylistInfo>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
-      subscription = fixture.getPlaylistInfo$(url).subscribe(successCallback, failCallback);
+      rx.subscribeTo(fixture.getPlaylistInfo$(url));
     });
 
     it('should not emit anything when url has yet to be resolved', async () => {
@@ -99,20 +93,19 @@ describe('download info service', () => {
   });
 
   function verifyFetchingDownloadInfo() {
-    expect(successCallback).to.not.have.been.called;
-    expect(failCallback).to.not.have.been.called;
-    expect(subscription.closed).to.be.false;
+    expect(rx.next).to.not.have.been.called;
+    expect(rx.error).to.not.have.been.called;
+    expect(rx.complete).to.not.have.been.called;
   }
 
   function verifyDownloadInfoFetched<T = ITrackInfo | IPlaylistInfo>(downloadInfo: T) {
-    expect(successCallback).to.have.been.calledOnce.calledWithExactly(downloadInfo);
-    expect(failCallback).to.not.have.been.called;
-    expect(subscription.closed).to.be.true;
+    expect(rx.next).to.have.been.calledOnce.calledWithExactly(downloadInfo);
+    expect(rx.error).to.not.have.been.called;
+    expect(rx.complete).to.have.been.called;
   }
 
   function verifyErrorEmitted(errorObj: any) {
-    expect(successCallback).to.not.have.been.called;
-    expect(failCallback).to.have.been.calledOnce.calledWithExactly(errorObj);
-    expect(subscription.closed).to.be.true;
+    expect(rx.next).to.not.have.been.called;
+    expect(rx.error).to.have.been.calledWithExactly(errorObj);
   }
 });

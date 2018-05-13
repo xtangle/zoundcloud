@@ -48,5 +48,4 @@ describe('test utils', () => {
       expect(sinonSpy).to.have.been.called;
     });
   });
-
 });

@@ -1,15 +1,13 @@
 import {elementAdded$, elementExist$, elementRemoved$} from '@src/util/dom-observer';
-import {useSinonChai} from '@test/test-initializers';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {Observable, Subscription} from 'rxjs';
-import {SinonSpy, spy} from 'sinon';
+import {Observable} from 'rxjs';
 
 const expect = useSinonChai();
 
 describe('dom observer', () => {
-  const callback: SinonSpy = spy();
-  let subscription: Subscription;
+  const rx = useRxTesting();
 
   beforeEach(() => {
     document.body.innerHTML = `
@@ -21,86 +19,76 @@ describe('dom observer', () => {
     `;
   });
 
-  afterEach(() => {
-    callback.resetHistory();
-    subscription.unsubscribe();
-  });
-
   describe('element removed observable', () => {
     let removeMe: HTMLElement;
-    let fixture: Observable<any>;
+    let actual$: Observable<any>;
 
     beforeEach(() => {
       removeMe = $('#removeMe')[0];
-      fixture = elementRemoved$(removeMe);
+      actual$ = elementRemoved$(removeMe);
     });
 
     it('should emit when element is removed directly', async () => {
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(actual$);
       removeMe.remove();
       await tick();
-      expect(callback).to.have.been.calledOnce;
+      expect(rx.next).to.have.been.calledOnce;
     });
 
     it('should emit when element is removed indirectly through parent', async () => {
       const parent: HTMLElement = $('#parent')[0];
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(actual$);
       parent.remove();
       await tick();
-      expect(callback).to.have.been.calledOnce;
+      expect(rx.next).to.have.been.calledOnce;
     });
 
     it('should not emit when element is not removed', async () => {
       const dontCareAboutMe: HTMLElement = $('#dontCareAboutMe')[0];
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(actual$);
       dontCareAboutMe.remove();
       await tick();
-      expect(callback).to.not.have.been.called;
+      expect(rx.next).to.not.have.been.called;
     });
   });
 
   describe('element added observable', () => {
     let addMe: HTMLElement;
-    let fixture: Observable<Node>;
 
     beforeEach(() => {
       addMe = $('<span/>').text('Dos')[0];
     });
 
     it('should emit node when node is added and passes test', async () => {
-      fixture = elementAdded$((node: Node) => node.textContent === 'Dos');
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(elementAdded$((node: Node) => node.textContent === 'Dos'));
       $('#appendToMe').append(addMe);
       await tick();
-      expect(callback).to.have.been.calledOnce.calledWithExactly(addMe);
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly(addMe);
     });
 
     it('should not emit any value when node is added but does not pass test', async () => {
-      fixture = elementAdded$((node: Node) => node.textContent === 'Dosu');
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(elementAdded$((node: Node) => node.textContent === 'Dosu'));
       $('#appendToMe').append(addMe);
       await tick();
-      expect(callback).to.not.have.been.called;
+      expect(rx.next).to.not.have.been.called;
     });
 
     it('should not emit any value when no nodes are added', async () => {
-      fixture = elementAdded$(() => true);
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(elementAdded$(() => true));
       await tick();
-      expect(callback).to.not.have.been.called;
+      expect(rx.next).to.not.have.been.called;
     });
 
     it('should emit nodes that passes test when when multiple nodes are added', async () => {
       const addMe2 = $('<span/>').text('Dosu')[0];
       const addMe3 = $('<div/>')[0];
-      fixture = elementAdded$((node: Node) => node.textContent === 'Dos' || node.nodeName === 'DIV');
-      subscription = fixture.subscribe(callback);
+      rx.subscribeTo(elementAdded$((node: Node) => node.textContent === 'Dos' || node.nodeName === 'DIV'));
       $('#appendToMe').append(addMe, addMe2, addMe3);
       await tick();
 
-      expect(callback).to.have.been.calledTwice;
-      expect(callback.firstCall).calledWithExactly(addMe);
-      expect(callback.secondCall).calledWithExactly(addMe3);
+      expect(rx.next).to.have.been.calledTwice;
+      expect(rx.next.firstCall).calledWithExactly(addMe);
+      expect(rx.next.secondCall).calledWithExactly(addMe3);
     });
   });
 
@@ -112,28 +100,26 @@ describe('dom observer', () => {
     });
 
     it('should emit node and complete when node exists and matches selector', async () => {
-      subscription = elementExist$('.iExist').subscribe(callback);
+      rx.subscribeTo(elementExist$('.iExist'));
       await tick();
-      expect(callback).to.have.been.calledOnce;
-      expect(callback.firstCall).calledWithExactly(iExist);
-      expect(subscription.closed).to.be.true;
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist);
+      expect(rx.complete).to.be.have.been.called;
     });
 
     it('should not emit any value and complete when no node matches selector', async () => {
-      subscription = elementExist$('.iDoNotExist').subscribe(callback);
+      rx.subscribeTo(elementExist$('.iDoNotExist'));
       await tick();
-      expect(callback).to.not.have.been.called;
-      expect(subscription.closed).to.be.true;
+      expect(rx.next).to.not.have.been.called;
+      expect(rx.complete).to.be.have.been.called;
     });
 
     it('should emit first node and complete when multiple nodes matches selector', async () => {
       const iExist2 = $('<li/>').addClass(['iExist', 'and', 'iAmFirst'])[0];
       $('#parent').prepend(iExist2);
-      subscription = elementExist$('.iExist').subscribe(callback);
+      rx.subscribeTo(elementExist$('.iExist'));
       await tick();
-      expect(callback).to.have.been.calledOnce;
-      expect(callback.firstCall).calledWithExactly(iExist2);
-      expect(subscription.closed).to.be.true;
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist2);
+      expect(rx.complete).to.be.have.been.called;
     });
   });
 });

@@ -3,16 +3,17 @@ import {ITrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {FilenameService} from '@src/util/filename-service';
-import {useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {noop, tick} from '@test/test-utils';
+import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {tick} from '@test/test-utils';
 import * as path from 'path';
-import {of, Subject, Subscription} from 'rxjs';
-import {match, SinonFakeTimers, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {of, Subject} from 'rxjs';
+import {match, SinonFakeTimers, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('track download service', () => {
   const sinonChrome = useSinonChrome();
+  const rx = useRxTesting();
   const fixture = TrackDownloadService;
 
   describe('downloading a track', () => {
@@ -145,28 +146,17 @@ describe('track download service', () => {
     });
 
     context('the returned observable', () => {
-      let subscription: Subscription;
-      const callback: SinonSpy = spy();
-
-      beforeEach(() => {
-        callback.resetHistory();
-      });
-
-      afterEach(() => {
-        subscription.unsubscribe();
-      });
-
       it('should emit the download id and complete if the download started successfully', async () => {
         const downloadId = 123;
         sinonChrome.downloads.download.callsArgWithAsync(1, downloadId);
 
-        subscription = fixture.downloadTrack(trackInfo).subscribe(callback);
+        rx.subscribeTo(fixture.downloadTrack(trackInfo));
         downloadMethod$.next(downloadMethod);
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
         await tick();
 
-        expect(callback).to.have.been.calledOnce.calledWithExactly(downloadId);
-        expect(subscription.closed).to.be.true;
+        expect(rx.next).to.have.been.calledOnce.calledWithExactly(downloadId);
+        expect(rx.complete).to.have.been.called;
       });
 
       it('should emit an error with the lastError message if the download didn\'t start successfully', async () => {
@@ -174,13 +164,12 @@ describe('track download service', () => {
         sinonChrome.downloads.download.callsArgWithAsync(1, undefined);
         sinonChrome.runtime.lastError = {message: errorMsg};
 
-        subscription = fixture.downloadTrack(trackInfo).subscribe(noop, callback);
+        rx.subscribeTo(fixture.downloadTrack(trackInfo));
         downloadMethod$.next(downloadMethod);
-        expect(callback).to.not.have.been.called;
         await tick();
 
-        expect(callback).to.have.been.calledOnce.calledWithExactly(errorMsg);
-        expect(subscription.closed).to.be.true;
+        expect(rx.next).to.not.have.been.called;
+        expect(rx.error).to.have.been.calledOnce.calledWithExactly(errorMsg);
       });
     });
   });

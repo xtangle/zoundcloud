@@ -13,10 +13,7 @@ export function elementRemoved$(elem: Node): Observable<any> {
           }
         });
       });
-      mutationObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
+      observeAllNodes(mutationObserver);
       return mutationObserver;
     },
     () => mutationObserver.disconnect()
@@ -37,10 +34,7 @@ export function elementAdded$(test: (node: Node) => boolean): Observable<Node> {
           });
         });
       });
-      mutationObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
+      observeAllNodes(mutationObserver);
       return mutationObserver;
     },
     () => mutationObserver.disconnect()
@@ -54,5 +48,12 @@ export function elementExist$(selector: string): Observable<Node> {
       observer.next(node[0]);
     }
     observer.complete();
+  });
+}
+
+function observeAllNodes(mutationObserver: MutationObserver) {
+  mutationObserver.observe(document.body, {
+    childList: true,
+    subtree: true
   });
 }

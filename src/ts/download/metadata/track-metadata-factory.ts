@@ -1,12 +1,12 @@
 import {ITrackInfo} from '@src/download/download-info';
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 
-export interface ITrackMetadataService {
-  toTrackMetadata(trackInfo: ITrackInfo): ITrackMetadata;
+export interface ITrackMetadataFactory {
+  create(trackInfo: ITrackInfo): ITrackMetadata;
 }
 
-export const TrackMetadataService: ITrackMetadataService = {
-  toTrackMetadata(trackInfo: ITrackInfo): ITrackMetadata {
+export const TrackMetadataFactory: ITrackMetadataFactory = {
+  create(trackInfo: ITrackInfo): ITrackMetadata {
     const titleParts = trackInfo.title.split(' - ');
     return {
       albumArtist: (titleParts.length > 1) ? titleParts[0] : trackInfo.user.username,

@@ -19,8 +19,6 @@ Tracks are downloaded to the Downloads folder with the **track title** as its na
 Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
 case it is replaced by a dash (-) symbol).
 
-[Change Log](https://github.com/xtangle/ZoundCloud/blob/master/CHANGELOG.md)
-
 ## Installation
 
 The extension is created as a Node.js project and does not come pre-packaged. 

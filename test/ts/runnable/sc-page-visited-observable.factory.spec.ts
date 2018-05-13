@@ -1,9 +1,8 @@
 import {SC_URL_PATTERN} from '@src/constants';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
-import {useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {doNothingIf, tick} from '@test/test-utils';
-import {Subscription} from 'rxjs';
-import {match, SinonMatcher, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {match, SinonMatcher, SinonStub, stub} from 'sinon';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 const forEach = require('mocha-each');
@@ -11,12 +10,11 @@ const expect = useSinonChai();
 
 describe('sc page visited observable factory', () => {
   const sinonChrome = useSinonChrome();
+  const rx = useRxTesting();
   const fixture = ScPageVisitedObservableFactory;
 
-  const callback: SinonSpy = spy();
   let stubOnCompleted: SinonStub;
   let stubOnHistoryStateUpdated: SinonStub;
-  let subscription: Subscription;
 
   before(() => {
     /**
@@ -32,12 +30,7 @@ describe('sc page visited observable factory', () => {
   });
 
   beforeEach(() => {
-    subscription = fixture.create$().subscribe(callback);
-  });
-
-  afterEach(() => {
-    subscription.unsubscribe();
-    callback.resetHistory();
+    rx.subscribeTo(fixture.create$());
   });
 
   after(() => {
@@ -63,14 +56,14 @@ describe('sc page visited observable factory', () => {
       .it('should emit when the URL is %s', (url: string) => {
         const details = {tabId: 1, timeStamp: 123, url};
         sinonChrome.webNavigation.onCompleted.trigger(details);
-        expect(callback).to.have.been.calledOnce.calledWithExactly(details);
+        expect(rx.next).to.have.been.calledOnce.calledWithExactly(details);
       });
 
     forEach(invalidScUrls)
       .it('should not emit when the URL is %s', (url: string) => {
         const details = {tabId: 1, timeStamp: 123, url};
         sinonChrome.webNavigation.onCompleted.trigger(details);
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
       });
   });
 
@@ -82,7 +75,7 @@ describe('sc page visited observable factory', () => {
         const details = {tabId: 1, timeStamp: 123, url};
         sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
         await tick(debounceWaitTime);
-        expect(callback).to.have.been.calledOnce.calledWithExactly(details);
+        expect(rx.next).to.have.been.calledOnce.calledWithExactly(details);
       });
 
     forEach(invalidScUrls)
@@ -90,7 +83,7 @@ describe('sc page visited observable factory', () => {
         const details = {tabId: 1, timeStamp: 123, url};
         sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
         await tick(debounceWaitTime);
-        expect(callback).to.not.have.been.called;
+        expect(rx.next).to.not.have.been.called;
       });
 
     it('should de-bounce events when they are emitted close together', async () => {
@@ -99,7 +92,7 @@ describe('sc page visited observable factory', () => {
       });
       const expectedDetails = {tabId: 1, timeStamp: 123, url: validScUrls[validScUrls.length - 1]};
       await tick(debounceWaitTime);
-      expect(callback).to.have.been.calledOnce.calledWithExactly(expectedDetails);
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly(expectedDetails);
     });
   });
 });

@@ -28,12 +28,11 @@ module.exports = function (config) {
       compilerOptions: require('./tsconfig').compilerOptions,
       coverageOptions: {
         threshold: {
-          // TODO: increase threshold back to 95 for all categories
           global: {
-            statements: 85,
-            branches: 85,
-            functions: 85,
-            lines: 85
+            statements: 95,
+            branches: 95,
+            functions: 95,
+            lines: 95
           }
         }
       },
@@ -45,7 +44,7 @@ module.exports = function (config) {
     },
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DISABLE,
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     singleRun: true,

@@ -1,17 +1,13 @@
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useSinonChai} from '@test/test-initializers';
-import {Subscription} from 'rxjs/index';
-import {fakeServer, SinonFakeServer, SinonFakeXMLHttpRequest, SinonSpy, spy} from 'sinon';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {fakeServer, SinonFakeServer, SinonFakeXMLHttpRequest} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('xhr request service', () => {
+  const rx = useRxTesting();
   const fixture = XhrRequestService;
-  const successCallback: SinonSpy = spy();
-  const failCallback: SinonSpy = spy();
-  let subscription: Subscription;
   const url = '/some/url';
-
   let server: SinonFakeServer;
 
   beforeEach(() => {
@@ -19,16 +15,12 @@ describe('xhr request service', () => {
   });
 
   afterEach(() => {
-    successCallback.resetHistory();
-    failCallback.resetHistory();
-    subscription.unsubscribe();
-
     server.restore();
   });
 
   describe('get array buffer', () => {
     beforeEach(() => {
-      subscription = fixture.getArrayBuffer$(url).subscribe(successCallback, failCallback);
+      rx.subscribeTo(fixture.getArrayBuffer$(url));
     });
 
     it('should make a request', () => {
@@ -39,8 +31,8 @@ describe('xhr request service', () => {
       const response = createFakeResponse();
       const responseAsStr = new TextDecoder().decode(response);
       getRequest().respond(200, {}, responseAsStr);
-      expect(successCallback).to.be.calledOnce.calledWithExactly(response);
-      expect(subscription.closed).to.be.true;
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly(response);
+      expect(rx.complete).to.have.been.called;
     });
 
     it('should error when response is other than 200', () => {
@@ -63,7 +55,7 @@ describe('xhr request service', () => {
 
   describe('get json', () => {
     beforeEach(() => {
-      subscription = fixture.getJSON$(url).subscribe(successCallback, failCallback);
+      rx.subscribeTo(fixture.getJSON$(url));
     });
 
     it('should make a request', () => {
@@ -73,8 +65,8 @@ describe('xhr request service', () => {
     it('should fetch a json response', () => {
       const response = '{"id": 123, "title": "abc"}';
       getRequest().respond(200, {}, response);
-      expect(successCallback).to.be.calledOnce.calledWithExactly({id: 123, title: 'abc'});
-      expect(subscription.closed).to.be.true;
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly({id: 123, title: 'abc'});
+      expect(rx.complete).to.have.been.called;
     });
 
     it('should error when response is other than 200', () => {
@@ -102,12 +94,12 @@ describe('xhr request service', () => {
   function verifyErrorWhenStatusIsNot200() {
     const expectedErrMsg = `Unable to get from ${url}, response is Forbidden (403)`;
     getRequest().respond(403, {}, '');
-    expect(failCallback).to.have.been.calledWithExactly(expectedErrMsg);
+    expect(rx.error).to.have.been.calledWithExactly(expectedErrMsg);
   }
 
   function verifyErrorWhenNoConnection() {
     const expectedErrMsg = `Unable to get from ${url}, network error`;
     getRequest().error();
-    expect(failCallback).to.have.been.calledWithExactly(expectedErrMsg);
+    expect(rx.error).to.have.been.calledWithExactly(expectedErrMsg);
   }
 });

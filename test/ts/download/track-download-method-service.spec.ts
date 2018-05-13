@@ -2,43 +2,38 @@ import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {IScI1ApiTrackDownloadInfo, TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useSinonChai} from '@test/test-initializers';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
-import {Subject, Subscription} from 'rxjs';
-import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {Subject} from 'rxjs';
+import {match, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('track download method service', () => {
+  const rx = useRxTesting();
   const fixture = TrackDownloadMethodService;
 
   context('determining the download method', () => {
-    const callback: SinonSpy = spy();
-    let subscription: Subscription;
-
-    afterEach(() => {
-      callback.resetHistory();
-      subscription.unsubscribe();
-    });
 
     describe('using the download url method if possible', () => {
       const trackInfo = createTrackInfo();
 
       beforeEach(() => {
-        subscription = fixture.getDownloadMethod(trackInfo).subscribe(callback);
+        rx.subscribeTo(fixture.getDownloadMethod(trackInfo));
       });
 
       it('should set the url to the download url', () => {
         const expectedUrl = `${trackInfo.download_url}?client_id=${CLIENT_ID}`;
-        expect(callback).calledOnce.calledWithMatch(match.has('url', expectedUrl));
+        expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('url', expectedUrl));
       });
 
       it('should set the file extension to the original format', () => {
-        expect(callback).calledOnce.calledWithMatch(match.has('fileExtension', trackInfo.original_format));
+        expect(rx.next).to.have.been.calledOnce
+          .calledWithMatch(match.has('fileExtension', trackInfo.original_format));
       });
 
       it('should complete the observable', () => {
-        expect(subscription.closed).to.be.true;
+        expect(rx.complete).to.have.been.called;
       });
     });
 
@@ -46,26 +41,25 @@ describe('track download method service', () => {
       const trackInfo = createTrackInfo(false);
 
       beforeEach(() => {
-        subscription = fixture.getDownloadMethod(trackInfo).subscribe(callback);
+        rx.subscribeTo(fixture.getDownloadMethod(trackInfo));
       });
 
       it('should set the url to the stream url', () => {
         const expectedUrl = `${trackInfo.stream_url}?client_id=${CLIENT_ID}`;
-        expect(callback).calledOnce.calledWithMatch(match.has('url', expectedUrl));
+        expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('url', expectedUrl));
       });
 
       it('should set the file extension to mp3', () => {
-        expect(callback).calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
+        expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
       });
 
       it('should complete the observable', () => {
-        expect(subscription.closed).to.be.true;
+        expect(rx.complete).to.have.been.called;
       });
     });
 
     describe('using the i1 api stream url if both download url and stream url methods cannot be used', () => {
       const trackInfo = createTrackInfo(false, false);
-      const failCallback: SinonSpy = spy();
       let jsonResponse$: Subject<IScI1ApiTrackDownloadInfo>;
       let stubGetJSON: SinonStub;
 
@@ -73,12 +67,12 @@ describe('track download method service', () => {
         jsonResponse$ = new Subject<IScI1ApiTrackDownloadInfo>();
         stubGetJSON = stub(XhrRequestService, 'getJSON$');
         stubGetJSON.returns(jsonResponse$);
-        subscription = fixture.getDownloadMethod(trackInfo).subscribe(callback, failCallback);
+
+        rx.subscribeTo(fixture.getDownloadMethod(trackInfo));
       });
 
       afterEach(() => {
         stubGetJSON.restore();
-        failCallback.resetHistory();
       });
 
       it('should fetch a response from the i1 api url', () => {
@@ -96,15 +90,15 @@ describe('track download method service', () => {
         });
 
         it('should set the url to the value of the http_mp3_128_url property', () => {
-          expect(callback).calledOnce.calledWithMatch(match.has('url', responseUrl));
+          expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('url', responseUrl));
         });
 
         it('should set the file extension to mp3', () => {
-          expect(callback).calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
+          expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
         });
 
         it('should complete the observable', () => {
-          expect(subscription.closed).to.be.true;
+          expect(rx.complete).to.have.been.called;
         });
       });
 
@@ -112,14 +106,14 @@ describe('track download method service', () => {
         jsonResponse$.next({});
         jsonResponse$.complete();
         await tick();
-        expect(callback).to.not.have.been.called;
-        expect(failCallback).to.have.been.calledOnce;
+        expect(rx.next).to.not.have.been.called;
+        expect(rx.error).to.have.been.calledOnce;
       });
 
       it('should not emit anything when no response is returned', () => {
-        expect(callback).to.not.have.been.called;
-        expect(failCallback).to.not.have.been.called;
-        expect(subscription.closed).to.be.false;
+        expect(rx.next).to.not.have.been.called;
+        expect(rx.error).to.not.have.been.called;
+        expect(rx.complete).to.not.have.been.called;
       });
     });
 
