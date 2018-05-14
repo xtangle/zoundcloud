@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 const ID3Writer = require('browser-id3-writer');
 
 export type IID3Writer = typeof ID3Writer;
@@ -19,7 +17,7 @@ export const ID3WriterService: IID3WriterService = {
   createWriter: (arrayBuffer: ArrayBuffer) => new ID3Writer(arrayBuffer),
   getURL: (writer: IID3Writer) => writer.getURL(),
   setFrame: (writer: IID3Writer, frame: string, value: any) => {
-    if (!_.isNil(value)) {
+    if (value !== null && value !== undefined) {
       writer.setFrame(frame, value);
     }
     return writer;

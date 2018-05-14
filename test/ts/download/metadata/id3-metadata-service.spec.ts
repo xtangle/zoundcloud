@@ -113,7 +113,7 @@ describe('id3 metadata service', () => {
         expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
       });
 
-      it('should not add cover art metadata when cover art url is not defined', () => {
+      it('should not add cover art metadata if cover art url is not defined', () => {
         const metadataWithNoCoverArtUrl = createMetadata({cover_url: undefined});
         rx.subscribeTo(fixture.addID3V2Metadata$(metadataWithNoCoverArtUrl, downloadOptions));
         fakeTimer.next();

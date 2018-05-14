@@ -43,10 +43,6 @@
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.1.tgz#55758d44d422756d6329cbf54e6d41931d7ba28f"
 
-"@types/lodash@^4.14.108":
-  version "4.14.108"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.108.tgz#02656af3add2e5b3174f830862c47421c00ef817"
-
 "@types/mocha-each@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/mocha-each/-/mocha-each-1.1.0.tgz#0def5f984f8d59a905b8c4a2a9e5f6b083632717"

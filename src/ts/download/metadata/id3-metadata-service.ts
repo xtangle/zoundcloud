@@ -2,7 +2,6 @@ import {ID3WriterService, IID3Writer} from '@src/download/metadata/id3-writer-se
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {logger} from '@src/util/logger';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import * as _ from 'lodash';
 import {Observable, of} from 'rxjs';
 import {catchError, first, map, switchMap, timeout} from 'rxjs/operators';
 import DownloadOptions = chrome.downloads.DownloadOptions;
@@ -54,7 +53,7 @@ function withTextualMetadata(metadata: ITrackMetadata, writer: IID3Writer): IID3
 }
 
 function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable<IID3Writer> {
-  if (_.isNil(metadata.cover_url)) {
+  if (!metadata.cover_url) {
     return of(writer);
   }
   return XhrRequestService.getArrayBuffer$(metadata.cover_url).pipe(

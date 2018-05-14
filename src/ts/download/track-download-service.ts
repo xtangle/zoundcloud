@@ -3,7 +3,6 @@ import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {FilenameService} from '@src/util/filename-service';
-import * as _ from 'lodash';
 import * as path from 'path';
 import {Observable, Subject} from 'rxjs';
 import {first, map, switchMap, timeout} from 'rxjs/operators';
@@ -14,7 +13,7 @@ export interface ITrackDownloadService {
 }
 
 export const TrackDownloadService: ITrackDownloadService = {
-  downloadTrack(trackInfo: ITrackInfo, downloadLocation: string = ''): Observable<number> {
+  downloadTrack(trackInfo: ITrackInfo, downloadLocation?: string): Observable<number> {
     const downloadId$: Subject<number> = new Subject<number>();
     const downloadMethod$: Observable<ITrackDownloadMethod> = TrackDownloadMethodService.getDownloadMethod(trackInfo);
 
@@ -50,11 +49,7 @@ function toDownloadOptions(trackInfo: ITrackInfo, downloadLocation: string,
   };
 }
 
-function getFilename(trackTitle: string, fileExtension: string, downloadLocation: string): string {
+function getFilename(trackTitle: string, fileExtension: string, downloadLocation: string = ''): string {
   const filename = `${FilenameService.removeSpecialCharacters(trackTitle)}.${fileExtension}`;
-  if (_.isEmpty(downloadLocation)) {
-    return filename;
-  } else {
-    return path.join(downloadLocation, filename);
-  }
+  return path.join(downloadLocation, filename);
 }
