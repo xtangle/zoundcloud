@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v1.1.0] - 2018-05-13
 ### Added
 - Metadata information and cover art to files downloaded in .mp3 format.
 - Changelog.
@@ -17,4 +19,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/xtangle/ZoundCloud/compare/v1.0.0...v1.1.0
