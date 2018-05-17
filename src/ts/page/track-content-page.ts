@@ -33,13 +33,7 @@ export class TrackContentPage implements IContentPage {
   }
 
   public load(): void {
-    const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
-    this.subscriptions.add(
-      merge(
-        elementExist$(listenEngagementSelector),
-        elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
-      ).subscribe(this.injectDlButton.bind(this))
-    );
+    this.subscriptions.add(this.injectDlButton());
     this.subscriptions.add(
       ContentPageMessenger.onMessage(ReloadContentPageMessage.TYPE).subscribe(
         (args: IMessageHandlerArgs<ReloadContentPageMessage>) => {
@@ -47,9 +41,6 @@ export class TrackContentPage implements IContentPage {
             this.reload();
           }
         })
-    );
-    this.subscriptions.add(
-      this.trackInfo$.subscribe((trackInfo: ITrackInfo) => logger.debug('Updated track info', trackInfo))
     );
     this.updateTrackInfo();
     logger.debug('Loaded track content page');
@@ -64,17 +55,49 @@ export class TrackContentPage implements IContentPage {
   private reload(): void {
     this.trackInfo$.next(null);
     this.updateTrackInfo();
+    logger.debug('Reloaded track content page');
   }
 
   private updateTrackInfo(): void {
     this.subscriptions.add(
-      DownloadInfoService.getTrackInfo$(UrlService.getCurrentUrl()).subscribe(this.trackInfo$)
+      DownloadInfoService.getTrackInfo$(UrlService.getCurrentUrl()).subscribe((trackInfo) => {
+        logger.debug('Updated track info', trackInfo);
+        this.trackInfo$.next(trackInfo);
+      })
     );
   }
 
-  private injectDlButton(listenEngagement: Node): void {
+  private injectDlButton(): Subscription {
+    const listenEngagementSelector = 'div.listenEngagement.sc-clearfix';
+    return merge(
+      elementExist$(listenEngagementSelector),
+      elementAdded$((node: Node) => $(node).is(listenEngagementSelector))
+    ).subscribe(this.addDlButton.bind(this));
+  }
+
+  private addDlButton(listenEngagement: Node): void {
+    const dlButton = this.createDlButton();
     const soundActions = $(listenEngagement).find('div.soundActions.sc-button-toolbar.soundActions__medium');
-    const dlButton = createDlButton();
+    const buttonGroup = soundActions.children('div').first();
+    if (buttonGroup.length) {
+      const lastButtonInGroup = buttonGroup.children('button').last();
+      if (lastButtonInGroup.hasClass('sc-button-more')) {
+        dlButton.insertBefore(lastButtonInGroup);
+      } else {
+        buttonGroup.append(dlButton);
+      }
+    }
+    logger.debug('Added download button');
+  }
+
+  private createDlButton(): JQuery<HTMLElement> {
+    const dlButton = $('<button/>')
+      .addClass(['sc-button', 'sc-button-medium', 'sc-button-responsive'])
+      .addClass(ZC_DL_BUTTON_ICON_CLASS)
+      .addClass(ZC_DL_BUTTON_CLASS)
+      .attr('id', ZC_TRACK_DL_BUTTON_ID)
+      .prop('title', 'Download this track')
+      .html('Download');
     const downloadClick$ = fromEvent(dlButton[0], 'click').pipe(throttleTime(3000));
     this.subscriptions.add(
       downloadClick$.pipe(map(() => this.trackInfo$.getValue()))
@@ -84,29 +107,7 @@ export class TrackContentPage implements IContentPage {
           }
         })
     );
-    addDlButton(soundActions, dlButton);
-  }
-}
-
-function createDlButton(): JQuery<HTMLElement> {
-  return $('<button/>')
-    .addClass(['sc-button', 'sc-button-medium', 'sc-button-responsive'])
-    .addClass(ZC_DL_BUTTON_ICON_CLASS)
-    .addClass(ZC_DL_BUTTON_CLASS)
-    .attr('id', ZC_TRACK_DL_BUTTON_ID)
-    .prop('title', 'Download this track')
-    .html('Download');
-}
-
-function addDlButton(soundActions: JQuery<HTMLElement>, dlButton: JQuery<HTMLElement>): void {
-  const buttonGroup = soundActions.children('div').first();
-  if (buttonGroup.length) {
-    const lastButtonInGroup = buttonGroup.children('button').last();
-    if (lastButtonInGroup.hasClass('sc-button-more')) {
-      dlButton.insertBefore(lastButtonInGroup);
-    } else {
-      buttonGroup.append(dlButton);
-    }
+    return dlButton;
   }
 }
 
