@@ -1,5 +1,5 @@
 import {Observable, Subscription} from 'rxjs';
-import {SinonSpy, spy} from 'sinon';
+import {SinonFakeTimers, SinonSpy, spy, useFakeTimers} from 'sinon';
 
 export function useSinonChai(): Chai.ExpectStatic {
   const chai = require('chai');
@@ -57,4 +57,24 @@ export function useRxTesting(): IRxTestingStatic {
   });
 
   return rx;
+}
+
+export interface IClockWrapper {
+  clock: SinonFakeTimers;
+}
+
+export function useFakeTimer(): IClockWrapper {
+  const cw: IClockWrapper = {
+    clock: undefined
+  };
+
+  beforeEach(() => {
+    cw.clock = useFakeTimers();
+  });
+
+  afterEach(() => {
+    cw.clock.restore();
+  });
+
+  return cw;
 }

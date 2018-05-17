@@ -10,38 +10,36 @@ export interface IScI1ApiTrackDownloadInfo {
 }
 
 export interface ITrackDownloadMethodService {
-  getDownloadMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod>;
+  getDownloadMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod>;
 }
 
 export const TrackDownloadMethodService: ITrackDownloadMethodService = {
-  getDownloadMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
+  getDownloadMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
     if (trackInfo.downloadable) {
-      return getDownloadUrlMethod(trackInfo);
-
+      return getDownloadUrlMethod$(trackInfo);
     } else if (trackInfo.stream_url) {
-      return getStreamUrlMethod(trackInfo);
-
+      return getStreamUrlMethod$(trackInfo);
     } else {
-      return getScI1ApiMethod(trackInfo);
+      return getScI1ApiMethod$(trackInfo);
     }
   }
 };
 
-function getDownloadUrlMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
+function getDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   return of({
     fileExtension: trackInfo.original_format,
     url: `${trackInfo.download_url}?client_id=${CLIENT_ID}`
   });
 }
 
-function getStreamUrlMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
+function getStreamUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   return of({
     fileExtension: 'mp3',
     url: `${trackInfo.stream_url}?client_id=${CLIENT_ID}`
   });
 }
 
-function getScI1ApiMethod(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
+function getScI1ApiMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   const dlInfoEndpoint = `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
   return XhrRequestService.getJSON$<IScI1ApiTrackDownloadInfo>(dlInfoEndpoint).pipe(
     map((downloadInfo: IScI1ApiTrackDownloadInfo) => {

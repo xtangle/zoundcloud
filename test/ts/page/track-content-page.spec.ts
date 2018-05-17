@@ -43,16 +43,11 @@ describe('track content page', () => {
   context('deciding when it should be loaded', () => {
     let stubGetUrl: SinonStub;
 
-    before(() => {
+    beforeEach(() => {
       stubGetUrl = stub(UrlService, 'getCurrentUrl');
     });
 
     afterEach(() => {
-      stubGetUrl.resetHistory();
-      stubGetUrl.resetBehavior();
-    });
-
-    after(() => {
       stubGetUrl.restore();
     });
 

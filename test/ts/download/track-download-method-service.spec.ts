@@ -3,7 +3,6 @@ import {ITrackInfo} from '@src/download/download-info';
 import {IScI1ApiTrackDownloadInfo, TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
 import {Subject} from 'rxjs';
 import {match, SinonStub, stub} from 'sinon';
 
@@ -19,7 +18,7 @@ describe('track download method service', () => {
       const trackInfo = createTrackInfo();
 
       beforeEach(() => {
-        rx.subscribeTo(fixture.getDownloadMethod(trackInfo));
+        rx.subscribeTo(fixture.getDownloadMethod$(trackInfo));
       });
 
       it('should set the url to the download url', () => {
@@ -41,7 +40,7 @@ describe('track download method service', () => {
       const trackInfo = createTrackInfo(false);
 
       beforeEach(() => {
-        rx.subscribeTo(fixture.getDownloadMethod(trackInfo));
+        rx.subscribeTo(fixture.getDownloadMethod$(trackInfo));
       });
 
       it('should set the url to the stream url', () => {
@@ -68,7 +67,7 @@ describe('track download method service', () => {
         stubGetJSON = stub(XhrRequestService, 'getJSON$');
         stubGetJSON.returns(jsonResponse$);
 
-        rx.subscribeTo(fixture.getDownloadMethod(trackInfo));
+        rx.subscribeTo(fixture.getDownloadMethod$(trackInfo));
       });
 
       afterEach(() => {
@@ -83,10 +82,9 @@ describe('track download method service', () => {
       context('when a response with the http_mp3_128_url property is returned', () => {
         const responseUrl = 'some-url-returned-by-i1-api';
 
-        beforeEach(async () => {
+        beforeEach(() => {
           jsonResponse$.next({http_mp3_128_url: responseUrl});
           jsonResponse$.complete();
-          await tick();
         });
 
         it('should set the url to the value of the http_mp3_128_url property', () => {
@@ -102,10 +100,9 @@ describe('track download method service', () => {
         });
       });
 
-      it('should emit an error when a response without the http_mp3_128_url property is returned', async () => {
+      it('should emit an error when a response without the http_mp3_128_url property is returned', () => {
         jsonResponse$.next({});
         jsonResponse$.complete();
-        await tick();
         expect(rx.next).to.not.have.been.called;
         expect(rx.error).to.have.been.calledOnce;
       });

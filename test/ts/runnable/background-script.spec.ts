@@ -9,7 +9,6 @@ import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-dow
 import {BackgroundScript} from '@src/runnable/background-script';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
 import {useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
 import {Subject} from 'rxjs';
 import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 import Tab = chrome.tabs.Tab;
@@ -133,15 +132,11 @@ describe('background script', () => {
     });
 
     describe('cleaning up', () => {
-      it('should clean up when the onSuspend event is emitted', async () => {
+      it('should clean up when the onSuspend event is emitted', () => {
         const spyCleanUp = spy(fixture, 'cleanUp');
         fixture.run();
-        await tick();
-
         expect(spyCleanUp).to.not.have.been.called;
         sinonChrome.runtime.onSuspend.trigger();
-        await tick();
-
         expect(spyCleanUp).to.have.been.called;
       });
 

@@ -1,7 +1,7 @@
 import {SC_URL_PATTERN} from '@src/constants';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
-import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {doNothingIf, tick} from '@test/test-utils';
+import {useFakeTimer, useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {doNothingIf} from '@test/test-utils';
 import {match, SinonMatcher, SinonStub, stub} from 'sinon';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
@@ -10,30 +10,29 @@ const expect = useSinonChai();
 
 describe('sc page visited observable factory', () => {
   const sinonChrome = useSinonChrome();
+  const cw = useFakeTimer();
   const rx = useRxTesting();
   const fixture = ScPageVisitedObservableFactory;
 
+  /**
+   * Do not emit event (by doing a noop) if url does not match an SoundCloud url.
+   * This has to be patched in manually because sinon-chrome's addListeners do not implement event filters.
+   */
+  const doesNotMatchScUrl: SinonMatcher =
+    match((details: WebNavigationUrlCallbackDetails) => !details.url.match(SC_URL_PATTERN));
   let stubOnCompleted: SinonStub;
   let stubOnHistoryStateUpdated: SinonStub;
 
-  before(() => {
-    /**
-     * Do not emit event (by doing a noop) if url does not match an SoundCloud url.
-     * This has to be patched in manually because sinon-chrome's addListeners do not implement event filters.
-     */
-    const doesNotMatchScUrl: SinonMatcher = match((details: WebNavigationUrlCallbackDetails) =>
-      !details.url.match(SC_URL_PATTERN));
+  beforeEach(() => {
     stubOnCompleted = stub(sinonChrome.webNavigation.onCompleted, 'trigger');
     stubOnHistoryStateUpdated = stub(sinonChrome.webNavigation.onHistoryStateUpdated, 'trigger');
     doNothingIf(stubOnCompleted, doesNotMatchScUrl);
     doNothingIf(stubOnHistoryStateUpdated, doesNotMatchScUrl);
-  });
 
-  beforeEach(() => {
     rx.subscribeTo(fixture.create$());
   });
 
-  after(() => {
+  afterEach(() => {
     stubOnCompleted.restore();
     stubOnHistoryStateUpdated.restore();
   });
@@ -71,27 +70,27 @@ describe('sc page visited observable factory', () => {
     const debounceWaitTime = 25; // ms
 
     forEach(validScUrls)
-      .it('should emit when the URL is %s', async (url: string) => {
+      .it('should emit when the URL is %s', (url: string) => {
         const details = {tabId: 1, timeStamp: 123, url};
         sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-        await tick(debounceWaitTime);
+        cw.clock.tick(debounceWaitTime);
         expect(rx.next).to.have.been.calledOnce.calledWithExactly(details);
       });
 
     forEach(invalidScUrls)
-      .it('should not emit when the URL is %s', async (url: string) => {
+      .it('should not emit when the URL is %s', (url: string) => {
         const details = {tabId: 1, timeStamp: 123, url};
         sinonChrome.webNavigation.onHistoryStateUpdated.trigger(details);
-        await tick(debounceWaitTime);
+        cw.clock.tick(debounceWaitTime);
         expect(rx.next).to.not.have.been.called;
       });
 
-    it('should de-bounce events when they are emitted close together', async () => {
+    it('should de-bounce events when they are emitted close together', () => {
       validScUrls.forEach((url) => {
         sinonChrome.webNavigation.onHistoryStateUpdated.trigger({tabId: 1, timeStamp: 123, url});
       });
       const expectedDetails = {tabId: 1, timeStamp: 123, url: validScUrls[validScUrls.length - 1]};
-      await tick(debounceWaitTime);
+      cw.clock.tick(debounceWaitTime);
       expect(rx.next).to.have.been.calledOnce.calledWithExactly(expectedDetails);
     });
   });

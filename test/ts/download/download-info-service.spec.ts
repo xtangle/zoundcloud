@@ -2,14 +2,14 @@ import {CLIENT_ID, SC_API_URL} from '@src/constants';
 import {IPlaylistInfo, ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
+import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('download info service', () => {
+  const cw = useFakeTimer();
   const rx = useRxTesting();
   const fixture = DownloadInfoService;
 
@@ -35,12 +35,12 @@ describe('download info service', () => {
       rx.subscribeTo(fixture.getTrackInfo$(url));
     });
 
-    it('should not emit anything when url has yet to be resolved', async () => {
-      await tick();
+    it('should not emit anything when url has yet to be resolved', () => {
+      cw.clock.next();
       verifyFetchingDownloadInfo();
     });
 
-    it('should fetch track track info and complete when url has been resolved', async () => {
+    it('should fetch track track info and complete when url has been resolved', () => {
       const fakeTrackInfo: ITrackInfo = {
         downloadable: false,
         id: 123,
@@ -50,14 +50,14 @@ describe('download info service', () => {
       };
       jsonResponse$.next(fakeTrackInfo);
       jsonResponse$.complete();
-      await tick();
+      cw.clock.next();
       verifyDownloadInfoFetched(fakeTrackInfo);
     });
 
-    it('should fail with error and complete if url cannot be resolved', async () => {
+    it('should fail with error and complete if url cannot be resolved', () => {
       const errorObj = {message: 'error: cannot resolve url'};
       jsonResponse$.error(errorObj);
-      await tick();
+      cw.clock.next();
       verifyErrorEmitted(errorObj);
     });
   });
@@ -71,23 +71,23 @@ describe('download info service', () => {
       rx.subscribeTo(fixture.getPlaylistInfo$(url));
     });
 
-    it('should not emit anything when url has yet to be resolved', async () => {
-      await tick();
+    it('should not emit anything when url has yet to be resolved', () => {
+      cw.clock.next();
       verifyFetchingDownloadInfo();
     });
 
-    it('should fetch playlist info and complete when url has been resolved', async () => {
+    it('should fetch playlist info and complete when url has been resolved', () => {
       const fakePlaylistInfo: IPlaylistInfo = {title: 'some-playlist', tracks: [], user: {username: 'some-user'}};
       jsonResponse$.next(fakePlaylistInfo);
       jsonResponse$.complete();
-      await tick();
+      cw.clock.next();
       verifyDownloadInfoFetched(fakePlaylistInfo);
     });
 
-    it('should fail with error and complete if url cannot be resolved', async () => {
+    it('should fail with error and complete if url cannot be resolved', () => {
       const errorObj = {message: 'error: cannot resolve url'};
       jsonResponse$.error(errorObj);
-      await tick();
+      cw.clock.next();
       verifyErrorEmitted(errorObj);
     });
   });

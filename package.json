@@ -1,6 +1,6 @@
 {
   "name": "zoundcloud",
-  "version": "1.1.0",
+  "version": "1.2.0-SNAPSHOT",
   "private": true,
   "description": "Adds download buttons to SoundCloud pages.",
   "main": "index.js",
@@ -41,7 +41,7 @@
     "@types/mocha": "^5.2.0",
     "@types/mocha-each": "^1.1.0",
     "@types/node": "^10.0.8",
-    "@types/sinon": "^4.3.0",
+    "@types/sinon": "^4.3.3",
     "@types/sinon-chai": "^2.7.31",
     "@types/sinon-chrome": "^2.2.3",
     "browser-id3-writer": "^4.0.0",
