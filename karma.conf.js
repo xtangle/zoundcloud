@@ -20,7 +20,7 @@ module.exports = function (config) {
         opts: 'mocha.opts'
       }
     },
-    reporters: ['spec'],
+    reporters: ['nyan'],
     karmaTypescriptConfig: {
       bundlerOptions: {
         entrypoints: /\.spec\.ts$/

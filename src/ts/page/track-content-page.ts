@@ -1,22 +1,21 @@
 import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
-import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
-import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {IContentPage} from '@src/page/content-page';
+import {subscribeToReloadPageRequest} from '@src/page/content-page-commons';
 import {elementAdded$, elementExist$} from '@src/util/dom-observer';
 import {logger} from '@src/util/logger';
 import {UrlService} from '@src/util/url-service';
 import * as $ from 'jquery';
 import {BehaviorSubject, fromEvent, merge, Subscription} from 'rxjs';
-import {first, skipWhile, switchMap, takeWhile, throttleTime, timeout} from 'rxjs/operators';
+import {filter, first, switchMap, take, throttleTime, timeout} from 'rxjs/operators';
 
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
 export class TrackContentPage implements IContentPage {
-  public readonly id = 'zc-track-content';
+  public readonly type = 'track';
   private readonly subscriptions: Subscription = new Subscription();
   private readonly trackInfo$: BehaviorSubject<ITrackInfo | null> = new BehaviorSubject<ITrackInfo>(null);
 
@@ -34,14 +33,7 @@ export class TrackContentPage implements IContentPage {
 
   public load(): void {
     this.subscriptions.add(this.injectDlButton());
-    this.subscriptions.add(
-      ContentPageMessenger.onMessage(ReloadContentPageMessage.TYPE).subscribe(
-        (args: IMessageHandlerArgs<ReloadContentPageMessage>) => {
-          if (args.message.contentPageId === this.id) {
-            this.reload();
-          }
-        })
-    );
+    this.subscriptions.add(subscribeToReloadPageRequest.call(this));
     this.updateTrackInfo();
     logger.debug('Loaded track content page');
   }
@@ -52,7 +44,7 @@ export class TrackContentPage implements IContentPage {
     logger.debug('Unloaded track content page');
   }
 
-  private reload(): void {
+  public reload(): void {
     this.trackInfo$.next(null);
     this.updateTrackInfo();
     logger.debug('Reloaded track content page');
@@ -105,8 +97,8 @@ export class TrackContentPage implements IContentPage {
   private addDlButtonBehavior(dlButton: JQuery<HTMLElement>) {
     const downloadClick$ = fromEvent(dlButton, 'click').pipe(throttleTime(3000));
     const toFirstTrackInfo$ = () => this.trackInfo$.pipe(
-      skipWhile((trackInfo) => trackInfo === null),
-      takeWhile((trackInfo) => trackInfo !== null),
+      take(2),
+      filter((trackInfo) => trackInfo !== null),
       first(),
       timeout(30000)
     );
@@ -117,7 +109,7 @@ export class TrackContentPage implements IContentPage {
             logger.debug('Downloading track', trackInfo.id);
             ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
           },
-          (err) => logger.error('Timeout when fetching track info', err)
+          (err) => logger.error('Error fetching track info', err)
         )
     );
   }

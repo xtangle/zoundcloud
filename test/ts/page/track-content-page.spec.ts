@@ -12,7 +12,7 @@ import {useFakeTimer, useSinonChai, useSinonChrome} from '@test/test-initializer
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {BehaviorSubject, Subject, Subscription} from 'rxjs';
-import {SinonFakeTimers, SinonStub, spy, stub} from 'sinon';
+import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const forEach = require('mocha-each');
 const expect = useSinonChai();
@@ -40,7 +40,7 @@ describe('track content page', () => {
     fixture.unload();
   });
 
-  context('deciding when it should be loaded', () => {
+  context('testing when it should be loaded', () => {
     let stubGetUrl: SinonStub;
 
     beforeEach(() => {
@@ -99,7 +99,7 @@ describe('track content page', () => {
 
   });
 
-  context('when the content page is loaded', () => {
+  context('when it is loaded', () => {
     const fakeTrackInfo: ITrackInfo = {
       downloadable: false,
       id: 123,
@@ -121,13 +121,13 @@ describe('track content page', () => {
       stubGetTrackInfo.restore();
     });
 
-    describe('fetching of the track info', () => {
+    describe('fetching the track info', () => {
       it('should have null track info initially', () => {
         fixture.load();
         verifyTrackInfoIs(null);
       });
 
-      it('should fetch the track info', () => {
+      it('should update track info when it is fetched', () => {
         fixture.load();
         fakeTrackInfo$.next(fakeTrackInfo);
         verifyTrackInfoIs(fakeTrackInfo);
@@ -137,12 +137,13 @@ describe('track content page', () => {
     describe('reloading the content page', () => {
       let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
       let stubOnMessage: SinonStub;
+      let spyReload: SinonSpy;
 
       beforeEach(() => {
         fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
         stubOnMessage = stub(ContentPageMessenger, 'onMessage');
         stubOnMessage.withArgs(ReloadContentPageMessage.TYPE).returns(fakeMessageHandlerArgs$);
-        stubOnMessage.callThrough();
+        spyReload = spy(fixture, 'reload');
       });
 
       beforeEach('load fixture and populate initial track info', () => {
@@ -152,32 +153,38 @@ describe('track content page', () => {
 
       afterEach(() => {
         stubOnMessage.restore();
-      });
-
-      it('should reload when a reload message is received and id matches', () => {
-        fakeMessageHandlerArgs$.next({message: new ReloadContentPageMessage(fixture.id), sender: null});
-        verifyContentPageIsReloaded();
-      });
-
-      it('should not reload when reload message is received and id does not match', () => {
-        const differentId = fixture.id + 'X';
-        fakeMessageHandlerArgs$.next({message: new ReloadContentPageMessage(differentId), sender: null});
-        verifyContentPageIsNotReloaded();
+        spyReload.restore();
       });
 
       it('should not reload when no reload message is received', () => {
-        verifyContentPageIsNotReloaded();
+        expect(spyReload).to.not.have.been.called;
       });
 
-      function verifyContentPageIsReloaded() {
-        verifyTrackInfoIs(null);
-        fakeTrackInfo$.next(fakeTrackInfo);
-        verifyTrackInfoIs(fakeTrackInfo);
-      }
+      it('should reload when a reload message is received and type match', () => {
+        fakeMessageHandlerArgs$.next({message: new ReloadContentPageMessage(fixture.type), sender: null});
+        expect(spyReload).to.have.been.calledOnce;
+      });
 
-      function verifyContentPageIsNotReloaded() {
-        verifyTrackInfoIs(fakeTrackInfo);
-      }
+      it('should not reload when reload message is received and type does not match', () => {
+        const differentType = fixture.type + 'X';
+        fakeMessageHandlerArgs$.next({message: new ReloadContentPageMessage(differentType), sender: null});
+        expect(spyReload).to.not.have.been.called;
+      });
+
+      context('when it is reloaded', () => {
+        beforeEach(() => {
+          fixture.reload();
+        });
+
+        it('should reset track info to null', () => {
+          verifyTrackInfoIs(null);
+        });
+
+        it('should update track info when it is fetched', () => {
+          fakeTrackInfo$.next(fakeTrackInfo);
+          verifyTrackInfoIs(fakeTrackInfo);
+        });
+      });
     });
 
     describe('the download button injection', () => {
@@ -261,6 +268,11 @@ describe('track content page', () => {
             .calledWithExactly(new RequestTrackDownloadMessage(fakeTrackInfo));
         });
 
+        it('should not send a request download message if there is no track info', () => {
+          getDlButton().trigger('click');
+          expect(stubSendToExtension).to.not.have.been.called;
+        });
+
         it('should send a request download message if track info is received within 30s', () => {
           getDlButton().trigger('click');
           cw.clock.tick(29999);
@@ -281,6 +293,14 @@ describe('track content page', () => {
           expect(stubSendToExtension).to.not.have.been.called;
         });
 
+        it('should not send a request download message for old track info ' +
+          'when page is reloaded with the new track info', () => {
+          getDlButton().trigger('click');
+          fixture.reload();
+          fakeTrackInfo$.next(fakeTrackInfo);
+          expect(stubSendToExtension).to.not.have.been.called;
+        });
+
         it('should throttle clicks that are within 3s of each other', () => {
           fakeTrackInfo$.next(fakeTrackInfo);
           getDlButton().trigger('click');
@@ -296,8 +316,8 @@ describe('track content page', () => {
     });
 
     function verifyTrackInfoIs(trackInfo: ITrackInfo) {
-      const TRACK_INFO_PROP = 'trackInfo$';
-      expect((fixture[TRACK_INFO_PROP] as BehaviorSubject<ITrackInfo>).getValue()).to.be.equal(trackInfo);
+      const TRACK_INFO_KEY = 'trackInfo$';
+      expect((fixture[TRACK_INFO_KEY] as BehaviorSubject<ITrackInfo>).getValue()).to.be.equal(trackInfo);
     }
   });
 

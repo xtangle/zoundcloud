@@ -22,28 +22,32 @@ import {first} from 'rxjs/operators';
  * being added/removed will be listened to; any subsequent event after that will be ignored.
  */
 export interface IBootstrapper {
-  // noinspection JSUnusedLocalSymbols
   bootstrap(contentPage: IContentPage): void;
 }
 
 export const Bootstrapper: IBootstrapper = {
   bootstrap(contentPage: IContentPage): void {
+    const id = getTagId(contentPage);
     if (contentPage.test()) {
-      if (!idTagIsInDOM(contentPage.id)) {
-        const idTag = createIdTag(contentPage.id);
+      if (idTagIsInDOM(id)) {
+        ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage(contentPage.type));
+      } else {
+        const idTag = createIdTag(id);
         elementAdded$((node: Node) => node.isSameNode(idTag)).pipe(first())
           .subscribe(() => contentPage.load());
         elementRemoved$(idTag).pipe(first())
           .subscribe(() => contentPage.unload());
         addIdTagToDOM(idTag);
-      } else {
-        ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage(contentPage.id));
       }
     } else {
-      removeIdTagFromDOM(contentPage.id);
+      removeIdTagFromDOM(id);
     }
   }
 };
+
+function getTagId(contentPage: IContentPage): string {
+  return `zc-${contentPage.type}-content-page-id`;
+}
 
 function idTagIsInDOM(id: string): boolean {
   return $(`#${id}`).length > 0;

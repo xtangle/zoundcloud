@@ -41,7 +41,7 @@ export class BackgroundScript implements IRunnable {
       ExtensionMessenger.onMessage(RequestContentPageReloadMessage.TYPE).subscribe(
         (args: IMessageHandlerArgs<RequestContentPageReloadMessage>) => {
           ExtensionMessenger.sendToContentPage(args.sender.tab.id,
-            new ReloadContentPageMessage(args.message.contentPageId));
+            new ReloadContentPageMessage(args.message.contentPageType));
         })
     );
   }
