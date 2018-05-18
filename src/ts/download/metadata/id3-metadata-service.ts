@@ -18,9 +18,9 @@ export const ID3MetadataService: IID3MetadataService = {
       switchMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
       map((url: string) => ({...downloadOptions, url})),
-      timeout(30000),
+      timeout(60000),
       catchError((err: any) => {
-        logger.error(err);
+        logger.error('Unable to fetch metadata', err);
         return of(downloadOptions);
       })
     );
@@ -66,9 +66,9 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
         useUnicodeEncoding: false
       })
     ),
-    timeout(10000),
-    catchError((err: any) => {
-      logger.error(err);
+    timeout(20000),
+    catchError((err) => {
+      logger.error('Unable to fetch cover art', err);
       return of(writer);
     })
   );

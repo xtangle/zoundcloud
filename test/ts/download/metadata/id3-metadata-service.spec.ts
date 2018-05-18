@@ -53,7 +53,7 @@ describe('id3 metadata service', () => {
       it('should not add metadata if fetching the song data times out', () => {
         stubGetArrayBuffer$.withArgs(downloadOptions.url).returns(NEVER);
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadOptions));
-        fakeTimer.tick(31000);
+        fakeTimer.tick(60001);
 
         verifyDownloadOptionsEmittedWithUrl(downloadOptions.url);
       });
@@ -125,14 +125,14 @@ describe('id3 metadata service', () => {
       it('should not add cover art metadata if fetching cover art data times out', () => {
         stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(NEVER);
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadOptions));
-        fakeTimer.tick(11000);
+        fakeTimer.tick(20001);
 
         expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
         verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
       });
 
       it('should not add cover art metadata if there is an error while fetching cover art', () => {
-        stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(throwError('error fetching cover art'));
+        stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(throwError('Some error'));
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadOptions));
         fakeTimer.next();
 

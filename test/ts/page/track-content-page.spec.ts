@@ -8,7 +8,7 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
 import {UrlService} from '@src/util/url-service';
-import {useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {useFakeTimer, useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {BehaviorSubject, Subject, Subscription} from 'rxjs';
@@ -208,17 +208,11 @@ describe('track content page', () => {
     });
 
     describe('the download button behavior', () => {
-      const sinon = require('sinon');
-      let fakeTimer: SinonFakeTimers;
+      const cw = useFakeTimer();
 
       beforeEach('ensure download button is injected', () => {
-        fakeTimer = sinon.useFakeTimers();
         document.body.innerHTML = testHtml;
         fixture.load();
-      });
-
-      afterEach(() => {
-        fakeTimer.restore();
       });
 
       it('should have the correct classes', () => {
@@ -252,27 +246,33 @@ describe('track content page', () => {
       describe('the behavior when clicked', () => {
         let stubSendToExtension: SinonStub;
 
-        before(() => {
+        beforeEach(() => {
           stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
         });
 
         afterEach(() => {
-          stubSendToExtension.resetHistory();
-        });
-
-        after(() => {
           stubSendToExtension.restore();
         });
 
-        it('should send a request download message if track info is not null', () => {
+        it('should send a request download message if there is track info', () => {
           fakeTrackInfo$.next(fakeTrackInfo);
           getDlButton().trigger('click');
           expect(stubSendToExtension).to.have.been.calledOnce
             .calledWithExactly(new RequestTrackDownloadMessage(fakeTrackInfo));
         });
 
-        it('should not send a request download message if there is no track info', () => {
+        it('should send a request download message if track info is received within 30s', () => {
           getDlButton().trigger('click');
+          cw.clock.tick(29999);
+          fakeTrackInfo$.next(fakeTrackInfo);
+          expect(stubSendToExtension).to.have.been.calledOnce
+            .calledWithExactly(new RequestTrackDownloadMessage(fakeTrackInfo));
+        });
+
+        it('should not send a request download message if track info is not received within 30s', () => {
+          getDlButton().trigger('click');
+          cw.clock.tick(30001);
+          fakeTrackInfo$.next(fakeTrackInfo);
           expect(stubSendToExtension).to.not.have.been.called;
         });
 
@@ -284,11 +284,11 @@ describe('track content page', () => {
         it('should throttle clicks that are within 3s of each other', () => {
           fakeTrackInfo$.next(fakeTrackInfo);
           getDlButton().trigger('click');
-          fakeTimer.tick(2900);
+          cw.clock.tick(2900);
           getDlButton().trigger('click');
           expect(stubSendToExtension).to.have.been.calledOnce;
 
-          fakeTimer.tick(101);
+          cw.clock.tick(101);
           getDlButton().trigger('click');
           expect(stubSendToExtension).to.have.been.calledTwice;
         });

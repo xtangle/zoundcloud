@@ -11,7 +11,7 @@ import {logger} from '@src/util/logger';
 import {UrlService} from '@src/util/url-service';
 import * as $ from 'jquery';
 import {BehaviorSubject, fromEvent, merge, Subscription} from 'rxjs';
-import {map, throttleTime} from 'rxjs/operators';
+import {first, skipWhile, switchMap, takeWhile, throttleTime, timeout} from 'rxjs/operators';
 
 export const ZC_TRACK_DL_BUTTON_ID = 'zcTrackDlButton';
 
@@ -98,16 +98,28 @@ export class TrackContentPage implements IContentPage {
       .attr('id', ZC_TRACK_DL_BUTTON_ID)
       .prop('title', 'Download this track')
       .html('Download');
-    const downloadClick$ = fromEvent(dlButton[0], 'click').pipe(throttleTime(3000));
-    this.subscriptions.add(
-      downloadClick$.pipe(map(() => this.trackInfo$.getValue()))
-        .subscribe((trackInfo: ITrackInfo) => {
-          if (trackInfo) {
-            ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
-          }
-        })
-    );
+    this.addDlButtonBehavior(dlButton);
     return dlButton;
+  }
+
+  private addDlButtonBehavior(dlButton: JQuery<HTMLElement>) {
+    const downloadClick$ = fromEvent(dlButton, 'click').pipe(throttleTime(3000));
+    const toFirstTrackInfo$ = () => this.trackInfo$.pipe(
+      skipWhile((trackInfo) => trackInfo === null),
+      takeWhile((trackInfo) => trackInfo !== null),
+      first(),
+      timeout(30000)
+    );
+    this.subscriptions.add(
+      downloadClick$.pipe(switchMap(toFirstTrackInfo$))
+        .subscribe(
+          (trackInfo) => {
+            logger.debug('Downloading track', trackInfo.id);
+            ContentPageMessenger.sendToExtension(new RequestTrackDownloadMessage(trackInfo));
+          },
+          (err) => logger.error('Timeout when fetching track info', err)
+        )
+    );
   }
 }
 

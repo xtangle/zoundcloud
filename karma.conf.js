@@ -15,7 +15,7 @@ module.exports = function (config) {
       'test/ts/**/*.ts': ['karma-typescript']
     },
     client: {
-      captureConsole: true,
+      captureConsole: false,
       mocha: {
         opts: 'mocha.opts'
       }
@@ -44,7 +44,7 @@ module.exports = function (config) {
     },
     port: 9876,
     colors: true,
-    logLevel: config.LOG_DISABLE,
+    logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     singleRun: true,
