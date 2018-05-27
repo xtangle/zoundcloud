@@ -100,6 +100,18 @@ describe('id3 metadata service', () => {
         expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
       });
 
+      it('should add an empty string comment metadata if it is undefined', () => {
+        rx.subscribeTo(fixture.addID3V2Metadata$(
+          createMetadata({description: undefined}), downloadOptions));
+        fakeTimer.next();
+
+        expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'COMM', {
+          description: 'Soundcloud description',
+          text: ''
+        });
+        expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
+      });
+
       it('should add cover art metadata', () => {
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadOptions));
         fakeTimer.next();

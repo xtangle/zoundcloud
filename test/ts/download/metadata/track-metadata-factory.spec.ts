@@ -1,3 +1,4 @@
+import {ITrackInfo} from '@src/download/download-info';
 import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
 import {expect} from 'chai';
 
@@ -29,7 +30,7 @@ describe('track metadata factory', () => {
       });
     });
 
-    function createTrackInfo(overrides: object = {}) {
+    function createTrackInfo(overrides: object = {}): ITrackInfo {
       return {
         artwork_url: 'artwork-url',
         bpm: 123,
@@ -39,6 +40,7 @@ describe('track metadata factory', () => {
         duration: 234,
         genre: 'song-genre',
         id: 345,
+        kind: 'track',
         original_format: 'orig-format',
         permalink_url: 'permalink-url',
         release_day: 1,
@@ -47,6 +49,7 @@ describe('track metadata factory', () => {
         stream_url: 'stream-url',
         title: 'a-song-title',
         user: {
+          kind: 'user',
           permalink_url: 'user-permalink-url',
           username: 'user-username'
         },

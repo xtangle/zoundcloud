@@ -1,5 +1,5 @@
 import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IPlaylistInfo, ITrackInfo} from '@src/download/download-info';
+import {IDownloadInfo, IPlaylistInfo, ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
@@ -26,85 +26,79 @@ describe('download info service', () => {
     stubGetJSON$.restore();
   });
 
-  describe('fetching track info', () => {
-    let jsonResponse$: Subject<ITrackInfo>;
+  describe('fetching download info', () => {
+    let jsonResponse$: Subject<IDownloadInfo>;
 
     beforeEach(() => {
-      jsonResponse$ = new Subject<ITrackInfo>();
+      jsonResponse$ = new Subject<IDownloadInfo>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
-      rx.subscribeTo(fixture.getTrackInfo$(url));
+      rx.subscribeTo(fixture.getDownloadInfo$(url));
     });
 
     it('should not emit anything when url has yet to be resolved', () => {
       cw.clock.next();
-      verifyFetchingDownloadInfo();
+      verifyFetching();
     });
 
-    it('should fetch track track info and complete when url has been resolved', () => {
-      const fakeTrackInfo: ITrackInfo = {
-        downloadable: false,
-        id: 123,
-        original_format: 'mp3',
-        title: 'some-track',
-        user: {username: 'foo'}
-      };
-      jsonResponse$.next(fakeTrackInfo);
+    it('should fetch download info and complete when url has been resolved', () => {
+      const fakeDownloadInfo: IDownloadInfo = {kind: 'foo', permalink_url: 'bar'};
+      jsonResponse$.next(fakeDownloadInfo);
       jsonResponse$.complete();
       cw.clock.next();
-      verifyDownloadInfoFetched(fakeTrackInfo);
+      verifyFetched(fakeDownloadInfo);
     });
 
-    it('should fail with error and complete if url cannot be resolved', () => {
+    it('should fail with error if url cannot be resolved', () => {
       const errorObj = {message: 'error: cannot resolve url'};
       jsonResponse$.error(errorObj);
       cw.clock.next();
-      verifyErrorEmitted(errorObj);
+      verifyError(errorObj);
     });
   });
 
-  describe('fetching playlist info', () => {
-    let jsonResponse$: Subject<IPlaylistInfo>;
+  describe('fetching track info list', () => {
+    let jsonResponse$: Subject<ITrackInfo[]>;
 
     beforeEach(() => {
-      jsonResponse$ = new Subject<IPlaylistInfo>();
+      jsonResponse$ = new Subject<ITrackInfo[]>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
-      rx.subscribeTo(fixture.getPlaylistInfo$(url));
+      rx.subscribeTo(fixture.getTrackInfoList$(url));
     });
 
     it('should not emit anything when url has yet to be resolved', () => {
       cw.clock.next();
-      verifyFetchingDownloadInfo();
+      verifyFetching();
     });
 
-    it('should fetch playlist info and complete when url has been resolved', () => {
-      const fakePlaylistInfo: IPlaylistInfo = {title: 'some-playlist', tracks: [], user: {username: 'some-user'}};
-      jsonResponse$.next(fakePlaylistInfo);
+    it('should fetch track info list and complete when url has been resolved', () => {
+      const fakeTrackInfoList: ITrackInfo[] = [{}, {}] as ITrackInfo[];
+      jsonResponse$.next(fakeTrackInfoList);
       jsonResponse$.complete();
       cw.clock.next();
-      verifyDownloadInfoFetched(fakePlaylistInfo);
+      verifyFetched(fakeTrackInfoList);
     });
 
-    it('should fail with error and complete if url cannot be resolved', () => {
+    it('should fail with error if url cannot be resolved', () => {
       const errorObj = {message: 'error: cannot resolve url'};
       jsonResponse$.error(errorObj);
       cw.clock.next();
-      verifyErrorEmitted(errorObj);
+      verifyError(errorObj);
     });
   });
 
-  function verifyFetchingDownloadInfo() {
+  function verifyFetching() {
     expect(rx.next).to.not.have.been.called;
     expect(rx.error).to.not.have.been.called;
     expect(rx.complete).to.not.have.been.called;
   }
 
-  function verifyDownloadInfoFetched<T = ITrackInfo | IPlaylistInfo>(downloadInfo: T) {
+  function verifyFetched<T = ITrackInfo | IPlaylistInfo>(downloadInfo: T) {
     expect(rx.next).to.have.been.calledOnce.calledWithExactly(downloadInfo);
     expect(rx.error).to.not.have.been.called;
     expect(rx.complete).to.have.been.called;
   }
 
-  function verifyErrorEmitted(errorObj: any) {
+  function verifyError(errorObj: any) {
     expect(rx.next).to.not.have.been.called;
     expect(rx.error).to.have.been.calledWithExactly(errorObj);
   }

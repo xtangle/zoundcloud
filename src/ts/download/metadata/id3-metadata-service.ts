@@ -6,12 +6,11 @@ import {Observable, of} from 'rxjs';
 import {catchError, first, map, switchMap, timeout} from 'rxjs/operators';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
-export interface IID3MetadataService {
-  // Adds ID3 v2.4 tags
-  addID3V2Metadata$(metadata: ITrackMetadata, downloadOptions: DownloadOptions): Observable<DownloadOptions>;
-}
-
-export const ID3MetadataService: IID3MetadataService = {
+/**
+ * Adds ID3 v2.4 tags and returns downloadOptions with the updated URL.
+ * To add the tags, it must download the entire mp3 file as an array buffer.
+ */
+export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
     logger.debug('Adding ID3 V2 Metadata', metadata, downloadOptions);
     return XhrRequestService.getArrayBuffer$(downloadOptions.url).pipe(
