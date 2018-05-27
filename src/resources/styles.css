@@ -2,8 +2,14 @@
   background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+UmVjdGFuZ2xlIDMxPC90aXRsZT48cGF0aCBkPSJNMyAxMXYyaDEwdi0ySDN6bTAtN2gxMGwtNSA2LTUtNnptMy0ydjJoNFYySDZ6IiBmaWxsPSIjMjIyIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=) no-repeat;
 }
 
-.zc-button-download {
+.zc-button-download-medium {
   background-position-x: 6px;
-  background-position-y: 4px;
+  background-position-y: 5px;
+  text-indent: 16px;
+}
+
+.zc-button-download-small {
+  background-position-x: 3px;
+  background-position-y: 3px;
   text-indent: 16px;
 }

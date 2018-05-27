@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import {fromEventPattern, Observable, Observer} from 'rxjs';
+import {fromEventPattern, merge, Observable, Observer} from 'rxjs';
 
 export function elementRemoved$(elem: Node): Observable<any> {
   let mutationObserver: MutationObserver;
@@ -43,12 +43,19 @@ export function elementAdded$(test: (node: Node) => boolean): Observable<Node> {
 
 export function elementExist$(selector: string): Observable<Node> {
   return Observable.create((observer: Observer<Node>) => {
-    const node = $(selector);
-    if (node.length) {
-      observer.next(node[0]);
-    }
+    const nodes = $(selector);
+    nodes.each((i) => {
+      observer.next(nodes[i]);
+    });
     observer.complete();
   });
+}
+
+export function elementExistOrAdded$(selector: string): Observable<Node> {
+  return merge(
+    elementExist$(selector),
+    elementAdded$((node: Node) => $(node).is(selector))
+  );
 }
 
 function observeAllNodes(mutationObserver: MutationObserver) {

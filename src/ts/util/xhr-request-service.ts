@@ -1,21 +1,19 @@
-import {Observable, Subject} from 'rxjs';
+import {AsyncSubject, Observable} from 'rxjs';
 
-export interface IXhrRequestService {
-  getArrayBuffer$(url: string): Observable<ArrayBuffer>;
-  getJSON$<T extends object>(url: string): Observable<T>;
-}
-
-export const XhrRequestService: IXhrRequestService = {
+export const XhrRequestService = {
+  checkStatus$(url: string): Observable<number> {
+    return checkStatus$(url);
+  },
   getArrayBuffer$(url: string): Observable<ArrayBuffer> {
     return getResponse$<ArrayBuffer>('arraybuffer', url);
   },
-  getJSON$<T extends object>(url: string): Observable<T> {
+  getJSON$<T>(url: string): Observable<T> {
     return getResponse$<T>('json', url);
   }
 };
 
 function getResponse$<T>(responseType: XMLHttpRequestResponseType, url: string): Observable<T> {
-  const response$: Subject<T> = new Subject<T>();
+  const response$: AsyncSubject<T> = new AsyncSubject<T>();
   const xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.responseType = responseType;
@@ -32,4 +30,23 @@ function getResponse$<T>(responseType: XMLHttpRequestResponseType, url: string):
   };
   xhr.send();
   return response$;
+}
+
+function checkStatus$(url: string): Observable<number> {
+  const status$: AsyncSubject<number> = new AsyncSubject<number>();
+  const xhr = new XMLHttpRequest();
+  xhr.open('HEAD', url, true);
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState === xhr.HEADERS_RECEIVED) {
+      status$.next(xhr.status);
+      status$.complete();
+      xhr.abort();
+    }
+  };
+  xhr.onerror = () => {
+    status$.next(xhr.status);
+    status$.complete();
+  };
+  xhr.send();
+  return status$;
 }

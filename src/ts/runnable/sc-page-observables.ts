@@ -3,13 +3,13 @@ import {fromEventPattern, merge, Observable} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
-export const ScPageVisitedObservableFactory = {
-  create$(): Observable<WebNavigationUrlCallbackDetails> {
+export const ScPageObservables = {
+  scPageVisited$(): Observable<WebNavigationUrlCallbackDetails> {
     const scWebNavOnCompleted$: Observable<WebNavigationUrlCallbackDetails> =
       fromEventPattern<WebNavigationUrlCallbackDetails>(
         (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
           chrome.webNavigation.onCompleted.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-      );
+      ).pipe(debounceTime(20));
 
     /**
      * onHistoryStateUpdated emits two events on every navigation: one event with URL of the old page and

@@ -5,27 +5,23 @@ import {TrackDownloadMethodService} from '@src/download/track-download-method-se
 import {FilenameService} from '@src/util/filename-service';
 import * as path from 'path';
 import {AsyncSubject, Observable, Subject} from 'rxjs';
-import {first, map, switchMap, timeout} from 'rxjs/operators';
+import {switchMap, timeout} from 'rxjs/operators';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
-export interface ITrackDownloadService {
-  downloadTrack(trackInfo: ITrackInfo, downloadLocation?: string): Observable<number>;
-}
-
-export const TrackDownloadService: ITrackDownloadService = {
-  downloadTrack(trackInfo: ITrackInfo, downloadLocation?: string): Observable<number> {
+export const TrackDownloadService = {
+  download$(trackInfo: ITrackInfo, downloadLocation: string = ''): Observable<number> {
     const downloadId$: Subject<number> = new AsyncSubject<number>();
-    TrackDownloadMethodService.getDownloadMethod$(trackInfo).pipe(
-      first(),
-      timeout(10000),
-      map(toDownloadOptions.bind(null, trackInfo, downloadLocation)),
-      switchMap(MetadataAdapter.addMetadata$.bind(null, trackInfo))
-    ).subscribe(doDownload$.bind(null, downloadId$));
-    return downloadId$.asObservable();
+    TrackDownloadMethodService.toDownloadMethod$(trackInfo).pipe(
+      switchMap((downloadMethod: ITrackDownloadMethod) =>
+        MetadataAdapter.addMetadata$(downloadMethod, toDownloadOptions(downloadLocation, downloadMethod))
+      ),
+      timeout(300000)
+    ).subscribe(downloadTrack$.bind(null, downloadId$));
+    return downloadId$;
   }
 };
 
-function doDownload$(downloadId$: Subject<number>, downloadOptions: DownloadOptions) {
+function downloadTrack$(downloadId$: Subject<number>, downloadOptions: DownloadOptions) {
   chrome.downloads.download(downloadOptions, (id: number) => {
     if (id !== undefined) {
       downloadId$.next(id);
@@ -37,16 +33,16 @@ function doDownload$(downloadId$: Subject<number>, downloadOptions: DownloadOpti
   });
 }
 
-function toDownloadOptions(trackInfo: ITrackInfo, downloadLocation: string,
-                           downloadMethod: ITrackDownloadMethod): DownloadOptions {
+function toDownloadOptions(downloadLocation: string, downloadMethod: ITrackDownloadMethod): DownloadOptions {
   return {
-    filename: getFilename(trackInfo.title, downloadMethod.fileExtension, downloadLocation),
+    conflictAction: 'uniquify',
+    filename: getFilename(downloadMethod.trackInfo.title, downloadMethod.fileExtension, downloadLocation),
     saveAs: false,
     url: downloadMethod.url
   };
 }
 
-function getFilename(trackTitle: string, fileExtension: string, downloadLocation: string = ''): string {
+function getFilename(trackTitle: string, fileExtension: string, downloadLocation: string): string {
   const filename = `${FilenameService.removeSpecialCharacters(trackTitle)}.${fileExtension}`;
   return path.join(downloadLocation, filename);
 }

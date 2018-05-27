@@ -13,12 +13,13 @@ export interface IID3MetadataService {
 
 export const ID3MetadataService: IID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
+    logger.debug('Adding ID3 V2 Metadata', metadata, downloadOptions);
     return XhrRequestService.getArrayBuffer$(downloadOptions.url).pipe(
       first(),
       switchMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
       map((url: string) => ({...downloadOptions, url})),
-      timeout(60000),
+      timeout(300000),
       catchError((err: any) => {
         logger.error('Unable to fetch metadata', err);
         return of(downloadOptions);
@@ -47,7 +48,7 @@ function withTextualMetadata(metadata: ITrackMetadata, writer: IID3Writer): IID3
   ID3WriterService.setFrame(writer, 'WOAS', metadata.audio_source_url);
   ID3WriterService.setFrame(writer, 'COMM', {
     description: 'Soundcloud description',
-    text: metadata.description
+    text: metadata.description || ''
   });
   return writer;
 }
@@ -66,7 +67,7 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
         useUnicodeEncoding: false
       })
     ),
-    timeout(20000),
+    timeout(60000),
     catchError((err) => {
       logger.error('Unable to fetch cover art', err);
       return of(writer);

@@ -1,6 +1,6 @@
 import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
-import {TrackDownloadService} from '@src/download/track-download-service';
+import {DownloadService} from '@src/download/track-download-service';
 import {FilenameService} from '@src/util/filename-service';
 import {useFakeTimer, useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
 import * as path from 'path';
@@ -14,7 +14,7 @@ describe(`track download service`, () => {
   const sinonChrome = useSinonChrome();
   const cw = useFakeTimer();
   const rx = useRxTesting();
-  const fixture = TrackDownloadService;
+  const fixture = DownloadService;
 
   describe(`downloading a track`, () => {
     const trackInfo = {
@@ -127,7 +127,7 @@ describe(`track download service`, () => {
 
     function setUpStubServices() {
       beforeEach(() => {
-        stubGetDownloadMethod = stub(TrackDownloadMethodService, 'getDownloadMethod$');
+        stubGetDownloadMethod = stub(TrackDownloadMethodService, 'toDownloadMethod$');
         stubGetDownloadMethod.withArgs(trackInfo).returns(of(downloadMethod));
 
         stubRemoveSpecialCharacters = stub(FilenameService, 'removeSpecialCharacters');

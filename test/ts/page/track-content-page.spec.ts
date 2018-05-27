@@ -1,4 +1,4 @@
-import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
+import {ZC_DL_BUTTON_MEDIUM_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
@@ -224,7 +224,7 @@ describe('track content page', () => {
 
       it('should have the correct classes', () => {
         const selector = '.sc-button.sc-button-medium.sc-button-responsive' +
-          `.${ZC_DL_BUTTON_ICON_CLASS}.${ZC_DL_BUTTON_CLASS}`;
+          `.${ZC_DL_BUTTON_ICON_CLASS}.${ZC_DL_BUTTON_MEDIUM_CLASS}`;
         expect(getDlButton().is(selector)).to.be.true;
       });
 

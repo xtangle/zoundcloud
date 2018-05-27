@@ -1,11 +1,11 @@
-import {TrackDownloadService} from '@src/download/track-download-service';
+import {DownloadService} from '@src/download/download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
 import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
+import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {IRunnable} from '@src/runnable/runnable';
-import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
+import {ScPageObservables} from '@src/runnable/sc-page-observables';
 import {logger} from '@src/util/logger';
 import {fromEventPattern, Observable, Subscription} from 'rxjs';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
@@ -24,7 +24,7 @@ export class BackgroundScript implements IRunnable {
   public run(): void {
     this.subscriptions.add(this.onSuspend$.subscribe(() => this.cleanUp()));
     this.subscriptions.add(
-      ScPageVisitedObservableFactory.create$().subscribe((details: WebNavigationUrlCallbackDetails) => {
+      ScPageObservables.scPageVisited$().subscribe((details: WebNavigationUrlCallbackDetails) => {
         logger.debug('Loading content script', details);
         chrome.tabs.insertCSS(details.tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
@@ -32,16 +32,15 @@ export class BackgroundScript implements IRunnable {
       })
     );
     this.subscriptions.add(
-      ExtensionMessenger.onMessage(RequestTrackDownloadMessage.TYPE).subscribe(
-        (args: IMessageHandlerArgs<RequestTrackDownloadMessage>) => {
-          TrackDownloadService.downloadTrack(args.message.trackInfo);
+      ExtensionMessenger.onMessage(RequestContentPageReloadMessage.TYPE).subscribe(
+        (args: IMessageHandlerArgs<RequestContentPageReloadMessage>) => {
+          ExtensionMessenger.sendToContentPage(args.sender.tab.id, new ReloadContentPageMessage());
         })
     );
     this.subscriptions.add(
-      ExtensionMessenger.onMessage(RequestContentPageReloadMessage.TYPE).subscribe(
-        (args: IMessageHandlerArgs<RequestContentPageReloadMessage>) => {
-          ExtensionMessenger.sendToContentPage(args.sender.tab.id,
-            new ReloadContentPageMessage(args.message.contentPageType));
+      ExtensionMessenger.onMessage(RequestDownloadMessage.TYPE).subscribe(
+        (args: IMessageHandlerArgs<RequestDownloadMessage>) => {
+          DownloadService.download$(args.message.downloadInfoUrl);
         })
     );
   }

@@ -2,41 +2,67 @@ import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {ITrackDownloadMethod} from '@src/download/track-download-method';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {combineLatest, Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 
-export interface IScI1ApiTrackDownloadInfo {
+interface IScI1ApiTrackDownloadInfo {
   http_mp3_128_url?: string;
 }
 
-export interface ITrackDownloadMethodService {
-  getDownloadMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod>;
-}
-
-export const TrackDownloadMethodService: ITrackDownloadMethodService = {
-  getDownloadMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
-    if (trackInfo.downloadable) {
-      return getDownloadUrlMethod$(trackInfo);
-    } else if (trackInfo.stream_url) {
-      return getStreamUrlMethod$(trackInfo);
-    } else {
-      return getScI1ApiMethod$(trackInfo);
-    }
+export const TrackDownloadMethodService = {
+  toDownloadMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
+    return combineLatest(canUseDownloadUrlMethod$(trackInfo), canUseStreamUrlMethod$(trackInfo)).pipe(
+      switchMap(([canUseDownloadUrlMethod, canUseStreamUrlMethod]) => {
+        if (canUseDownloadUrlMethod) {
+          return getDownloadUrlMethod$(trackInfo);
+        } else if (canUseStreamUrlMethod) {
+          return getStreamUrlMethod$(trackInfo);
+        } else {
+          return getScI1ApiMethod$(trackInfo);
+        }
+      })
+    );
   }
 };
+
+function canUseDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
+  if (!trackInfo.downloadable) {
+    return of(false);
+  } else {
+    return XhrRequestService.checkStatus$(getDownloadUrl(trackInfo)).pipe(map((status) => status === 200));
+  }
+}
 
 function getDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   return of({
     fileExtension: trackInfo.original_format,
-    url: `${trackInfo.download_url}?client_id=${CLIENT_ID}`
+    trackInfo,
+    url: getDownloadUrl(trackInfo)
   });
+}
+
+function getDownloadUrl(trackInfo: ITrackInfo): string {
+  return `${trackInfo.download_url}?client_id=${CLIENT_ID}`;
+}
+
+function canUseStreamUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
+  if (!trackInfo.stream_url) {
+    return of(false);
+  } else {
+    return  XhrRequestService.checkStatus$(getStreamUrl(trackInfo)).pipe(map((status) => status === 200));
+  }
 }
 
 function getStreamUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
   return of({
     fileExtension: 'mp3',
-    url: `${trackInfo.stream_url}?client_id=${CLIENT_ID}`
+    trackInfo,
+    url: getStreamUrl(trackInfo)
   });
+}
+
+function getStreamUrl(trackInfo: ITrackInfo): string {
+  return `${trackInfo.stream_url}?client_id=${CLIENT_ID}`;
 }
 
 function getScI1ApiMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod> {
@@ -46,6 +72,7 @@ function getScI1ApiMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMeth
       if (downloadInfo.http_mp3_128_url) {
         return {
           fileExtension: 'mp3',
+          trackInfo,
           url: downloadInfo.http_mp3_128_url
         };
       } else {

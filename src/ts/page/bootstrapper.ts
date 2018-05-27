@@ -1,66 +1,49 @@
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {IContentPage} from '@src/page/content-page';
+import {ContentPage} from '@src/page/content-page';
 import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
 import {first} from 'rxjs/operators';
 
+const TAG_ID = 'zc-content-page';
+
 /**
  * Bootstraps a content-page to the DOM.
  *
- * It first tests if the content page should be loaded using the test() function of the content page;
- * if it should be loaded, then it adds an id tag (unique per type of content page) to the content page to the DOM
- * if it doesn't exist. If it should be loaded and the id tag already exists, then a message will be sent to the
- * extension (background page) signalling for the existing content page to be reloaded.
- * If the content page should not be loaded, then the id tag is removed from the DOM if it already exists.
+ * When calling the bootstrap() function on a content page, it adds an 'id tag' (a unique div element)
+ * to the DOM if it doesn't already exist. If the id tag already exists, a request reload content page message
+ * is sent to the extension signalling for the content page to be reloaded.
  *
- * The status of the id tag is directly related and is the source of truth to the status of the content page.
- * When the id tag is added, the content page is signalled to load.
- * When it is removed, the content page is signalled to unload.
- *
- * Do note that to prevent state of the subscription being stored, only the first event of the id tag
- * being added/removed will be listened to; any subsequent event after that will be ignored.
+ * The purpose of the id tag is to signal whether the content script has already been loaded. Additionally,
+ * when the id tag is removed, the content page is signalled to be unloaded.
  */
 export interface IBootstrapper {
-  bootstrap(contentPage: IContentPage): void;
+  bootstrap(contentPage: ContentPage): void;
 }
 
 export const Bootstrapper: IBootstrapper = {
-  bootstrap(contentPage: IContentPage): void {
-    const id = getTagId(contentPage);
-    if (contentPage.test()) {
-      if (idTagIsInDOM(id)) {
-        ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage(contentPage.type));
-      } else {
-        const idTag = createIdTag(id);
-        elementAdded$((node: Node) => node.isSameNode(idTag)).pipe(first())
-          .subscribe(() => contentPage.load());
-        elementRemoved$(idTag).pipe(first())
-          .subscribe(() => contentPage.unload());
-        addIdTagToDOM(idTag);
-      }
+  bootstrap(contentPage: ContentPage): void {
+    if (idTagIsInDOM()) {
+      ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage());
     } else {
-      removeIdTagFromDOM(id);
+      const idTag = createIdTag();
+      elementAdded$((node: Node) => node.isSameNode(idTag)).pipe(first())
+        .subscribe(() => contentPage.load());
+      elementRemoved$(idTag).pipe(first())
+        .subscribe(() => contentPage.unload());
+      addIdTagToDOM(idTag);
     }
   }
 };
 
-function getTagId(contentPage: IContentPage): string {
-  return `zc-${contentPage.type}-content-page-id`;
+function idTagIsInDOM(): boolean {
+  return $(`#${TAG_ID}`).length > 0;
 }
 
-function idTagIsInDOM(id: string): boolean {
-  return $(`#${id}`).length > 0;
-}
-
-function createIdTag(id: string): HTMLElement {
-  return $('<div/>', {id})[0];
+function createIdTag(): HTMLElement {
+  return $('<div/>', {id: TAG_ID})[0];
 }
 
 function addIdTagToDOM(idTag: HTMLElement): void {
   $('body').append(idTag);
-}
-
-function removeIdTagFromDOM(id: string): void {
-  $(`#${id}`).remove();
 }

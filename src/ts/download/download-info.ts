@@ -1,9 +1,13 @@
-export interface IUserInfo {
-  permalink_url?: string;
+export interface IDownloadInfo {
+  kind: string;
+  permalink_url: string;
+}
+
+export interface IUserInfo extends IDownloadInfo {
   username: string;
 }
 
-export interface ITrackInfo {
+export interface ITrackInfo extends IDownloadInfo {
   artwork_url?: string;
   bpm?: number;
   description?: string;
@@ -13,7 +17,6 @@ export interface ITrackInfo {
   genre?: string;
   id: number;
   original_format: string;
-  permalink_url?: string;
   release_day?: number;
   release_month?: number;
   release_year?: number;
@@ -22,7 +25,7 @@ export interface ITrackInfo {
   user: IUserInfo;
 }
 
-export interface IPlaylistInfo {
+export interface IPlaylistInfo extends IDownloadInfo {
   title: string;
   tracks: ITrackInfo[];
   user: IUserInfo;

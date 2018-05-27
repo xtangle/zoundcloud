@@ -1,5 +1,5 @@
 import {ITrackInfo} from '@src/download/download-info';
-import {TrackDownloadService} from '@src/download/track-download-service';
+import {DownloadService} from '@src/download/track-download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
 import {Message} from '@src/messaging/message';
@@ -70,7 +70,7 @@ describe('background script', () => {
         stubOnMessage = stub(ExtensionMessenger, 'onMessage');
         stubOnMessage.withArgs(RequestTrackDownloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
         stubOnMessage.callThrough();
-        stubDownloadTrack = stub(TrackDownloadService, 'downloadTrack');
+        stubDownloadTrack = stub(DownloadService, 'downloadTrack');
         fixture.run();
       });
 

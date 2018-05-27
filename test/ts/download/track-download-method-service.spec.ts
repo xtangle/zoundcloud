@@ -18,7 +18,7 @@ describe('track download method service', () => {
       const trackInfo = createTrackInfo();
 
       beforeEach(() => {
-        rx.subscribeTo(fixture.getDownloadMethod$(trackInfo));
+        rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       });
 
       it('should set the url to the download url', () => {
@@ -40,7 +40,7 @@ describe('track download method service', () => {
       const trackInfo = createTrackInfo(false);
 
       beforeEach(() => {
-        rx.subscribeTo(fixture.getDownloadMethod$(trackInfo));
+        rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       });
 
       it('should set the url to the stream url', () => {
@@ -67,7 +67,7 @@ describe('track download method service', () => {
         stubGetJSON = stub(XhrRequestService, 'getJSON$');
         stubGetJSON.returns(jsonResponse$);
 
-        rx.subscribeTo(fixture.getDownloadMethod$(trackInfo));
+        rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       });
 
       afterEach(() => {
