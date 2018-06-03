@@ -53,7 +53,7 @@ describe('id3 metadata service', () => {
       it('should not add metadata if fetching the song data times out', () => {
         stubGetArrayBuffer$.withArgs(downloadOptions.url).returns(NEVER);
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadOptions));
-        fakeTimer.tick(60001);
+        fakeTimer.tick(300001);
 
         verifyDownloadOptionsEmittedWithUrl(downloadOptions.url);
       });
@@ -137,7 +137,7 @@ describe('id3 metadata service', () => {
       it('should not add cover art metadata if fetching cover art data times out', () => {
         stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(NEVER);
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadOptions));
-        fakeTimer.tick(20001);
+        fakeTimer.tick(60001);
 
         expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
         verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);

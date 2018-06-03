@@ -1,4 +1,4 @@
-import {elementAdded$, elementExist$, elementRemoved$} from '@src/util/dom-observer';
+import {elementAdded$, elementExist$, elementExistOrAdded$, elementRemoved$} from '@src/util/dom-observer';
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
@@ -99,7 +99,7 @@ describe('dom observer', () => {
       iExist = $('.iExist')[0];
     });
 
-    it('should emit node and complete when node exists and matches selector', async () => {
+    it('should emit node and complete when one node exists and matches selector', async () => {
       rx.subscribeTo(elementExist$('.iExist'));
       await tick();
       expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist);
@@ -113,13 +113,35 @@ describe('dom observer', () => {
       expect(rx.complete).to.be.have.been.called;
     });
 
-    it('should emit first node and complete when multiple nodes matches selector', async () => {
+    it('should emit all matching nodes and complete when multiple nodes matches selector', async () => {
       const iExist2 = $('<li/>').addClass(['iExist', 'and', 'iAmFirst'])[0];
       $('#parent').prepend(iExist2);
       rx.subscribeTo(elementExist$('.iExist'));
       await tick();
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist2);
+      expect(rx.next).to.have.been.calledTwice;
+      expect(rx.next.getCall(0)).to.have.been.calledWithExactly(iExist2);
+      expect(rx.next.getCall(1)).to.have.been.calledWithExactly(iExist);
       expect(rx.complete).to.be.have.been.called;
+    });
+  });
+
+  describe('element exist or added observable', () => {
+    let iExist: HTMLElement;
+    let addMe: HTMLElement;
+
+    beforeEach(() => {
+      iExist = $('.iExist')[0];
+      addMe = $('<span/>').addClass('iExist afterIAmAdded')[0];
+    });
+
+    it('should emit node when a node matching the selector exists or is added', async () => {
+      rx.subscribeTo(elementExistOrAdded$('.iExist'));
+      await tick();
+      expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist);
+      $('#appendToMe').append(addMe);
+      await tick();
+      expect(rx.next).to.have.been.calledTwice.calledWith(addMe);
+      expect(rx.complete).to.not.have.been.called;
     });
   });
 });

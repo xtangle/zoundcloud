@@ -6,9 +6,9 @@ import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export const MetadataAdapter = {
   addMetadata$(downloadMethod: ITrackDownloadMethod, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
-    const metadata = TrackMetadataFactory.create(downloadMethod.trackInfo);
     switch (downloadMethod.fileExtension) {
       case 'mp3':
+        const metadata = TrackMetadataFactory.create(downloadMethod.trackInfo);
         return ID3MetadataService.addID3V2Metadata$(metadata, downloadOptions);
       default:
         return of(downloadOptions);

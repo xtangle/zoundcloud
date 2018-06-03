@@ -5,7 +5,7 @@ import {XhrRequestService} from '@src/util/xhr-request-service';
 import {combineLatest, Observable, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
-interface IScI1ApiTrackDownloadInfo {
+export interface IScI1ApiTrackDownloadInfo {
   http_mp3_128_url?: string;
 }
 

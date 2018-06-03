@@ -1,3 +1,4 @@
+/*
 import {SC_URL_PATTERN} from '@src/constants';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
 import {useFakeTimer, useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
@@ -14,10 +15,10 @@ describe('sc page visited observable factory', () => {
   const rx = useRxTesting();
   const fixture = ScPageVisitedObservableFactory;
 
-  /**
+  /!**
    * Do not emit event (by doing a noop) if url does not match an SoundCloud url.
    * This has to be patched in manually because sinon-chrome's addListeners do not implement event filters.
-   */
+   *!/
   const doesNotMatchScUrl: SinonMatcher =
     match((details: WebNavigationUrlCallbackDetails) => !details.url.match(SC_URL_PATTERN));
   let stubOnCompleted: SinonStub;
@@ -95,3 +96,4 @@ describe('sc page visited observable factory', () => {
     });
   });
 });
+*/

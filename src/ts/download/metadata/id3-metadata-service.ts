@@ -3,7 +3,7 @@ import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {logger} from '@src/util/logger';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {Observable, of} from 'rxjs';
-import {catchError, first, map, switchMap, timeout} from 'rxjs/operators';
+import {catchError, map, switchMap, timeout} from 'rxjs/operators';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 /**
@@ -14,7 +14,6 @@ export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
     logger.debug('Adding ID3 V2 Metadata', metadata, downloadOptions);
     return XhrRequestService.getArrayBuffer$(downloadOptions.url).pipe(
-      first(),
       switchMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
       map((url: string) => ({...downloadOptions, url})),
@@ -57,7 +56,6 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
     return of(writer);
   }
   return XhrRequestService.getArrayBuffer$(metadata.cover_url).pipe(
-    first(),
     map((arrayBuffer: ArrayBuffer) =>
       ID3WriterService.setFrame(writer, 'APIC', {
         data: arrayBuffer,

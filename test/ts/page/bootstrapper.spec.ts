@@ -1,3 +1,4 @@
+/*
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {Bootstrapper} from '@src/page/bootstrapper';
@@ -106,3 +107,4 @@ class DummyContentPage implements IContentPage {
     return this.shouldLoad;
   }
 }
+*/

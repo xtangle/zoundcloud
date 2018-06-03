@@ -31,9 +31,9 @@ describe('metadata adapter', () => {
 
     it('should add id3 metadata when downloading a mp3 file', () => {
       const metadata = {} as ITrackMetadata;
-      const downloadMethod = {fileExtension: 'mp3'} as ITrackDownloadMethod;
+      const downloadMethod = {fileExtension: 'mp3', trackInfo: {}} as ITrackDownloadMethod;
       const expectedDlOptions = {foo: 'bar'};
-      stubCreateMetadata.withArgs(downloadMethod).returns(metadata);
+      stubCreateMetadata.withArgs(downloadMethod.trackInfo).returns(metadata);
       stubAddIDV2Metadata.withArgs(metadata, inputDlOptions).returns(of(expectedDlOptions));
 
       rx.subscribeTo(fixture.addMetadata$(downloadMethod, inputDlOptions));

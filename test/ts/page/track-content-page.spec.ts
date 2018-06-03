@@ -1,3 +1,4 @@
+/*
 import {ZC_DL_BUTTON_MEDIUM_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
@@ -353,3 +354,4 @@ describe('track content page', () => {
     expect(getDlButton().length).to.be.equal(0, 'download button is in DOM when it should not be');
   }
 });
+*/
