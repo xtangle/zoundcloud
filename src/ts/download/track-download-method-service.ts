@@ -76,7 +76,7 @@ function getScI1ApiMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMeth
           url: downloadInfo.http_mp3_128_url
         };
       } else {
-        throw new Error('No download URL found in i1 api endpoint response');
+        throw new Error(`No download URL found in i1 api endpoint response: ${dlInfoEndpoint}`);
       }
     })
   );

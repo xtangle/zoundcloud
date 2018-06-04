@@ -1,4 +1,4 @@
-import {CLIENT_ID} from '@src/constants';
+import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
@@ -8,7 +8,7 @@ import {match, SinonMatcher, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
-describe.only('track download method service', () => {
+describe('track download method service', () => {
   const rx = useRxTesting();
   const fixture = TrackDownloadMethodService;
 
@@ -39,7 +39,7 @@ describe.only('track download method service', () => {
       } as ITrackInfo;
     });
 
-    it('should use the download url method if track is downloadable and download url is working', () => {
+    it('should use the download url method if track is downloadable and has a working download url', () => {
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.have.been.calledOnce.calledWithMatch(usedDownloadUrlMethod());
       expect(rx.complete).to.have.been.called;
@@ -51,18 +51,18 @@ describe.only('track download method service', () => {
       expect(rx.next).to.not.have.been.calledWithMatch(usedDownloadUrlMethod());
     });
 
-    it('should not use the download url method if track is downloadable but download url is not working', () => {
+    it('should not use the download url method if track is downloadable but download url is non-working', () => {
       stubCheckStatus$.withArgs(expectedDownloadUrl()).returns(of(401));
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.not.have.been.calledWithMatch(usedDownloadUrlMethod());
     });
 
-    it('should set the file extension to the original format', () => {
+    it('should set the file extension to the original format in the response', () => {
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', trackInfo.original_format));
     });
 
-    it('should set the trackInfo', () => {
+    it('should set the trackInfo in the response', () => {
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('trackInfo', trackInfo));
     });
@@ -86,7 +86,8 @@ describe.only('track download method service', () => {
       } as ITrackInfo;
     });
 
-    it('should use the stream url method if track has a stream url and it is working', () => {
+    it('should use the stream url method if ' +
+      'download url method cannot be used and track has a working stream url', () => {
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.have.been.calledOnce.calledWithMatch(usedStreamUrlMethod());
       expect(rx.complete).to.have.been.called;
@@ -104,18 +105,18 @@ describe.only('track download method service', () => {
       expect(rx.next).to.not.have.been.calledWithMatch(usedStreamUrlMethod());
     });
 
-    it('should not use the stream url method if track has a stream url but it is not working', () => {
+    it('should not use the stream url method if track has a non-working stream url', () => {
       stubCheckStatus$.withArgs(expectedStreamUrl()).returns(of(401));
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.not.have.been.calledWithMatch(usedStreamUrlMethod());
     });
 
-    it('should set the file extension to mp3', () => {
+    it('should set the file extension to mp3 in the response', () => {
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
     });
 
-    it('should set the trackInfo', () => {
+    it('should set the trackInfo in the response', () => {
       rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
       expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('trackInfo', trackInfo));
     });
@@ -129,118 +130,67 @@ describe.only('track download method service', () => {
     }
   });
 
-  /*context('determining the download method', () => {
-    describe('using the download url method if possible', () => {
-      const trackInfo = createTrackInfo();
+  describe('using the sc i1 api method', () => {
+    let trackInfo: ITrackInfo;
+    const expectedDlUrl = 'expected-sc-i1-api-dl-url';
 
-      beforeEach(() => {
-        rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
-      });
+    beforeEach(() => {
+      trackInfo = {
+        downloadable: false,
+        id: 123
+      } as ITrackInfo;
 
-      it('should set the url to the download url', () => {
-        const expectedUrl = `${trackInfo.download_url}?client_id=${CLIENT_ID}`;
-        expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('url', expectedUrl));
-      });
-
-      it('should set the file extension to the original format', () => {
-        expect(rx.next).to.have.been.calledOnce
-          .calledWithMatch(match.has('fileExtension', trackInfo.original_format));
-      });
-
-      it('should complete the observable', () => {
-        expect(rx.complete).to.have.been.called;
-      });
+      stubGetJSON$.withArgs(expectedScI1ApiEndpoint()).returns(of({http_mp3_128_url: expectedDlUrl}));
     });
 
-    describe('using the stream url method if the download url method cannot be used', () => {
-      const trackInfo = createTrackInfo(false);
-
-      beforeEach(() => {
-        rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
-      });
-
-      it('should set the url to the stream url', () => {
-        const expectedUrl = `${trackInfo.stream_url}?client_id=${CLIENT_ID}`;
-        expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('url', expectedUrl));
-      });
-
-      it('should set the file extension to mp3', () => {
-        expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
-      });
-
-      it('should complete the observable', () => {
-        expect(rx.complete).to.have.been.called;
-      });
+    it('should use the sc i1 api method if download url method and stream url method cannot be used', () => {
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.have.been.calledOnce.calledWithMatch(usedScI1ApiMethod());
+      expect(rx.complete).to.have.been.called;
     });
 
-    describe('using the i1 api stream url if both download url and stream url methods cannot be used', () => {
-      const trackInfo = createTrackInfo(false, false);
-      let jsonResponse$: Subject<IScI1ApiTrackDownloadInfo>;
-      let stubGetJSON: SinonStub;
-
-      beforeEach(() => {
-        jsonResponse$ = new Subject<IScI1ApiTrackDownloadInfo>();
-        stubGetJSON = stub(XhrRequestService, 'getJSON$');
-        stubGetJSON.returns(jsonResponse$);
-
-        rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
-      });
-
-      afterEach(() => {
-        stubGetJSON.restore();
-      });
-
-      it('should fetch a response from the i1 api url', () => {
-        const expectedEndpoint = `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
-        expect(stubGetJSON).to.have.been.calledOnce.calledWithExactly(expectedEndpoint);
-      });
-
-      context('when a response with the http_mp3_128_url property is returned', () => {
-        const responseUrl = 'some-url-returned-by-i1-api';
-
-        beforeEach(() => {
-          jsonResponse$.next({http_mp3_128_url: responseUrl});
-          jsonResponse$.complete();
-        });
-
-        it('should set the url to the value of the http_mp3_128_url property', () => {
-          expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('url', responseUrl));
-        });
-
-        it('should set the file extension to mp3', () => {
-          expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
-        });
-
-        it('should complete the observable', () => {
-          expect(rx.complete).to.have.been.called;
-        });
-      });
-
-      it('should emit an error when a response without the http_mp3_128_url property is returned', () => {
-        jsonResponse$.next({});
-        jsonResponse$.complete();
-        expect(rx.next).to.not.have.been.called;
-        expect(rx.error).to.have.been.calledOnce;
-      });
-
-      it('should not emit anything when no response is returned', () => {
-        expect(rx.next).to.not.have.been.called;
-        expect(rx.error).to.not.have.been.called;
-        expect(rx.complete).to.not.have.been.called;
-      });
+    it('should not use the sc i1 api method if download url method can be used', () => {
+      trackInfo.downloadable = true;
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.not.have.been.calledWithMatch(usedScI1ApiMethod());
     });
-  });*/
 
-  /*function createTrackInfo(downloadable: boolean = true,
-                           hasStreamUrl: boolean = true): ITrackInfo {
-    return {
-      download_url: 'https://api.soundcloud.com/tracks/208094428/download',
-      downloadable,
-      id: 123,
-      original_format: 'wav',
-      stream_url: hasStreamUrl ? 'https://api.soundcloud.com/tracks/208094428/stream' : undefined,
-      title: 'song-title',
-      user: {username: 'foo'}
-    };
-  }*/
+    it('should not use the sc i1 api method if stream url method can be used', () => {
+      trackInfo.stream_url = 'some-stream-url';
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.not.have.been.calledWithMatch(usedScI1ApiMethod());
+    });
+
+    it('should set the file extension to mp3 in the response', () => {
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('fileExtension', 'mp3'));
+    });
+
+    it('should set the trackInfo in the response', () => {
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.have.been.calledOnce.calledWithMatch(match.has('trackInfo', trackInfo));
+    });
+
+    it('should return an error if it cannot fetch download info from sc i1 api endpoint', () => {
+      stubGetJSON$.withArgs(expectedScI1ApiEndpoint()).returns(throwError('some error'));
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.not.have.been.called;
+      expect(rx.error).to.have.been.calledWithExactly('some error');
+    });
+
+    it('should return an error if there is no download url property in the i1 api response', () => {
+      stubGetJSON$.withArgs(expectedScI1ApiEndpoint()).returns(of({http_mp3_128_url: undefined}));
+      rx.subscribeTo(fixture.toDownloadMethod$(trackInfo));
+      expect(rx.next).to.not.have.been.called;
+      expect(rx.error).to.have.been.called;
+    });
+
+    function expectedScI1ApiEndpoint(): string {
+      return `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
+    }
+
+    function usedScI1ApiMethod(): SinonMatcher {
+      return match.hasOwn('url', expectedDlUrl);
+    }
+  });
 });
