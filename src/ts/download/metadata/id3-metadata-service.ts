@@ -14,10 +14,10 @@ export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
     logger.debug('Adding ID3 V2 Metadata', metadata, downloadOptions);
     return XhrRequestService.getArrayBuffer$(downloadOptions.url).pipe(
+      timeout(300000),
       switchMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
       map((url: string) => ({...downloadOptions, url})),
-      timeout(300000),
       catchError((err: any) => {
         logger.error('Unable to fetch metadata', err);
         return of(downloadOptions);

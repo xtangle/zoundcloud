@@ -13,7 +13,7 @@ export const PlaylistDownloadService = {
       mergeMap((trackInfo) =>
         TrackDownloadService.download$(trackInfo, downloadLocation).pipe(
           catchError((err) => {
-            logger.error(`Cannot download track ${trackInfo.title} in playlist`, err);
+            logger.error(`Cannot download track ${trackInfo.title} in playlist ${playlistInfo.title}`, err);
             return EMPTY;
           })
         )

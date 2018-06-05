@@ -38,6 +38,7 @@ describe('playlist download service', () => {
 
     it('should download each track in playlist', () => {
       fixture.download$(playlistInfo);
+
       expect(stubDownloadTrack$).to.have.been.calledTwice;
       expect(stubDownloadTrack$.getCall(0).args[0]).to.be.equal(trackOneInfo);
       expect(stubDownloadTrack$.getCall(1).args[0]).to.be.equal(trackTwoInfo);
@@ -46,12 +47,14 @@ describe('playlist download service', () => {
     it('should download to the correct download location', () => {
       const expectedDlLocation = 'some_username_with_special_characters - some_playlist_with_special_characters';
       fixture.download$(playlistInfo);
+
       expect(stubDownloadTrack$).to.have.been.calledTwice;
       stubDownloadTrack$.getCalls().forEach((spyCall) => expect(spyCall.args[1]).to.be.equal(expectedDlLocation));
     });
 
     it('should return stream of download ids and complete once all tracks have been downloaded', () => {
       rx.subscribeTo(fixture.download$(playlistInfo));
+
       expect(rx.next).to.have.been.calledTwice;
       expect(rx.next.getCall(0)).to.have.been.calledWithExactly(1);
       expect(rx.next.getCall(1)).to.have.been.calledWithExactly(2);
@@ -61,6 +64,7 @@ describe('playlist download service', () => {
     it('should log error and continue downloading other tracks if there is an error downloading a track', () => {
       stubDownloadTrack$.withArgs(trackOneInfo, match.any).returns(throwError('error downloading track one'));
       rx.subscribeTo(fixture.download$(playlistInfo));
+
       expect(rx.error).to.not.have.been.called;
       expect(rx.next).to.have.been.calledOnce.calledWithExactly(2);
       expect(rx.complete).to.have.been.called;
