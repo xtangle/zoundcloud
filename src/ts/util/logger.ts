@@ -6,7 +6,7 @@ class Logger {
     ifDevEnv(() => console.debug(this.affixMessage(message), ...optionalParams));
   }
 
-  public error(message: any, error?: ErrorEvent): void {
+  public error(message: any, error?: any): void {
     if (error) {
       console.error(this.affixMessage(message), error);
     } else {

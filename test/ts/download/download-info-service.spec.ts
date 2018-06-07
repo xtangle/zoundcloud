@@ -11,8 +11,8 @@ const expect = useSinonChai();
 describe('download info service', () => {
   const cw = useFakeTimer();
   const rx = useRxTesting();
-  const fixture = DownloadInfoService;
 
+  const fixture = DownloadInfoService;
   const url = 'some-url';
   const resolveEndpoint = `${SC_API_URL}/resolve.json?url=${url}&client_id=${CLIENT_ID}`;
   let stubGetJSON$: SinonStub;

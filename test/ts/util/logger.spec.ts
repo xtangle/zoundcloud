@@ -34,12 +34,12 @@ describe('logger', () => {
 
   it('should print just error message to console', () => {
     logger.error('Some error message');
-    expect(stubError).to.have.been.calledOnce.calledWithExactly(`ZC: Some error message`);
+    expect(stubError).to.have.been.calledOnce.calledWithExactly('ZC: Some error message');
   });
 
   it('should print error message along with error to console', () => {
-    const ev = new ErrorEvent('Some error');
-    logger.error('Some error message', ev);
-    expect(stubError).to.have.been.calledOnce.calledWithExactly(`ZC: Some error message`, ev);
+    const err = 'Some error';
+    logger.error('Some error message', err);
+    expect(stubError).to.have.been.calledOnce.calledWithExactly('ZC: Some error message', err);
   });
 });
