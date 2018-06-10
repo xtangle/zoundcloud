@@ -1,14 +1,14 @@
 import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IDownloadInfo, ITrackInfo} from '@src/download/download-info';
+import {IResourceInfo, ITrackInfo} from '@src/download/resource-info';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {Observable} from 'rxjs';
 
 /**
- * Fetches the download information when given a tab url
+ * Fetches the resource information when given a url
  */
-export const DownloadInfoService = {
-  getDownloadInfo$(url: string): Observable<IDownloadInfo> {
-    return getResource$<IDownloadInfo>(url);
+export const ResourceInfoService = {
+  getResourceInfo$(url: string): Observable<IResourceInfo> {
+    return getResource$<IResourceInfo>(url);
   },
   getTrackInfoList$(url: string): Observable<ITrackInfo[]> {
     return getResource$<ITrackInfo[]>(url);

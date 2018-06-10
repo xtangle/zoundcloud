@@ -1,11 +1,7 @@
-import {ITrackInfo} from '@src/download/download-info';
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
+import {ITrackInfo} from '@src/download/resource-info';
 
-export interface ITrackMetadataFactory {
-  create(trackInfo: ITrackInfo): ITrackMetadata;
-}
-
-export const TrackMetadataFactory: ITrackMetadataFactory = {
+export const TrackMetadataFactory = {
   create(trackInfo: ITrackInfo): ITrackMetadata {
     const titleParts = trackInfo.title.split(' - ');
     return {

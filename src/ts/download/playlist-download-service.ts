@@ -1,25 +1,19 @@
-import {IPlaylistInfo} from '@src/download/download-info';
+import {IPlaylistDownloadResult} from '@src/download/download-result';
+import {IPlaylistInfo, ITrackInfo, ResourceType} from '@src/download/resource-info';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {FilenameService} from '@src/util/filename-service';
-import {logger} from '@src/util/logger';
-import {EMPTY, from, Observable, ReplaySubject} from 'rxjs';
-import {catchError, mergeMap} from 'rxjs/operators';
 
 export const PlaylistDownloadService = {
-  download$(playlistInfo: IPlaylistInfo): Observable<number> {
-    const downloadId$ = new ReplaySubject<number>();
+  download(playlistInfo: IPlaylistInfo): IPlaylistDownloadResult {
     const downloadLocation = getDownloadLocation(playlistInfo);
-    from(playlistInfo.tracks).pipe(
-      mergeMap((trackInfo) =>
-        TrackDownloadService.download$(trackInfo, downloadLocation).pipe(
-          catchError((err) => {
-            logger.error(`Cannot download track ${trackInfo.title} in playlist ${playlistInfo.title}`, err);
-            return EMPTY;
-          })
-        )
-      )
-    ).subscribe(downloadId$);
-    return downloadId$.asObservable();
+    const tracks = playlistInfo.tracks.map(
+      (trackInfo: ITrackInfo) => TrackDownloadService.download(trackInfo, downloadLocation)
+    );
+    return {
+      kind: ResourceType.Playlist,
+      playlistInfo,
+      tracks
+    };
   }
 };
 

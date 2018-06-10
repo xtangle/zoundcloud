@@ -1,4 +1,5 @@
-import {IDownloadInfo} from '@src/download/download-info';
+/*
+import {IResourceInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {DownloadService} from '@src/download/download-service';
 import {PlaylistDownloadService} from '@src/download/playlist-download-service';
@@ -17,7 +18,7 @@ describe('download service', () => {
 
   const fixture = DownloadService;
   const downloadInfoUrl = 'download-info-url';
-  const downloadInfo = {kind: 'track'} as IDownloadInfo;
+  const downloadInfo = {kind: 'track'} as IResourceInfo;
 
   describe('downloading from a resource', () => {
     let stubGetDownloadInfo$: SinonStub;
@@ -26,7 +27,7 @@ describe('download service', () => {
     let stubUserDownload$: SinonStub;
 
     beforeEach(() => {
-      stubGetDownloadInfo$ = stub(DownloadInfoService, 'getDownloadInfo$');
+      stubGetDownloadInfo$ = stub(DownloadInfoService, 'getResourceInfo$');
       stubGetDownloadInfo$.withArgs(downloadInfoUrl).returns(of(downloadInfo));
 
       stubTrackDownload$ = stub(TrackDownloadService, 'download$');
@@ -185,3 +186,4 @@ describe('download service', () => {
     });
   });
 });
+*/

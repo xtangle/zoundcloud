@@ -1,13 +1,19 @@
-export interface IDownloadInfo {
-  kind: string;
+export enum ResourceType {
+  Track = 'track',
+  Playlist = 'playlist',
+  User = 'user'
+}
+
+export interface IResourceInfo {
+  kind: ResourceType;
   permalink_url: string;
 }
 
-export interface IUserInfo extends IDownloadInfo {
+export interface IUserInfo extends IResourceInfo {
   username: string;
 }
 
-export interface ITrackInfo extends IDownloadInfo {
+export interface ITrackInfo extends IResourceInfo {
   artwork_url?: string;
   bpm?: number;
   description?: string;
@@ -25,7 +31,7 @@ export interface ITrackInfo extends IDownloadInfo {
   user: IUserInfo;
 }
 
-export interface IPlaylistInfo extends IDownloadInfo {
+export interface IPlaylistInfo extends IResourceInfo {
   title: string;
   tracks: ITrackInfo[];
   user: IUserInfo;

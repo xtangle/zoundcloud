@@ -1,17 +1,16 @@
 import {ID3MetadataService} from '@src/download/metadata/id3-metadata-service';
 import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
-import {ITrackDownloadMethod} from '@src/download/track-download-method';
+import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {Observable, of} from 'rxjs';
-import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export const MetadataAdapter = {
-  addMetadata$(downloadMethod: ITrackDownloadMethod, downloadOptions: DownloadOptions): Observable<DownloadOptions> {
-    switch (downloadMethod.fileExtension) {
+  addMetadata$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
+    switch (downloadInfo.downloadOptions.filename.split('.').pop()) {
       case 'mp3':
-        const metadata = TrackMetadataFactory.create(downloadMethod.trackInfo);
-        return ID3MetadataService.addID3V2Metadata$(metadata, downloadOptions);
+        const metadata = TrackMetadataFactory.create(downloadInfo.trackInfo);
+        return ID3MetadataService.addID3V2Metadata$(metadata, downloadInfo);
       default:
-        return of(downloadOptions);
+        return of(downloadInfo);
     }
   }
 };

@@ -1,3 +1,4 @@
+/*
 import {ITrackInfo, IUserInfo} from '@src/download/download-info';
 import {DownloadInfoService} from '@src/download/download-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
@@ -104,3 +105,4 @@ describe('user download service', () => {
     });
   });
 });
+*/

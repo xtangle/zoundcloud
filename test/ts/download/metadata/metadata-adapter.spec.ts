@@ -2,11 +2,10 @@ import {ID3MetadataService} from '@src/download/metadata/id3-metadata-service';
 import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
-import {ITrackDownloadMethod} from '@src/download/track-download-method';
+import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {of} from 'rxjs';
 import {SinonStub, stub} from 'sinon';
-import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const expect = useSinonChai();
 
@@ -15,11 +14,13 @@ describe('metadata adapter', () => {
   const fixture = MetadataAdapter;
 
   describe('adding metadata', () => {
-    const inputDlOptions = {} as DownloadOptions;
+    let inputDlInfo: ITrackDownloadInfo;
     let stubCreateMetadata: SinonStub;
     let stubAddIDV2Metadata: SinonStub;
 
     beforeEach(() => {
+      inputDlInfo = {downloadOptions: {}, trackInfo: {}} as ITrackDownloadInfo;
+
       stubCreateMetadata = stub(TrackMetadataFactory, 'create');
       stubAddIDV2Metadata = stub(ID3MetadataService, 'addID3V2Metadata$');
     });
@@ -30,22 +31,23 @@ describe('metadata adapter', () => {
     });
 
     it('should add id3 metadata when downloading a mp3 file', () => {
-      const metadata = {} as ITrackMetadata;
-      const downloadMethod = {fileExtension: 'mp3', trackInfo: {}} as ITrackDownloadMethod;
-      const expectedDlOptions = {foo: 'bar'};
-      stubCreateMetadata.withArgs(downloadMethod.trackInfo).returns(metadata);
-      stubAddIDV2Metadata.withArgs(metadata, inputDlOptions).returns(of(expectedDlOptions));
+      inputDlInfo.downloadOptions.filename = 'file.name.mp3';
+      const metadata = {title: 'foo'} as ITrackMetadata;
+      const expectedDlInfo = {trackInfo: {title: 'bar'}} as ITrackDownloadInfo;
 
-      rx.subscribeTo(fixture.addMetadata$(downloadMethod, inputDlOptions));
-      expect(rx.next).to.be.calledOnce.calledWithExactly(expectedDlOptions);
+      stubCreateMetadata.withArgs(inputDlInfo.trackInfo).returns(metadata);
+      stubAddIDV2Metadata.withArgs(metadata, inputDlInfo).returns(of(expectedDlInfo));
+
+      rx.subscribeTo(fixture.addMetadata$(inputDlInfo));
+      expect(rx.next).to.be.calledOnce.calledWithExactly(expectedDlInfo);
       expect(rx.complete).to.be.called;
     });
 
     it('should not add metadata when not downloading a mp3 file', () => {
-      const downloadMethod = {fileExtension: 'wav'} as ITrackDownloadMethod;
+      inputDlInfo.downloadOptions.filename = 'file.name.wav';
 
-      rx.subscribeTo(fixture.addMetadata$(downloadMethod, inputDlOptions));
-      expect(rx.next).to.be.calledOnce.calledWithExactly(inputDlOptions);
+      rx.subscribeTo(fixture.addMetadata$(inputDlInfo));
+      expect(rx.next).to.be.calledOnce.calledWithExactly(inputDlInfo);
       expect(rx.complete).to.be.called;
     });
   });

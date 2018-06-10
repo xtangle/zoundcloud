@@ -1,6 +1,7 @@
+/*
 import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/download-info';
-import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
+import {TrackDownloadInfoService} from '@src/download/track-download-method-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {of, throwError} from 'rxjs';
@@ -10,7 +11,7 @@ const expect = useSinonChai();
 
 describe('track download method service', () => {
   const rx = useRxTesting();
-  const fixture = TrackDownloadMethodService;
+  const fixture = TrackDownloadInfoService;
 
   let stubCheckStatus$: SinonStub;
   let stubGetJSON$: SinonStub;
@@ -194,3 +195,4 @@ describe('track download method service', () => {
     }
   });
 });
+*/
