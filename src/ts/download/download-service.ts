@@ -4,9 +4,9 @@ import {IPlaylistInfo, IResourceInfo, ITrackInfo, IUserInfo, ResourceType} from 
 import {ResourceInfoService} from '@src/download/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {UserDownloadService} from '@src/download/user-download-service';
-import {logger} from '@src/util/logger';
 import {AsyncSubject, Observable, Subject} from 'rxjs';
 import {timeout} from 'rxjs/operators';
+import * as VError from 'verror';
 
 export const DownloadService = {
   download$(resourceInfoUrl: string): Observable<IDownloadResult> {
@@ -43,13 +43,12 @@ function doDownload(downloadResult$: AsyncSubject<IDownloadResult>,
     }
     default: {
       const err = `Cannot download, unsupported resource type ${resourceInfo.kind} gotten from ${resourceInfoUrl}`;
-      logger.error(err);
       downloadResult$.error(err);
     }
   }
 }
 
-function onError(downloadResult$: Subject<IDownloadResult>, resourceInfoUrl: string, err: any) {
-  logger.error(`Cannot download, unable to get resource info from ${resourceInfoUrl}`, err);
+function onError(downloadResult$: Subject<IDownloadResult>, resourceInfoUrl: string, e: Error) {
+  const err = new VError(e, `Cannot download, unable to get resource info from ${resourceInfoUrl}`);
   downloadResult$.error(err);
 }

@@ -1,7 +1,6 @@
-/*
 import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IResourceInfo, IPlaylistInfo, ITrackInfo} from '@src/download/download-info';
-import {DownloadInfoService} from '@src/download/download-info-service';
+import {IPlaylistInfo, IResourceInfo, ITrackInfo, ResourceType} from '@src/download/resource-info';
+import {ResourceInfoService} from '@src/download/resource-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
 import {Subject} from 'rxjs';
@@ -9,11 +8,11 @@ import {SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
-describe('download info service', () => {
+describe('resource info service', () => {
   const cw = useFakeTimer();
   const rx = useRxTesting();
 
-  const fixture = DownloadInfoService;
+  const fixture = ResourceInfoService;
   const url = 'some-url';
   const resolveEndpoint = `${SC_API_URL}/resolve.json?url=${url}&client_id=${CLIENT_ID}`;
   let stubGetJSON$: SinonStub;
@@ -27,12 +26,15 @@ describe('download info service', () => {
     stubGetJSON$.restore();
   });
 
-  describe('fetching download info', () => {
+  describe('fetching resource info', () => {
     let jsonResponse$: Subject<IResourceInfo>;
 
     beforeEach(() => {
       jsonResponse$ = new Subject<IResourceInfo>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
+    });
+
+    beforeEach('fetch resource info', () => {
       rx.subscribeTo(fixture.getResourceInfo$(url));
     });
 
@@ -41,12 +43,12 @@ describe('download info service', () => {
       verifyFetching();
     });
 
-    it('should fetch download info and complete when url has been resolved', () => {
-      const fakeDownloadInfo: IResourceInfo = {kind: 'foo', permalink_url: 'bar'};
-      jsonResponse$.next(fakeDownloadInfo);
+    it('should fetch resource info and complete when url has been resolved', () => {
+      const fakeResourceInfo = {kind: ResourceType.Track} as IResourceInfo;
+      jsonResponse$.next(fakeResourceInfo);
       jsonResponse$.complete();
       cw.clock.next();
-      verifyFetched(fakeDownloadInfo);
+      verifyFetched(fakeResourceInfo);
     });
 
     it('should fail with error if url cannot be resolved', () => {
@@ -63,6 +65,10 @@ describe('download info service', () => {
     beforeEach(() => {
       jsonResponse$ = new Subject<ITrackInfo[]>();
       stubGetJSON$.withArgs(resolveEndpoint).returns(jsonResponse$);
+
+    });
+
+    beforeEach('fetch track info list', () => {
       rx.subscribeTo(fixture.getTrackInfoList$(url));
     });
 
@@ -104,4 +110,3 @@ describe('download info service', () => {
     expect(rx.error).to.have.been.calledWithExactly(errorObj);
   }
 });
-*/

@@ -13,7 +13,7 @@ export interface ITrackDownloadMetadata {
 
 export interface ITrackDownloadResult extends IDownloadResult {
   trackInfo: ITrackInfo;
-  metadata: Observable<ITrackDownloadMetadata>;
+  metadata$: Observable<ITrackDownloadMetadata>;
 }
 
 export interface IPlaylistDownloadResult extends IDownloadResult {

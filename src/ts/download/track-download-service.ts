@@ -3,9 +3,9 @@ import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackInfo, ResourceType} from '@src/download/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoService} from '@src/download/track-download-info-service';
-import {logger} from '@src/util/logger';
 import {AsyncSubject} from 'rxjs';
 import {switchMap, timeout} from 'rxjs/operators';
+import * as VError from 'verror';
 
 export const TrackDownloadService = {
   download(trackInfo: ITrackInfo, downloadLocation: string = ''): ITrackDownloadResult {
@@ -19,7 +19,7 @@ export const TrackDownloadService = {
     );
     return {
       kind: ResourceType.Track,
-      metadata: downloadMetadata$.asObservable(),
+      metadata$: downloadMetadata$.asObservable(),
       trackInfo
     };
   }
@@ -34,13 +34,13 @@ function downloadTrack(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, 
       });
       downloadMetadata$.complete();
     } else {
-      downloadMetadata$.error(chrome.runtime.lastError.message);
+      downloadMetadata$.error(new Error(chrome.runtime.lastError.message));
     }
     URL.revokeObjectURL(downloadInfo.downloadOptions.url);
   });
 }
 
-function onError(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, trackInfo: ITrackInfo, err: any) {
-  logger.error(`Cannot download track: ${trackInfo}`, err);
+function onError(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, trackInfo: ITrackInfo, e: Error) {
+  const err = new VError(e, `Cannot download track: ${trackInfo.title}`);
   downloadMetadata$.error(err);
 }

@@ -13,7 +13,6 @@ import {catchError, map, switchMap, timeout} from 'rxjs/operators';
  */
 export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
-    logger.debug('Adding ID3 V2 Metadata', metadata, downloadInfo);
     return XhrRequestService.getArrayBuffer$(downloadInfo.downloadOptions.url).pipe(
       timeout(300000),
       switchMap(writeMetadata$.bind(null, metadata)),
@@ -25,8 +24,8 @@ export const ID3MetadataService = {
           url
         }
       })),
-      catchError((err: any) => {
-        logger.error('Unable to fetch metadata', err);
+      catchError((err: Error) => {
+        logger.error(`Unable to fetch metadata for track ${downloadInfo.trackInfo.title}`, err);
         return of(downloadInfo);
       })
     );
@@ -72,8 +71,8 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
       })
     ),
     timeout(60000),
-    catchError((err) => {
-      logger.error('Unable to fetch cover art', err);
+    catchError((err: Error) => {
+      logger.error(`Unable to fetch cover art for track ${metadata.title}`, err);
       return of(writer);
     })
   );

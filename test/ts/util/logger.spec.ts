@@ -38,7 +38,7 @@ describe('logger', () => {
   });
 
   it('should print error message along with error to console', () => {
-    const err = 'Some error';
+    const err = new Error('Some error');
     logger.error('Some error message', err);
     expect(stubError).to.have.been.calledOnce.calledWithExactly('ZC: Some error message', err);
   });

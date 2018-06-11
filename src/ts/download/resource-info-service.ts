@@ -4,7 +4,7 @@ import {XhrRequestService} from '@src/util/xhr-request-service';
 import {Observable} from 'rxjs';
 
 /**
- * Fetches the resource information when given a url
+ * Fetches the resource metadata information from SoundCloud when given the url
  */
 export const ResourceInfoService = {
   getResourceInfo$(url: string): Observable<IResourceInfo> {

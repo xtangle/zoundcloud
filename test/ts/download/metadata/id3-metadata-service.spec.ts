@@ -16,7 +16,10 @@ describe('id3 metadata service', () => {
 
   const fixture = ID3MetadataService;
   const metadata = createMetadata();
-  const downloadInfo = {downloadOptions: {url: 'download-options-url'}} as ITrackDownloadInfo;
+  const downloadInfo = {
+    downloadOptions: {url: 'download-options-url'},
+    trackInfo: {title: 'track-title'}
+  } as ITrackDownloadInfo;
   const writer = {foo: 'bar'} as IID3Writer;
   const metadataAddedURL = 'url-with-metadata-added';
 

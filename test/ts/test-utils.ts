@@ -1,4 +1,4 @@
-import {SinonMatcher, SinonStub} from 'sinon';
+import {match, SinonMatcher, SinonStub} from 'sinon';
 
 /**
  * Noop.
@@ -15,6 +15,26 @@ export const noop: () => void = () => undefined;
 export function doNothingIf(sinonStub: SinonStub, sinonMatcher: SinonMatcher) {
   sinonStub.withArgs(sinonMatcher).callsFake(noop);
   sinonStub.callThrough();
+}
+
+/**
+ * Helper Sinon matcher for matching against an Error thrown. If an Error is passed, it also
+ * asserts that the Error thrown has a cause() property that evaluates to an Error with the
+ * same message as the passed Error.
+ * @param {string} message
+ * @param {Error} cause
+ * @returns {Sinon.SinonMatcher}
+ */
+export function matchesError(message: string, cause?: Error): SinonMatcher {
+  return match((error: Error) => {
+    const matchesMessage = error.message === message;
+    if (cause === undefined) {
+      return matchesMessage;
+    } else {
+      const actualCause = ((error as any).cause as () => Error)();
+      return actualCause.message === cause.message;
+    }
+  }, 'matchesError');
 }
 
 /**
