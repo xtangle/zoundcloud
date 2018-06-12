@@ -2,7 +2,7 @@ import {ITrackDownloadMetadata, ITrackDownloadResult} from '@src/download/downlo
 import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackInfo, ResourceType} from '@src/download/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {TrackDownloadInfoService} from '@src/download/track-download-info-service';
+import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {AsyncSubject} from 'rxjs';
 import {switchMap, timeout} from 'rxjs/operators';
 import * as VError from 'verror';
@@ -10,7 +10,7 @@ import * as VError from 'verror';
 export const TrackDownloadService = {
   download(trackInfo: ITrackInfo, downloadLocation: string = ''): ITrackDownloadResult {
     const downloadMetadata$: AsyncSubject<ITrackDownloadMetadata> = new AsyncSubject();
-    TrackDownloadInfoService.toDownloadInfo$(trackInfo, downloadLocation).pipe(
+    TrackDownloadInfoFactory.create$(trackInfo, downloadLocation).pipe(
       switchMap(MetadataAdapter.addMetadata$),
       timeout(300000)
     ).subscribe(

@@ -1,7 +1,7 @@
 import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackInfo, ResourceType} from '@src/download/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {TrackDownloadInfoService} from '@src/download/track-download-info-service';
+import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {useFakeTimer, useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {matchesError} from '@test/test-utils';
@@ -27,13 +27,13 @@ describe(`track download service`, () => {
       trackInfo
     } as ITrackDownloadInfo;
 
-    let stubToDownloadInfo$: SinonStub;
+    let stubCreateDownloadInfo$: SinonStub;
     let stubAddMetadata$: SinonStub;
     let stubRevokeObjectURL: SinonSpy;
 
     beforeEach(() => {
-      stubToDownloadInfo$ = stub(TrackDownloadInfoService, 'toDownloadInfo$');
-      stubToDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(inputDownloadInfo));
+      stubCreateDownloadInfo$ = stub(TrackDownloadInfoFactory, 'create$');
+      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(inputDownloadInfo));
 
       stubAddMetadata$ = stub(MetadataAdapter, 'addMetadata$');
       stubAddMetadata$.withArgs(inputDownloadInfo).returns(of(downloadInfo));
@@ -43,7 +43,7 @@ describe(`track download service`, () => {
     });
 
     afterEach(() => {
-      stubToDownloadInfo$.restore();
+      stubCreateDownloadInfo$.restore();
       stubAddMetadata$.restore();
       stubRevokeObjectURL.restore();
     });
@@ -64,10 +64,10 @@ describe(`track download service`, () => {
     });
 
     it('should download with a default download location of empty (current directory)', () => {
-      stubToDownloadInfo$.withArgs(trackInfo, '').returns(of(inputDownloadInfo));
+      stubCreateDownloadInfo$.withArgs(trackInfo, '').returns(of(inputDownloadInfo));
       fixture.download(trackInfo);
 
-      expect(stubToDownloadInfo$).to.have.been.calledOnce.calledWithExactly(trackInfo, '');
+      expect(stubCreateDownloadInfo$).to.have.been.calledOnce.calledWithExactly(trackInfo, '');
       expect(sinonChrome.downloads.download).to.have.been.called;
     });
 
@@ -87,7 +87,7 @@ describe(`track download service`, () => {
 
     it('should return an error in download metadata if download info cannot be fetched', () => {
       const error = new Error('cannot fetch download info');
-      stubToDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(throwError(error));
+      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(throwError(error));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
 
       expect(rx.next).to.not.have.been.called;
@@ -105,7 +105,7 @@ describe(`track download service`, () => {
     });
 
     it('should download if fetching download info or metadata takes less than 5 minutes', () => {
-      stubToDownloadInfo$.withArgs(trackInfo, downloadLocation)
+      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation)
         .returns(timer(100000).pipe(mapTo(inputDownloadInfo)));
       stubAddMetadata$.withArgs(inputDownloadInfo)
         .returns(timer(199999).pipe(mapTo(downloadInfo)));
@@ -118,7 +118,7 @@ describe(`track download service`, () => {
     });
 
     it('should not download and emit error if fetching download method takes 5 minutes or more', () => {
-      stubToDownloadInfo$.withArgs(trackInfo, downloadLocation)
+      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation)
         .returns(timer(100000).pipe(mapTo(inputDownloadInfo)));
       stubAddMetadata$.withArgs(inputDownloadInfo)
         .returns(timer(200000).pipe(mapTo(downloadInfo)));
@@ -129,38 +129,5 @@ describe(`track download service`, () => {
       expect(rx.next).to.not.have.been.called;
       expect(rx.error).to.have.been.called;
     });
-
-    /* todo: these tests should belong in the track-download-info-service.spec
-
-    it(`should use the download url in the download method`, () => {
-      fixture.download(trackInfo);
-      expect(sinonChrome.downloads.download).to.have.been.calledOnce
-        .calledWithMatch(match.has('url', downloadMethod.url));
-    });
-
-    it(`should not ask the user where to download`, () => {
-      fixture.download(trackInfo);
-      expect(sinonChrome.downloads.download).to.have.been.calledOnce
-        .calledWithMatch(match.has('saveAs', false));
-    });
-
-    it(`should not overwrite an existing file with the same filename`, () => {
-      fixture.download$(trackInfo);
-      expect(sinonChrome.downloads.download).to.have.been.calledOnce
-        .calledWithMatch(match.has('conflictAction', 'uniquify'));
-    });
-
-    it(`should save with the correct filename when download location is not provided`, () => {
-      fixture.download$(trackInfo);
-      expect(sinonChrome.downloads.download).to.have.been.calledOnce
-        .calledWithMatch(match.has('filename', 'song_title_with_special_characters.mp3'));
-    });
-
-    it(`should save with the correct filename and location when download location is provided`, () => {
-      fixture.download$(trackInfo, 'parent|dir/with:special?characters');
-      const expectedPath = path.join('parent_dir_with_special_characters', 'song_title_with_special_characters.mp3');
-      expect(sinonChrome.downloads.download).to.have.been.calledOnce
-        .calledWithMatch(match.has('filename', expectedPath));
-    });*/
   });
 });

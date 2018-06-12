@@ -1,11 +1,6 @@
 import {ITrackInfo} from '@src/download/resource-info';
+import {TrackDownloadMethod} from '@src/download/track-download-method';
 import DownloadOptions = chrome.downloads.DownloadOptions;
-
-export enum TrackDownloadMethod {
-  DownloadUrlMethod,
-  StreamUrlMethod,
-  I1ApiMethod
-}
 
 export interface ITrackDownloadInfo {
   trackInfo: ITrackInfo;
