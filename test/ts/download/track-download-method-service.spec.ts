@@ -13,19 +13,19 @@ describe('track download method service', () => {
   const rx = useRxTesting();
   const fixture = TrackDownloadMethodService;
 
-  let stubCheckStatus$: SinonStub;
+  let stubPing$: SinonStub;
   let stubGetJSON$: SinonStub;
 
   beforeEach(() => {
-    stubCheckStatus$ = stub(XhrRequestService, 'checkStatus$');
-    stubCheckStatus$.returns(of(200));
+    stubPing$ = stub(XhrRequestService, 'ping$');
+    stubPing$.returns(of(200));
 
     stubGetJSON$ = stub(XhrRequestService, 'getJSON$');
     stubGetJSON$.returns(of({http_mp3_128_url: 'foo'}));
   });
 
   afterEach(() => {
-    stubCheckStatus$.restore();
+    stubPing$.restore();
     stubGetJSON$.restore();
   });
 
@@ -53,7 +53,7 @@ describe('track download method service', () => {
     });
 
     it('should not use the download url method if track is downloadable but download url is non-working', () => {
-      stubCheckStatus$.withArgs(expectedDownloadUrl()).returns(of(401));
+      stubPing$.withArgs(expectedDownloadUrl()).returns(of(401));
       rx.subscribeTo(fixture.getDownloadMethodInfo$(trackInfo));
       expect(rx.next).to.not.have.been.calledWithMatch(usedDownloadUrlMethod());
     });
@@ -108,7 +108,7 @@ describe('track download method service', () => {
     });
 
     it('should not use the stream url method if track has a non-working stream url', () => {
-      stubCheckStatus$.withArgs(expectedStreamUrl()).returns(of(401));
+      stubPing$.withArgs(expectedStreamUrl()).returns(of(401));
       rx.subscribeTo(fixture.getDownloadMethodInfo$(trackInfo));
       expect(rx.next).to.not.have.been.calledWithMatch(usedStreamUrlMethod());
     });

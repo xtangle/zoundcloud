@@ -1,11 +1,8 @@
 /**
- * Chrome download api is really finicky with which characters to allow in filenames (eg. the ~ symbol)
+ * This util exists because Chrome download api is really finicky with which characters
+ * are allowed in filenames (eg. the ~ symbol is not allowed even though Windows allows it).
  */
-export interface IFilenameService {
-  removeSpecialCharacters(name: string): string;
-}
-
-export const FilenameService: IFilenameService = {
+export const FilenameService = {
   removeSpecialCharacters(name: string): string {
     return name.replace(/[<>:"|?*\/\\]/g, '_').replace(/~/g, '-');
   }

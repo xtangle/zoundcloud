@@ -42,7 +42,8 @@ function doDownload(downloadResult$: AsyncSubject<IDownloadResult>,
       break;
     }
     default: {
-      const err = `Cannot download, unsupported resource type ${resourceInfo.kind} gotten from ${resourceInfoUrl}`;
+      const err = new Error(
+        `Cannot download, unsupported resource type '${resourceInfo.kind}' gotten from ${resourceInfoUrl}`);
       downloadResult$.error(err);
     }
   }

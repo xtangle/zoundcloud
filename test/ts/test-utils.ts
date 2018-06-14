@@ -1,4 +1,5 @@
 import {match, SinonMatcher, SinonStub} from 'sinon';
+import * as VError from 'verror';
 
 /**
  * Noop.
@@ -18,35 +19,41 @@ export function doNothingIf(sinonStub: SinonStub, sinonMatcher: SinonMatcher) {
 }
 
 /**
- * Helper Sinon matcher for matching against an Error thrown. If an Error is passed, it also
- * asserts that the Error thrown has a cause() property that evaluates to an Error with the
- * same message as the passed Error.
- * @param {string} message
- * @param {Error} cause
- * @returns {Sinon.SinonMatcher}
- */
-export function matchesError(message: string, cause?: Error): SinonMatcher {
-  return match((error: Error) => {
-    const matchesMessage = error.message === message;
-    if (cause === undefined) {
-      return matchesMessage;
-    } else {
-      const actualCause = ((error as any).cause as () => Error)();
-      return actualCause.message === cause.message;
-    }
-  }, 'matchesError');
-}
-
-/**
  * Prefer using {@link useFakeTimer} instead of this function to fake passage of time if possible.
  * Note that both methods cannot be used in the same test.
  * @param {number} delay
  * @returns {Promise<any>}
  */
-export async function tick(delay: number = 0) {
-  return new Promise((resolve) => {
+export async function tick(delay: number = 0): Promise<any> {
+  return new Promise((resolve: () => void) => {
     setTimeout(() => {
       resolve();
     }, delay);
   });
+}
+
+/**
+ * Helper Sinon matcher for matching against an Error thrown. It matches if the actual Error
+ * contains the same message as the provided Error (or message) to test against.
+ * @param {Error | string} error
+ * @returns {Sinon.SinonMatcher}
+ */
+export function matchesError(error: Error | string): SinonMatcher {
+  const errorMessage = getErrorMessage(error);
+  return match((actual: Error) => actual.message === errorMessage, errorMessage);
+}
+
+/**
+ * Helper Sinon matcher for matching against an VError thrown. It matches if the actual VError
+ * contains an Error cause that has the same message as the provided Error (or message) to test against.
+ * @param {Error | string} cause
+ * @returns {Sinon.SinonMatcher}
+ */
+export function matchesCause(cause: Error | string): SinonMatcher {
+  const errorMessage = getErrorMessage(cause);
+  return match((actual: VError) => actual.cause() && actual.cause().message === errorMessage, errorMessage);
+}
+
+function getErrorMessage(error: Error | string): string {
+  return (typeof error === 'string') ? error : error.message;
 }

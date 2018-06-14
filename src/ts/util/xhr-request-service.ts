@@ -1,8 +1,8 @@
 import {AsyncSubject, Observable} from 'rxjs';
 
 export const XhrRequestService = {
-  checkStatus$(url: string): Observable<number> {
-    return checkStatus$(url);
+  ping$(url: string): Observable<number> {
+    return pingUrl$(url);
   },
   getArrayBuffer$(url: string): Observable<ArrayBuffer> {
     return getResponse$<ArrayBuffer>('arraybuffer', url);
@@ -22,17 +22,17 @@ function getResponse$<T>(responseType: XMLHttpRequestResponseType, url: string):
       response$.next(xhr.response);
       response$.complete();
     } else {
-      response$.error(`Unable to get from ${url}, response is ${xhr.statusText} (${xhr.status})`);
+      response$.error(new Error(`Unable to get from ${url}, response is ${xhr.statusText} (${xhr.status})`));
     }
   };
   xhr.onerror = () => {
-    response$.error(`Unable to get from ${url}, network error`);
+    response$.error(new Error(`Unable to get from ${url}, network error`));
   };
   xhr.send();
   return response$;
 }
 
-function checkStatus$(url: string): Observable<number> {
+function pingUrl$(url: string): Observable<number> {
   const status$: AsyncSubject<number> = new AsyncSubject<number>();
   const xhr = new XMLHttpRequest();
   xhr.open('HEAD', url, true);

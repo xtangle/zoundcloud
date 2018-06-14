@@ -5,11 +5,7 @@
  * of the page as it forces the page to reload. The reason for placing this logic in a separate service is so that
  * it is possible for it to be stubbed out.
  */
-export interface IUrlService {
-  getCurrentUrl(): string;
-}
-
-export const UrlService: IUrlService = {
+export const UrlService = {
   getCurrentUrl(): string {
     return document.location.href;
   }

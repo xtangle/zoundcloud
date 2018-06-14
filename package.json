@@ -41,7 +41,7 @@
     "@types/mocha": "^5.2.0",
     "@types/mocha-each": "^1.1.0",
     "@types/node": "^10.1.1",
-    "@types/sinon": "^4.3.3",
+    "@types/sinon": "^5.0.1",
     "@types/sinon-chai": "^2.7.31",
     "@types/sinon-chrome": "^2.2.3",
     "@types/verror": "^1.10.3",

@@ -4,7 +4,7 @@ import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {useFakeTimer, useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {matchesError} from '@test/test-utils';
+import {matchesCause, matchesError} from '@test/test-utils';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
@@ -86,13 +86,12 @@ describe(`track download service`, () => {
     });
 
     it('should return an error in download metadata if download info cannot be fetched', () => {
-      const error = new Error('cannot fetch download info');
-      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(throwError(error));
+      const cause = new Error('cannot fetch download info');
+      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(throwError(cause));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
 
       expect(rx.next).to.not.have.been.called;
-      expect(rx.error).to.have.been.calledOnce
-        .calledWithMatch(matchesError(`Cannot download track: ${trackInfo.title}`, error));
+      expect(rx.error).to.have.been.calledOnce.calledWithMatch(matchesCause(cause));
     });
 
     it('should return an error in download metadata if there was error starting the download', () => {

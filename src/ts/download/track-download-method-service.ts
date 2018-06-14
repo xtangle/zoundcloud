@@ -29,7 +29,7 @@ function canUseDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
   if (!trackInfo.downloadable) {
     return of(false);
   } else {
-    return XhrRequestService.checkStatus$(getDownloadUrl(trackInfo)).pipe(map((status) => status === 200));
+    return XhrRequestService.ping$(getDownloadUrl(trackInfo)).pipe(map((status) => status === 200));
   }
 }
 
@@ -41,7 +41,7 @@ function canUseStreamUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
   if (!trackInfo.stream_url) {
     return of(false);
   } else {
-    return XhrRequestService.checkStatus$(getStreamUrl(trackInfo)).pipe(map((status) => status === 200));
+    return XhrRequestService.ping$(getStreamUrl(trackInfo)).pipe(map((status) => status === 200));
   }
 }
 
