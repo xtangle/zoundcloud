@@ -1,5 +1,5 @@
 import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IResourceInfo, ITrackInfo} from '@src/download/resource-info';
+import {IResourceInfo, ITrackInfo} from '@src/download/resource/resource-info';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {Observable} from 'rxjs';
 

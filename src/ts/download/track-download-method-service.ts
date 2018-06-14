@@ -1,5 +1,5 @@
 import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
-import {ITrackInfo} from '@src/download/resource-info';
+import {ITrackInfo} from '@src/download/resource/resource-info';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from '@src/download/track-download-method';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {combineLatest, Observable, of} from 'rxjs';

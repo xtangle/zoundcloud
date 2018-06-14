@@ -1,5 +1,5 @@
 import {IPlaylistDownloadResult} from '@src/download/download-result';
-import {IPlaylistInfo, ITrackInfo, ResourceType} from '@src/download/resource-info';
+import {IPlaylistInfo, ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {FilenameService} from '@src/util/filename-service';
 

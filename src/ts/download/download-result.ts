@@ -1,4 +1,4 @@
-import {IPlaylistInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource-info';
+import {IPlaylistInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {Observable} from 'rxjs';
 

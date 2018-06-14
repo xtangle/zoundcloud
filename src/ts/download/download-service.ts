@@ -1,7 +1,7 @@
 import {IDownloadResult} from '@src/download/download-result';
 import {PlaylistDownloadService} from '@src/download/playlist-download-service';
-import {IPlaylistInfo, IResourceInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource-info';
-import {ResourceInfoService} from '@src/download/resource-info-service';
+import {IPlaylistInfo, IResourceInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
+import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {UserDownloadService} from '@src/download/user-download-service';
 import {AsyncSubject, Observable, Subject} from 'rxjs';

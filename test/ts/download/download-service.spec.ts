@@ -1,8 +1,8 @@
 import {IPlaylistDownloadResult, ITrackDownloadResult, IUserDownloadResult} from '@src/download/download-result';
 import {DownloadService} from '@src/download/download-service';
 import {PlaylistDownloadService} from '@src/download/playlist-download-service';
-import {IResourceInfo, ResourceType} from '@src/download/resource-info';
-import {ResourceInfoService} from '@src/download/resource-info-service';
+import {IResourceInfo, ResourceType} from '@src/download/resource/resource-info';
+import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {UserDownloadService} from '@src/download/user-download-service';
 import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';

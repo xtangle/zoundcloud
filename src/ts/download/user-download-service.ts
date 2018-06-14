@@ -1,6 +1,6 @@
 import {ITrackDownloadResult, IUserDownloadResult} from '@src/download/download-result';
-import {ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource-info';
-import {ResourceInfoService} from '@src/download/resource-info-service';
+import {ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
+import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {FilenameService} from '@src/util/filename-service';
 import {AsyncSubject, Observable} from 'rxjs';

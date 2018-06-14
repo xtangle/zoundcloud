@@ -1,6 +1,6 @@
 import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IPlaylistInfo, IResourceInfo, ITrackInfo, ResourceType} from '@src/download/resource-info';
-import {ResourceInfoService} from '@src/download/resource-info-service';
+import {IPlaylistInfo, IResourceInfo, ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
+import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
 import {Subject} from 'rxjs';

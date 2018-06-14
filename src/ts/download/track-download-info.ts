@@ -1,4 +1,4 @@
-import {ITrackInfo} from '@src/download/resource-info';
+import {ITrackInfo} from '@src/download/resource/resource-info';
 import {TrackDownloadMethod} from '@src/download/track-download-method';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 

@@ -1,4 +1,4 @@
-import {ITrackInfo} from '@src/download/resource-info';
+import {ITrackInfo} from '@src/download/resource/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {ITrackDownloadMethodInfo} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';

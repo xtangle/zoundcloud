@@ -1,5 +1,5 @@
 import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
-import {ITrackInfo, ResourceType} from '@src/download/resource-info';
+import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {expect} from 'chai';
 
 describe('track metadata factory', () => {

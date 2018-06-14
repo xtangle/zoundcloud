@@ -1,5 +1,5 @@
 import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
-import {ITrackInfo, ResourceType} from '@src/download/resource-info';
+import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {TrackDownloadService} from '@src/download/track-download-service';
