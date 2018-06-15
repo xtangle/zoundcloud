@@ -5,18 +5,18 @@ import {ContentPage} from '@src/page/content-page';
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {mock, SinonMock, SinonStub, stub} from 'sinon';
+import {SinonStub, SinonStubbedInstance, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('bootstrapper', () => {
   const fixture = Bootstrapper;
   let contentPage: ContentPage;
-  let contentPageMock: SinonMock;
+  let contentPageStub: SinonStubbedInstance<ContentPage>;
 
   beforeEach(() => {
     contentPage = new ContentPage();
-    contentPageMock = mock(contentPage);
+    contentPageStub = stub(contentPage);
   });
 
   context('when the id tag is in the DOM', () => {
@@ -37,11 +37,9 @@ describe('bootstrapper', () => {
     });
 
     it('should not load the content page', async () => {
-      contentPageMock.expects('load').never();
       fixture.bootstrap(contentPage);
       await tick();
-
-      contentPageMock.verify();
+      expect(contentPageStub.load).to.not.have.been.called;
     });
 
     it('should not add another id tag to the DOM', () => {
@@ -61,21 +59,23 @@ describe('bootstrapper', () => {
     });
 
     it('should load the content page', async () => {
-      contentPageMock.expects('load').once();
       fixture.bootstrap(contentPage);
       await tick();
+      expect(contentPageStub.load).to.have.been.calledOnce;
+    });
 
-      contentPageMock.verify();
+    it('should not unload the content page when id tag is not removed from the DOM', async () => {
+      fixture.bootstrap(contentPage);
+      await tick();
+      expect(contentPageStub.unload).to.not.have.been.called;
     });
 
     it('should unload the content page when id tag is removed from the DOM', async () => {
       fixture.bootstrap(contentPage);
-      contentPageMock.expects('unload').once();
       removeIdTagFromDOM();
       await tick();
-
       verifyIdTagsInDOM(0);
-      contentPageMock.verify();
+      expect(contentPageStub.unload).to.have.been.calledOnce;
     });
   });
 

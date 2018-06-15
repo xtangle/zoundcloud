@@ -1,33 +1,26 @@
-/*
 import {Bootstrapper} from '@src/page/bootstrapper';
-import {IContentPage} from '@src/page/content-page';
-import {TrackContentPage} from '@src/page/track-content-page';
+import {ContentPage} from '@src/page/content-page';
 import {ContentScript} from '@src/runnable/content-script';
 import {useSinonChai} from '@test/test-initializers';
-import {match, SinonSpy, spy} from 'sinon';
+import {SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('content script', () => {
   let fixture: ContentScript;
-  let spyBootstrap: SinonSpy;
-
-  before(() => {
-    spyBootstrap = spy(Bootstrapper, 'bootstrap');
-  });
+  let stubBootstrap: SinonStub;
 
   beforeEach(() => {
     fixture = new ContentScript();
+    stubBootstrap = stub(Bootstrapper, 'bootstrap');
   });
 
-  after(() => {
-    spyBootstrap.restore();
+  afterEach(() => {
+    stubBootstrap.restore();
   });
 
-  it('should bootstrap the track content page', () => {
-    const isTrackContentPage = match((contentPage: IContentPage) => contentPage instanceof TrackContentPage);
+  it('should bootstrap a new content page when run', () => {
     fixture.run();
-    expect(spyBootstrap.withArgs(isTrackContentPage)).to.be.calledOnce;
+    expect(stubBootstrap.withArgs(new ContentPage())).to.have.been.calledOnce;
   });
 });
-*/

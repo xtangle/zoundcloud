@@ -3,17 +3,16 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {DownloadPage} from '@src/page/download-page';
 import {logger} from '@src/util/logger';
 import {Subscription} from 'rxjs';
+import {first} from 'rxjs/operators';
 
 export class ContentPage {
-  private subscriptions: Subscription;
+  private subscriptions: Subscription = new Subscription();
 
   public load(): void {
-    this.subscriptions = new Subscription();
     DownloadPage.load(this.subscriptions);
-    this.subscriptions.add(
-      ContentPageMessenger.onMessage(UnloadContentPageMessage.TYPE)
-        .subscribe(this.unload.bind(this))
-    );
+    ContentPageMessenger.onMessage(UnloadContentPageMessage.TYPE)
+      .pipe(first())
+      .subscribe(this.unload.bind(this));
     logger.debug('Loaded content page');
   }
 

@@ -9,18 +9,19 @@ export const ScPageObservables = {
       fromEventPattern<WebNavigationUrlCallbackDetails>(
         (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
           chrome.webNavigation.onCompleted.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-      ).pipe(debounceTime(20));
+      );
 
     /**
      * onHistoryStateUpdated emits two events on every navigation: one event with URL of the old page and
-     * one with URL of the new page. The de-bounce ensures we only receive tha later event.
+     * one with URL of the new page.
      */
     const scWebNavOnHistoryUpdated$: Observable<WebNavigationUrlCallbackDetails> =
       fromEventPattern<WebNavigationUrlCallbackDetails>(
         (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
           chrome.webNavigation.onHistoryStateUpdated.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-      ).pipe(debounceTime(20));
+      );
 
-    return merge(scWebNavOnCompleted$, scWebNavOnHistoryUpdated$);
+    // The de-bounce ensures we do not unnecessarily load multiple content scripts
+    return merge(scWebNavOnCompleted$, scWebNavOnHistoryUpdated$).pipe(debounceTime(20));
   }
 };
