@@ -5,7 +5,7 @@ import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
 import {first} from 'rxjs/operators';
 
-const TAG_ID = 'zc-content-page';
+export const TAG_ID = 'zc-content-page';
 
 /**
  * Bootstraps a content-page to the DOM.
@@ -17,20 +17,14 @@ const TAG_ID = 'zc-content-page';
  * The purpose of the id tag is to signal whether the content script has already been loaded. Additionally,
  * when the id tag is removed, the content page is signalled to be unloaded.
  */
-export interface IBootstrapper {
-  bootstrap(contentPage: ContentPage): void;
-}
-
-export const Bootstrapper: IBootstrapper = {
+export const Bootstrapper = {
   bootstrap(contentPage: ContentPage): void {
     if (idTagIsInDOM()) {
       ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage());
     } else {
       const idTag = createIdTag();
-      elementAdded$((node: Node) => node.isSameNode(idTag)).pipe(first())
-        .subscribe(() => contentPage.load());
-      elementRemoved$(idTag).pipe(first())
-        .subscribe(() => contentPage.unload());
+      elementAdded$((node: Node) => node.isSameNode(idTag)).pipe(first()).subscribe(() => contentPage.load());
+      elementRemoved$(idTag).pipe(first()).subscribe(() => contentPage.unload());
       addIdTagToDOM(idTag);
     }
   }

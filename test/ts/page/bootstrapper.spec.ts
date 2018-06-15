@@ -1,110 +1,89 @@
-/*
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {Bootstrapper} from '@src/page/bootstrapper';
-import {IContentPage} from '@src/page/content-page';
+import {Bootstrapper, TAG_ID} from '@src/page/bootstrapper';
+import {ContentPage} from '@src/page/content-page';
 import {useSinonChai} from '@test/test-initializers';
-import {noop, tick} from '@test/test-utils';
+import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {SinonStub, spy, stub} from 'sinon';
+import {mock, SinonMock, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('bootstrapper', () => {
   const fixture = Bootstrapper;
-  let contentPage: DummyContentPage;
+  let contentPage: ContentPage;
+  let contentPageMock: SinonMock;
 
   beforeEach(() => {
-    document.body.innerHTML = '<body></body>';
+    contentPage = new ContentPage();
+    contentPageMock = mock(contentPage);
   });
 
-  context('when the content page should be loaded', () => {
+  context('when the id tag is in the DOM', () => {
+    let stubSendToExtension: SinonStub;
+
     beforeEach(() => {
-      contentPage = new DummyContentPage(true);
+      document.body.innerHTML = `<body><div id="${TAG_ID}"></div></body>`;
+      stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
     });
 
-    it('should bootstrap the content page when the id tag is not in the DOM', async () => {
+    afterEach(() => {
+      stubSendToExtension.restore();
+    });
+
+    it('should send request content page reload message to extension', () => {
       fixture.bootstrap(contentPage);
-      verifyIdTagAddedToDOM();
+      expect(stubSendToExtension).to.have.been.calledOnce.calledWithExactly(new RequestContentPageReloadMessage());
+    });
+
+    it('should not load the content page', async () => {
+      contentPageMock.expects('load').never();
+      fixture.bootstrap(contentPage);
       await tick();
-      expect(contentPage.load).to.have.been.calledOnce;
+
+      contentPageMock.verify();
     });
 
-    context('when the id tag is in the DOM', () => {
-      let stubSendToExtension: SinonStub;
-
-      beforeEach(() => {
-        stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
-        document.body.innerHTML = `<body><div id="${getTagId()}"></div></body>`;
-      });
-
-      afterEach(() => {
-        stubSendToExtension.restore();
-      });
-
-      it('should not bootstrap the content page', async () => {
-        fixture.bootstrap(contentPage);
-        await tick();
-        expect(contentPage.load).to.not.have.been.called;
-      });
-
-      it('should send a message to the background script to reload the content page', async () => {
-        fixture.bootstrap(contentPage);
-        await tick();
-        expect(stubSendToExtension).to.have.been.calledOnce
-          .calledWithExactly(new RequestContentPageReloadMessage(contentPage.type));
-      });
-    });
-  });
-
-  context('when the content page should not be loaded', () => {
-    beforeEach(() => {
-      contentPage = new DummyContentPage(false);
-    });
-
-    it('should remove the id tag', () => {
-      document.body.innerHTML = `<body><div id="${getTagId()}"></div></body>`;
+    it('should not add another id tag to the DOM', () => {
       fixture.bootstrap(contentPage);
-      verifyIdTagRemovedFromDOM();
+      verifyIdTagsInDOM(1);
     });
   });
 
-  it('should unload the content page when the id tag is removed from the DOM after bootstrapping', async () => {
-    contentPage = new DummyContentPage(true);
-    fixture.bootstrap(contentPage);
-    removeIdTagFromDOM();
-    await tick();
-    expect(contentPage.unload).to.have.been.calledOnce;
+  context('when the id tag is not in the DOM', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<body></body>';
+    });
+
+    it('should add the id tag to the DOM', () => {
+      fixture.bootstrap(contentPage);
+      verifyIdTagsInDOM(1);
+    });
+
+    it('should load the content page', async () => {
+      contentPageMock.expects('load').once();
+      fixture.bootstrap(contentPage);
+      await tick();
+
+      contentPageMock.verify();
+    });
+
+    it('should unload the content page when id tag is removed from the DOM', async () => {
+      fixture.bootstrap(contentPage);
+      contentPageMock.expects('unload').once();
+      removeIdTagFromDOM();
+      await tick();
+
+      verifyIdTagsInDOM(0);
+      contentPageMock.verify();
+    });
   });
 
-  function getTagId() {
-    return `zc-${contentPage.type}-content-page-id`;
-  }
-
-  function verifyIdTagAddedToDOM() {
-    expect($(`#${getTagId()}`).length).to.be.equal(1);
-  }
-
-  function verifyIdTagRemovedFromDOM() {
-    expect($(`#${getTagId()}`).length).to.be.equal(0);
+  function verifyIdTagsInDOM(numberOfIdTags: number) {
+    expect($(`#${TAG_ID}`).length).to.be.equal(numberOfIdTags);
   }
 
   function removeIdTagFromDOM() {
-    $(`#${getTagId()}`).remove();
+    $(`#${TAG_ID}`).remove();
   }
 });
-
-class DummyContentPage implements IContentPage {
-  public type = 'dummy';
-  public load = spy();
-  public unload = spy();
-  public reload = noop;
-
-  constructor(public shouldLoad: boolean) {
-  }
-
-  public test(): boolean {
-    return this.shouldLoad;
-  }
-}
-*/
