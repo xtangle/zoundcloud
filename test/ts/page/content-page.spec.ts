@@ -4,11 +4,10 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {ContentPage} from '@src/page/content-page';
-import {DownloadPage} from '@src/page/download-page';
 import {useSinonChai} from '@test/test-initializers';
-import {Subject} from 'rxjs/internal/Subject';
-import {Subscription} from 'rxjs/internal/Subscription';
 import {SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {Subject, Subscription} from 'rxjs';
+import {InjectionService} from '@src/page/injection-service';
 
 const expect = useSinonChai();
 
@@ -17,7 +16,7 @@ describe('content page', () => {
   let subscriptions: Subscription;
 
   let spyUnload: SinonSpy;
-  let stubLoadDownloadPage: SinonStub;
+  let stubInjectDownloadButtons: SinonStub;
   let stubOnMessage: SinonStub;
   let messages$: Subject<IMessageHandlerArgs<Message, MessageResponse>>;
 
@@ -26,7 +25,7 @@ describe('content page', () => {
     subscriptions = (fixture as any).subscriptions;
 
     spyUnload = spy(fixture, 'unload');
-    stubLoadDownloadPage = stub(DownloadPage, 'load');
+    stubInjectDownloadButtons = stub(InjectionService, 'injectDownloadButtons');
     stubOnMessage = stub(ContentPageMessenger, 'onMessage');
     messages$ = new Subject();
   });
@@ -34,7 +33,7 @@ describe('content page', () => {
   afterEach(() => {
     subscriptions.unsubscribe();
     spyUnload.restore();
-    stubLoadDownloadPage.restore();
+    stubInjectDownloadButtons.restore();
     stubOnMessage.restore();
   });
 
@@ -48,8 +47,8 @@ describe('content page', () => {
       fixture.load();
     });
 
-    it('should load the download page', () => {
-      expect(stubLoadDownloadPage).to.have.been.calledOnce.calledWithExactly(subscriptions);
+    it('should inject the download buttons', () => {
+      expect(stubInjectDownloadButtons).to.have.been.calledOnce.calledWithExactly(subscriptions);
     });
 
     it('should not unload when unload content page message is not received', () => {
