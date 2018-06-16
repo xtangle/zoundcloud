@@ -1,22 +1,22 @@
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {matchesError} from '@test/test-utils';
-import {fakeServer, SinonFakeServer, SinonFakeXMLHttpRequest} from 'sinon';
+import {restore, server, SinonFakeXMLHttpRequest, useFakeServer} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('xhr request service', () => {
   const rx = useRxTesting();
+
   const fixture = XhrRequestService;
   const url = '/some/url';
-  let server: SinonFakeServer;
 
   beforeEach(() => {
-    server = fakeServer.create();
+    useFakeServer();
   });
 
   afterEach(() => {
-    server.restore();
+    restore();
   });
 
   describe('pinging a url', () => {

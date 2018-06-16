@@ -2,7 +2,7 @@ import {Bootstrapper} from '@src/page/bootstrapper';
 import {ContentPage} from '@src/page/content-page';
 import {ContentScript} from '@src/runnable/content-script';
 import {useSinonChai} from '@test/test-initializers';
-import {SinonStub, stub} from 'sinon';
+import {restore, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
@@ -16,7 +16,7 @@ describe('content script', () => {
   });
 
   afterEach(() => {
-    stubBootstrap.restore();
+    restore();
   });
 
   it('should bootstrap a new content page when run', () => {

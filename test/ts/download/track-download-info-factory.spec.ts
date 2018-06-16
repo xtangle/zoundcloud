@@ -5,15 +5,15 @@ import {TrackDownloadMethodService} from '@src/download/track-download-method-se
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import * as path from 'path';
 import {of} from 'rxjs';
-import {match, SinonStub, stub} from 'sinon';
+import {match, restore, SinonStub, stub} from 'sinon';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const expect = useSinonChai();
 
 describe('track download info factory', () => {
   const rx = useRxTesting();
-  const fixture = TrackDownloadInfoFactory;
 
+  const fixture = TrackDownloadInfoFactory;
   const trackInfo = {title: 'track?title/with\\special>characters'} as ITrackInfo;
   const downloadLocation = 'download?location/with\\special<characters';
   const downloadMethodInfo: ITrackDownloadMethodInfo = {
@@ -30,7 +30,7 @@ describe('track download info factory', () => {
   });
 
   afterEach(() => {
-    stubGetDownloadMethodInfo$.restore();
+    restore();
   });
 
   it('should return a track download info and complete', () => {

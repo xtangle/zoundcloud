@@ -5,14 +5,14 @@ import {TrackDownloadMethodService} from '@src/download/track-download-method-se
 import {XhrRequestService} from '@src/util/xhr-request-service';
 import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {of, throwError} from 'rxjs';
-import {match, SinonMatcher, SinonStub, stub} from 'sinon';
+import {match, restore, SinonMatcher, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('track download method service', () => {
   const rx = useRxTesting();
-  const fixture = TrackDownloadMethodService;
 
+  const fixture = TrackDownloadMethodService;
   let stubPing$: SinonStub;
   let stubGetJSON$: SinonStub;
 
@@ -25,8 +25,7 @@ describe('track download method service', () => {
   });
 
   afterEach(() => {
-    stubPing$.restore();
-    stubGetJSON$.restore();
+    restore();
   });
 
   describe('using the download url method', () => {

@@ -19,7 +19,7 @@ export function doNothingIf(sinonStub: SinonStub, sinonMatcher: SinonMatcher) {
 }
 
 /**
- * Prefer using {@link useFakeTimer} instead of this function to fake passage of time if possible.
+ * Prefer using sinon's {@link useFakeTimers} instead of this function to fake passage of time if possible.
  * Note that both methods cannot be used in the same test.
  * @param {number} delay
  * @returns {Promise<any>}

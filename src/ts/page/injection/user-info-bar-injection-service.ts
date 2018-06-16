@@ -1,7 +1,7 @@
 import {ZC_DL_BUTTON_MEDIUM_CLASS} from '@src/constants';
 import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
 import {InjectionCommonsService} from '@src/page/injection/injection-commons-service';
-import {InjectionSignalService} from '@src/page/injection/injection-signal-service';
+import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
 import {UrlService} from '@src/util/url-service';
 import {Subscription} from 'rxjs';
 
@@ -9,7 +9,7 @@ export const UserInfoBarInjectionService = {
   injectDownloadButtons(subscriptions: Subscription) {
     const selector = '.userInfoBar';
     subscriptions.add(
-      InjectionSignalService.getInjectionSignal$(selector)
+      InjectionSignalFactory.create$(selector)
         .subscribe(addToUserInfoBar.bind(null, subscriptions))
     );
   }

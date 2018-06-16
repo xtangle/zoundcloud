@@ -6,8 +6,8 @@ import * as $ from 'jquery';
 import {interval, merge, Observable} from 'rxjs';
 import {filter, map, switchMapTo} from 'rxjs/operators';
 
-export const InjectionSignalService = {
-  getInjectionSignal$(selector: string): Observable<JQuery<HTMLElement>> {
+export const InjectionSignalFactory = {
+  create$(selector: string): Observable<JQuery<HTMLElement>> {
     return merge(
       elementExistOrAdded$(selector),
       forcefullyInjectSignal$(selector)

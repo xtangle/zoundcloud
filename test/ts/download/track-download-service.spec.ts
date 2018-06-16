@@ -3,51 +3,50 @@ import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {TrackDownloadService} from '@src/download/track-download-service';
-import {useFakeTimer, useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
 import {matchesCause, matchesError} from '@test/test-utils';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
-import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {clock, match, restore, SinonSpy, SinonStub, spy, stub, useFakeTimers} from 'sinon';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const expect = useSinonChai();
 
 describe(`track download service`, () => {
   const sinonChrome = useSinonChrome();
-  const cw = useFakeTimer();
   const rx = useRxTesting();
+
   const fixture = TrackDownloadService;
+  const trackInfo = {title: 'some-song'} as ITrackInfo;
+  const downloadLocation = 'download-location';
+  const inputDownloadInfo = {trackInfo} as ITrackDownloadInfo;
+  const downloadInfo = {
+    downloadOptions: {url: 'download-options-url'} as DownloadOptions,
+    trackInfo
+  } as ITrackDownloadInfo;
+
+  let stubCreateDownloadInfo$: SinonStub;
+  let stubAddMetadata$: SinonStub;
+  let stubRevokeObjectURL: SinonSpy;
+
+  beforeEach(() => {
+    useFakeTimers();
+
+    stubCreateDownloadInfo$ = stub(TrackDownloadInfoFactory, 'create$');
+    stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(inputDownloadInfo));
+
+    stubAddMetadata$ = stub(MetadataAdapter, 'addMetadata$');
+    stubAddMetadata$.withArgs(inputDownloadInfo).returns(of(downloadInfo));
+
+    stubRevokeObjectURL = spy(URL, 'revokeObjectURL');
+    sinonChrome.downloads.download.yields(123);
+  });
+
+  afterEach(() => {
+    restore();
+  });
 
   describe(`downloading a track`, () => {
-    const trackInfo = {title: 'some-song'} as ITrackInfo;
-    const downloadLocation = 'download-location';
-    const inputDownloadInfo = {trackInfo} as ITrackDownloadInfo;
-    const downloadInfo = {
-      downloadOptions: {url: 'download-options-url'} as DownloadOptions,
-      trackInfo
-    } as ITrackDownloadInfo;
-
-    let stubCreateDownloadInfo$: SinonStub;
-    let stubAddMetadata$: SinonStub;
-    let stubRevokeObjectURL: SinonSpy;
-
-    beforeEach(() => {
-      stubCreateDownloadInfo$ = stub(TrackDownloadInfoFactory, 'create$');
-      stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(inputDownloadInfo));
-
-      stubAddMetadata$ = stub(MetadataAdapter, 'addMetadata$');
-      stubAddMetadata$.withArgs(inputDownloadInfo).returns(of(downloadInfo));
-
-      stubRevokeObjectURL = spy(URL, 'revokeObjectURL');
-      sinonChrome.downloads.download.yields(123);
-    });
-
-    afterEach(() => {
-      stubCreateDownloadInfo$.restore();
-      stubAddMetadata$.restore();
-      stubRevokeObjectURL.restore();
-    });
-
     it('should download the track using the download options', () => {
       fixture.download(trackInfo, downloadLocation);
 
@@ -109,7 +108,7 @@ describe(`track download service`, () => {
       stubAddMetadata$.withArgs(inputDownloadInfo)
         .returns(timer(199999).pipe(mapTo(downloadInfo)));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
-      cw.clock.tick(300000);
+      clock.tick(300000);
 
       expect(sinonChrome.downloads.download).to.have.been.called;
       expect(rx.next).to.have.been.calledOnce;
@@ -122,7 +121,7 @@ describe(`track download service`, () => {
       stubAddMetadata$.withArgs(inputDownloadInfo)
         .returns(timer(200000).pipe(mapTo(downloadInfo)));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
-      cw.clock.tick(300001);
+      clock.tick(300001);
 
       expect(sinonChrome.downloads.download).to.not.have.been.called;
       expect(rx.next).to.not.have.been.called;

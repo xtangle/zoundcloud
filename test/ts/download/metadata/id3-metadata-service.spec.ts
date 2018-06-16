@@ -3,16 +3,15 @@ import {ID3WriterService, IID3Writer} from '@src/download/metadata/id3-writer-se
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
-import {match, SinonStub, stub} from 'sinon';
+import {clock, match, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('id3 metadata service', () => {
   const rx = useRxTesting();
-  const cw = useFakeTimer();
 
   const fixture = ID3MetadataService;
   const metadata = createMetadata();
@@ -27,51 +26,44 @@ describe('id3 metadata service', () => {
   const songData: ArrayBuffer = new Int8Array([1, 2, 3]).buffer;
   const coverArtData: ArrayBuffer = new Int8Array([4, 5, 6]).buffer;
 
+  let stubAddTag: SinonStub;
+  let stubSetFrame: SinonStub;
+  let stubCreateWriter: SinonStub;
+  let stubGetURL: SinonStub;
+
   beforeEach(() => {
+    useFakeTimers();
+
     stubGetArrayBuffer$ = stub(XhrRequestService, 'getArrayBuffer$');
     stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url).returns(of(songData));
     stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(of(coverArtData));
+
+    stubAddTag = stub(ID3WriterService, 'addTag');
+    stubAddTag.withArgs(writer).returns(writer);
+
+    stubSetFrame = stub(ID3WriterService, 'setFrame');
+    stubSetFrame.withArgs(writer, match.string, match.any).returns(writer);
+
+    stubCreateWriter = stub(ID3WriterService, 'createWriter');
+    stubCreateWriter.withArgs(songData).returns(writer);
+
+    stubGetURL = stub(ID3WriterService, 'getURL');
+    stubGetURL.withArgs(writer).returns(metadataAddedURL);
   });
 
   afterEach(() => {
-    stubGetArrayBuffer$.restore();
+    restore();
   });
 
   describe('adding id3 metadata', () => {
-    let stubAddTag: SinonStub;
-    let stubSetFrame: SinonStub;
-    let stubCreateWriter: SinonStub;
-    let stubGetURL: SinonStub;
-
-    beforeEach(() => {
-      stubAddTag = stub(ID3WriterService, 'addTag');
-      stubSetFrame = stub(ID3WriterService, 'setFrame');
-      stubCreateWriter = stub(ID3WriterService, 'createWriter');
-      stubGetURL = stub(ID3WriterService, 'getURL');
-
-      stubAddTag.withArgs(writer).returns(writer);
-      stubSetFrame.withArgs(writer, match.string, match.any).returns(writer);
-      stubCreateWriter.withArgs(songData).returns(writer);
-      stubGetURL.withArgs(writer).returns(metadataAddedURL);
-    });
-
-    afterEach(() => {
-      stubAddTag.restore();
-      stubSetFrame.restore();
-      stubCreateWriter.restore();
-      stubGetURL.restore();
-    });
-
     it('should emit download options with the updated url', () => {
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.next();
 
       verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
     });
 
     it('should add all textual metadata', () => {
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.next();
 
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'TIT2', metadata.title);
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'TPE1', [metadata.albumArtist]);
@@ -92,7 +84,6 @@ describe('id3 metadata service', () => {
     it('should add an empty string comment metadata if it is undefined', () => {
       rx.subscribeTo(fixture.addID3V2Metadata$(
         createMetadata({description: undefined}), downloadInfo));
-      cw.clock.next();
 
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'COMM', {
         description: 'Soundcloud description',
@@ -103,7 +94,6 @@ describe('id3 metadata service', () => {
 
     it('should add cover art metadata', () => {
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.next();
 
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'APIC', {
         data: coverArtData,
@@ -118,7 +108,6 @@ describe('id3 metadata service', () => {
     it('should not add cover art metadata if cover art url is not defined', () => {
       const metadataWithNoCoverArtUrl = createMetadata({cover_url: undefined});
       rx.subscribeTo(fixture.addID3V2Metadata$(metadataWithNoCoverArtUrl, downloadInfo));
-      cw.clock.next();
 
       expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
     });
@@ -127,7 +116,7 @@ describe('id3 metadata service', () => {
       stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url)
         .returns(timer(299999).pipe(mapTo(songData)));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.tick(300000);
+      clock.tick(300000);
 
       verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
     });
@@ -136,7 +125,7 @@ describe('id3 metadata service', () => {
       stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url)
         .returns(timer(300000).pipe(mapTo(songData)));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.tick(300001);
+      clock.tick(300001);
 
       verifyDownloadOptionsEmittedWithUrl(downloadInfo.downloadOptions.url);
     });
@@ -145,7 +134,6 @@ describe('id3 metadata service', () => {
       stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url)
         .returns(throwError('error fetching song data'));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.next();
 
       verifyDownloadOptionsEmittedWithUrl(downloadInfo.downloadOptions.url);
     });
@@ -154,7 +142,7 @@ describe('id3 metadata service', () => {
       stubGetArrayBuffer$.withArgs(metadata.cover_url)
         .returns(timer(59999).pipe(mapTo(coverArtData)));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.tick(60000);
+      clock.tick(60000);
 
       expect(stubSetFrame).to.have.been.calledWith(writer, 'APIC', match.any);
     });
@@ -163,7 +151,7 @@ describe('id3 metadata service', () => {
       stubGetArrayBuffer$.withArgs(metadata.cover_url)
         .returns(timer(60000).pipe(mapTo(coverArtData)));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.tick(60001);
+      clock.tick(60001);
 
       expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
     });
@@ -172,7 +160,6 @@ describe('id3 metadata service', () => {
       stubGetArrayBuffer$.withArgs(metadata.cover_url)
         .returns(throwError('Some error'));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      cw.clock.next();
 
       expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
     });

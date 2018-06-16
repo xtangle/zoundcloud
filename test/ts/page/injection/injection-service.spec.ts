@@ -4,7 +4,7 @@ import {ListenEngagementInjectionService} from '@src/page/injection/listen-engag
 import {UserInfoBarInjectionService} from '@src/page/injection/user-info-bar-injection-service';
 import {useSinonChai} from '@test/test-initializers';
 import {Subscription} from 'rxjs';
-import {SinonStub, stub} from 'sinon';
+import {restore, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
@@ -26,9 +26,7 @@ describe('injection service', () => {
   });
 
   afterEach(() => {
-    stubInjectToListenEngagement.restore();
-    stubInjectToListItem.restore();
-    stubInjectToUserInfoBar.restore();
+    restore();
   });
 
   it('should inject download buttons to listen engagement', () => {

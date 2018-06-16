@@ -1,5 +1,5 @@
 import {Observable, Subscription} from 'rxjs';
-import {SinonFakeTimers, SinonSpy, spy, useFakeTimers} from 'sinon';
+import {createSandbox, SinonSpy} from 'sinon';
 
 export function useSinonChai(): Chai.ExpectStatic {
   const chai = require('chai');
@@ -28,53 +28,33 @@ export function useSinonChrome() {
   return sinonChrome;
 }
 
-export interface IRxTestingStatic {
+export interface IRxTestingWrapper {
   readonly next: SinonSpy;
   readonly error: SinonSpy;
   readonly complete: SinonSpy;
+
   subscribeTo<T>(observable: Observable<T>): void;
 }
 
-export function useRxTesting(): IRxTestingStatic {
+export function useRxTesting(): IRxTestingWrapper {
+  const sandbox = createSandbox();
   let subscription: Subscription;
 
-  const rx: IRxTestingStatic = {
-    complete: spy(),
-    error: spy(),
-    next: spy(),
+  const rx: IRxTestingWrapper = {
+    complete: sandbox.spy(),
+    error: sandbox.spy(),
+    next: sandbox.spy(),
     subscribeTo<T>(observable: Observable<T>) {
       subscription = observable.subscribe(this);
     }
   };
 
   afterEach('reset callbacks and unsubscribe', () => {
-    rx.next.resetHistory();
-    rx.error.resetHistory();
-    rx.complete.resetHistory();
+    sandbox.resetHistory();
     if (subscription) {
       subscription.unsubscribe();
     }
   });
 
   return rx;
-}
-
-export interface IClockWrapper {
-  clock: SinonFakeTimers;
-}
-
-export function useFakeTimer(): IClockWrapper {
-  const cw: IClockWrapper = {
-    clock: undefined
-  };
-
-  beforeEach(() => {
-    cw.clock = useFakeTimers();
-  });
-
-  afterEach(() => {
-    cw.clock.restore();
-  });
-
-  return cw;
 }

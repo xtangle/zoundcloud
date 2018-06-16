@@ -3,13 +3,13 @@ import {PlaylistDownloadService} from '@src/download/playlist-download-service';
 import {IPlaylistInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {useSinonChai} from '@test/test-initializers';
-import {match, SinonStub, stub} from 'sinon';
+import {match, restore, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('playlist download service', () => {
-  const fixture = PlaylistDownloadService;
 
+  const fixture = PlaylistDownloadService;
   const trackOneInfo: ITrackInfo = {title: 'foo'} as ITrackInfo;
   const trackTwoInfo: ITrackInfo = {title: 'bar'} as ITrackInfo;
   const playlistInfo: IPlaylistInfo = {
@@ -24,19 +24,19 @@ describe('playlist download service', () => {
   const trackOneDlResult = {trackInfo: trackOneInfo} as ITrackDownloadResult;
   const trackTwoDlResult = {trackInfo: trackTwoInfo} as ITrackDownloadResult;
 
+  let stubDownloadTrack: SinonStub;
+
+  beforeEach(() => {
+    stubDownloadTrack = stub(TrackDownloadService, 'download');
+    stubDownloadTrack.withArgs(trackOneInfo, match.any).returns(trackOneDlResult);
+    stubDownloadTrack.withArgs(trackTwoInfo, match.any).returns(trackTwoDlResult);
+  });
+
+  afterEach(() => {
+    restore();
+  });
+
   describe('downloading a playlist', () => {
-    let stubDownloadTrack: SinonStub;
-
-    beforeEach(() => {
-      stubDownloadTrack = stub(TrackDownloadService, 'download');
-      stubDownloadTrack.withArgs(trackOneInfo, match.any).returns(trackOneDlResult);
-      stubDownloadTrack.withArgs(trackTwoInfo, match.any).returns(trackTwoDlResult);
-    });
-
-    afterEach(() => {
-      stubDownloadTrack.restore();
-    });
-
     it('should download each track in the playlist', () => {
       fixture.download(playlistInfo);
 

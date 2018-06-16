@@ -2,15 +2,13 @@ import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {useFakeTimer, useSinonChai} from '@test/test-initializers';
+import {useSinonChai} from '@test/test-initializers';
 import {Subscription} from 'rxjs';
-import {SinonStub, stub} from 'sinon';
+import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('download button factory', () => {
-  const cw = useFakeTimer();
-
   const fixture = DownloadButtonFactory;
   const resourceInfoUrl = 'resource-info-url';
   let subscriptions: Subscription;
@@ -19,6 +17,8 @@ describe('download button factory', () => {
   let stubSendToExtension: SinonStub;
 
   beforeEach(() => {
+    useFakeTimers();
+
     subscriptions = new Subscription();
     button = fixture.create(subscriptions, resourceInfoUrl);
     stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
@@ -26,7 +26,7 @@ describe('download button factory', () => {
 
   afterEach(() => {
     subscriptions.unsubscribe();
-    stubSendToExtension.restore();
+    restore();
   });
 
   context('button properties', () => {
@@ -60,11 +60,11 @@ describe('download button factory', () => {
 
     it('should throttle clicks that are within 3 seconds of each other', () => {
       button.trigger('click');
-      cw.clock.tick(2999);
+      clock.tick(2999);
       button.trigger('click');
       expect(stubSendToExtension).to.have.been.calledOnce;
 
-      cw.clock.tick(1);
+      clock.tick(1);
       button.trigger('click');
       expect(stubSendToExtension).to.have.been.calledTwice;
     });

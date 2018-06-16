@@ -5,17 +5,16 @@ import {IResourceInfo, ResourceType} from '@src/download/resource/resource-info'
 import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {UserDownloadService} from '@src/download/user-download-service';
-import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {matchesCause, matchesError} from '@test/test-utils';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
-import {match, SinonStub, stub} from 'sinon';
+import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('download service', () => {
   const rx = useRxTesting();
-  const cw = useFakeTimer();
 
   const fixture = DownloadService;
   const resourceInfoUrl = 'resource-info-url';
@@ -25,33 +24,32 @@ describe('download service', () => {
   const playlistDownloadResult = {playlistInfo: {}, tracks: [trackDownloadResult]} as IPlaylistDownloadResult;
   const userDownloadResult = {userInfo: {}, tracks: [trackDownloadResult]} as IUserDownloadResult;
 
-  describe('downloading from a resource', () => {
-    let stubGetResourceInfo$: SinonStub;
-    let stubTrackDownload: SinonStub;
-    let stubPlaylistDownload: SinonStub;
-    let stubUserDownload$: SinonStub;
+  let stubGetResourceInfo$: SinonStub;
+  let stubTrackDownload: SinonStub;
+  let stubPlaylistDownload: SinonStub;
+  let stubUserDownload$: SinonStub;
 
-    beforeEach(() => {
-      stubGetResourceInfo$ = stub(ResourceInfoService, 'getResourceInfo$');
-      stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(of(resourceInfo));
+  beforeEach(() => {
+    useFakeTimers();
 
-      stubTrackDownload = stub(TrackDownloadService, 'download');
-      stubTrackDownload.returns(trackDownloadResult);
+    stubGetResourceInfo$ = stub(ResourceInfoService, 'getResourceInfo$');
+    stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(of(resourceInfo));
 
-      stubPlaylistDownload = stub(PlaylistDownloadService, 'download');
-      stubPlaylistDownload.returns(playlistDownloadResult);
+    stubTrackDownload = stub(TrackDownloadService, 'download');
+    stubTrackDownload.returns(trackDownloadResult);
 
-      stubUserDownload$ = stub(UserDownloadService, 'download$');
-      stubUserDownload$.returns(of(userDownloadResult));
-    });
+    stubPlaylistDownload = stub(PlaylistDownloadService, 'download');
+    stubPlaylistDownload.returns(playlistDownloadResult);
 
-    afterEach(() => {
-      stubGetResourceInfo$.restore();
-      stubTrackDownload.restore();
-      stubPlaylistDownload.restore();
-      stubUserDownload$.restore();
-    });
+    stubUserDownload$ = stub(UserDownloadService, 'download$');
+    stubUserDownload$.returns(of(userDownloadResult));
+  });
 
+  afterEach(() => {
+    restore();
+  });
+
+  describe('download from a resource', () => {
     context('downloading a track', () => {
       const trackDlInfo = {kind: ResourceType.Track};
 
@@ -137,7 +135,7 @@ describe('download service', () => {
       it('should download if fetching resource info takes less than 30 seconds', () => {
         stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(timer(29999).pipe(mapTo(resourceInfo)));
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
-        cw.clock.tick(30000);
+        clock.tick(30000);
 
         expect(stubTrackDownload).to.have.been.called;
         expect(rx.next).to.have.been.called;
@@ -146,7 +144,7 @@ describe('download service', () => {
       it('should emit error if fetching resource info takes 30 seconds or more', () => {
         stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(timer(30000).pipe(mapTo(resourceInfo)));
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
-        cw.clock.tick(30001);
+        clock.tick(30001);
 
         expect(stubTrackDownload).to.not.have.been.called;
         expect(rx.next).to.not.have.been.called;

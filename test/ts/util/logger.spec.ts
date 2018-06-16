@@ -1,22 +1,22 @@
 import {logger} from '@src/util/logger';
 import {useSinonChai} from '@test/test-initializers';
-import {SinonStub, stub} from 'sinon';
+import {restore, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('logger', () => {
-  const prevNodeEnv = process.env.NODE_ENV; // Previous stored value in NODE_ENV
+  let prevNodeEnv: string; // Previous stored value in NODE_ENV
   let stubDebug: SinonStub;
   let stubError: SinonStub;
 
   beforeEach(() => {
+    prevNodeEnv = process.env.NODE_ENV;
     stubDebug = stub(console, 'debug');
     stubError = stub(console, 'error');
   });
 
   afterEach(() => {
-    stubDebug.restore();
-    stubError.restore();
+    restore();
     process.env.NODE_ENV = prevNodeEnv;
   });
 

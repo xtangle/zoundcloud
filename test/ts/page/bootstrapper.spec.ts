@@ -5,30 +5,33 @@ import {ContentPage} from '@src/page/content-page';
 import {useSinonChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
-import {SinonStub, SinonStubbedInstance, stub} from 'sinon';
+import {restore, SinonStub, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('bootstrapper', () => {
   const fixture = Bootstrapper;
   let contentPage: ContentPage;
-  let contentPageStub: SinonStubbedInstance<ContentPage>;
+
+  let stubLoad: SinonStub;
+  let stubUnload: SinonStub;
+  let stubSendToExtension: SinonStub;
 
   beforeEach(() => {
     contentPage = new ContentPage();
-    contentPageStub = stub(contentPage);
+    stubLoad = stub(contentPage, 'load');
+    stubUnload = stub(contentPage, 'unload');
+    stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+  });
+
+  afterEach(() => {
+    contentPage.subscriptions.unsubscribe();
+    restore();
   });
 
   context('when the id tag is in the DOM', () => {
-    let stubSendToExtension: SinonStub;
-
     beforeEach(() => {
       document.body.innerHTML = `<body><div id="${TAG_ID}"></div></body>`;
-      stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
-    });
-
-    afterEach(() => {
-      stubSendToExtension.restore();
     });
 
     it('should send request content page reload message to extension', () => {
@@ -39,12 +42,12 @@ describe('bootstrapper', () => {
     it('should not load the content page', async () => {
       fixture.bootstrap(contentPage);
       await tick();
-      expect(contentPageStub.load).to.not.have.been.called;
+      expect(stubLoad).to.not.have.been.called;
     });
 
     it('should not add another id tag to the DOM', () => {
       fixture.bootstrap(contentPage);
-      verifyIdTagsInDOM(1);
+      verifyOneIdTagInDOM();
     });
   });
 
@@ -55,32 +58,51 @@ describe('bootstrapper', () => {
 
     it('should add the id tag to the DOM', () => {
       fixture.bootstrap(contentPage);
-      verifyIdTagsInDOM(1);
+      verifyOneIdTagInDOM();
     });
 
-    it('should load the content page', async () => {
+    it('should load the content page since id tag is added to DOM', async () => {
       fixture.bootstrap(contentPage);
       await tick();
-      expect(contentPageStub.load).to.have.been.calledOnce;
+      expect(stubLoad).to.have.been.calledOnce;
+    });
+
+    it('should not load the content page again when another id tag is added to DOM', async () => {
+      fixture.bootstrap(contentPage);
+      addIdTagToDOM();
+      await tick();
+      expect(stubLoad).to.have.been.calledOnce;
     });
 
     it('should not unload the content page when id tag is not removed from the DOM', async () => {
       fixture.bootstrap(contentPage);
       await tick();
-      expect(contentPageStub.unload).to.not.have.been.called;
+      expect(stubUnload).to.not.have.been.called;
+    });
+
+    it('should not unload the content page when content page is unsubscribed', async () => {
+      fixture.bootstrap(contentPage);
+      contentPage.subscriptions.unsubscribe();
+      removeIdTagFromDOM();
+      await tick();
+      expect(stubUnload).to.not.have.been.called;
     });
 
     it('should unload the content page when id tag is removed from the DOM', async () => {
       fixture.bootstrap(contentPage);
       removeIdTagFromDOM();
       await tick();
-      verifyIdTagsInDOM(0);
-      expect(contentPageStub.unload).to.have.been.calledOnce;
+      expect(stubUnload).to.have.been.calledOnce;
     });
   });
 
-  function verifyIdTagsInDOM(numberOfIdTags: number) {
-    expect($(`#${TAG_ID}`).length).to.be.equal(numberOfIdTags);
+  function verifyOneIdTagInDOM() {
+    expect($(`#${TAG_ID}`).length).to.be.equal(1);
+    expect($('div').length).to.be.equal(1);
+  }
+
+  function addIdTagToDOM() {
+    $('body').append($('<div/>', {id: TAG_ID})[0]);
   }
 
   function removeIdTagFromDOM() {

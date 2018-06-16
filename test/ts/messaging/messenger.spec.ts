@@ -53,13 +53,10 @@ describe('default messenger', () => {
     });
 
     context('when sending a response', () => {
-      const responseCallback: SinonSpy = spy();
-
-      afterEach(() => {
-        responseCallback.resetHistory();
-      });
+      let responseCallback: SinonSpy;
 
       beforeEach(() => {
+        responseCallback = spy();
         rx.subscribeTo(fixture.onMessage(msgType1, true));
       });
 

@@ -3,16 +3,15 @@ import {ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resour
 import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {UserDownloadService} from '@src/download/user-download-service';
-import {useFakeTimer, useRxTesting, useSinonChai} from '@test/test-initializers';
+import {useRxTesting, useSinonChai} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
-import {match, SinonStub, stub} from 'sinon';
+import {clock, match, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('user download service', () => {
   const rx = useRxTesting();
-  const cw = useFakeTimer();
 
   const fixture = UserDownloadService;
   const trackOneInfo: ITrackInfo = {title: 'foo'} as ITrackInfo;
@@ -26,24 +25,25 @@ describe('user download service', () => {
   const trackOneDlResult = {trackInfo: trackOneInfo} as ITrackDownloadResult;
   const trackTwoDlResult = {trackInfo: trackTwoInfo} as ITrackDownloadResult;
 
+  let stubGetTrackInfoList$: SinonStub;
+  let stubDownloadTrack: SinonStub;
+
+  beforeEach(() => {
+    useFakeTimers();
+
+    stubGetTrackInfoList$ = stub(ResourceInfoService, 'getTrackInfoList$');
+    stubGetTrackInfoList$.withArgs(expectedTrackListInfoUrl).returns(of([trackOneInfo, trackTwoInfo]));
+
+    stubDownloadTrack = stub(TrackDownloadService, 'download');
+    stubDownloadTrack.withArgs(trackOneInfo, match.any).returns(trackOneDlResult);
+    stubDownloadTrack.withArgs(trackTwoInfo, match.any).returns(trackTwoDlResult);
+  });
+
+  afterEach(() => {
+    restore();
+  });
+
   describe('downloading tracks from a user', () => {
-    let stubGetTrackInfoList$: SinonStub;
-    let stubDownloadTrack: SinonStub;
-
-    beforeEach(() => {
-      stubGetTrackInfoList$ = stub(ResourceInfoService, 'getTrackInfoList$');
-      stubGetTrackInfoList$.withArgs(expectedTrackListInfoUrl).returns(of([trackOneInfo, trackTwoInfo]));
-
-      stubDownloadTrack = stub(TrackDownloadService, 'download');
-      stubDownloadTrack.withArgs(trackOneInfo, match.any).returns(trackOneDlResult);
-      stubDownloadTrack.withArgs(trackTwoInfo, match.any).returns(trackTwoDlResult);
-    });
-
-    afterEach(() => {
-      stubGetTrackInfoList$.restore();
-      stubDownloadTrack.restore();
-    });
-
     it('should download every track from the user', () => {
       fixture.download$(userInfo);
 
@@ -76,7 +76,7 @@ describe('user download service', () => {
       stubGetTrackInfoList$.withArgs(expectedTrackListInfoUrl)
         .returns(timer(29999).pipe(mapTo([trackOneInfo, trackTwoInfo])));
       rx.subscribeTo(fixture.download$(userInfo));
-      cw.clock.tick(30000);
+      clock.tick(30000);
 
       expect(rx.error).to.not.have.been.called;
       expect(rx.next).to.have.been.calledOnce;
@@ -86,7 +86,7 @@ describe('user download service', () => {
       stubGetTrackInfoList$.withArgs(expectedTrackListInfoUrl)
         .returns(timer(30000).pipe(mapTo([trackOneInfo, trackTwoInfo])));
       rx.subscribeTo(fixture.download$(userInfo));
-      cw.clock.tick(30001);
+      clock.tick(30001);
 
       expect(rx.error).to.have.been.called;
       expect(rx.next).to.not.have.been.called;

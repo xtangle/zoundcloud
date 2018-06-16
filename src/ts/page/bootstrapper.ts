@@ -23,12 +23,16 @@ export const Bootstrapper = {
       ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage());
     } else {
       const idTag = createIdTag();
-      elementAdded$((node: Node) => node.isSameNode(idTag))
-        .pipe(first())
-        .subscribe(() => contentPage.load());
-      elementRemoved$(idTag)
-        .pipe(first())
-        .subscribe(() => contentPage.unload());
+      contentPage.subscriptions.add(
+        elementAdded$((node: Node) => node.isSameNode(idTag))
+          .pipe(first())
+          .subscribe(() => contentPage.load())
+      );
+      contentPage.subscriptions.add(
+        elementRemoved$(idTag)
+          .pipe(first())
+          .subscribe(() => contentPage.unload())
+      );
       addIdTagToDOM(idTag);
     }
   }

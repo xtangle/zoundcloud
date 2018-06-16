@@ -1,6 +1,6 @@
 import {useSinonChai} from '@test/test-initializers';
 import {doNothingIf, matchesCause, matchesError, tick} from '@test/test-utils';
-import {match, spy, stub} from 'sinon';
+import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
 import * as VError from 'verror';
 
 const expect = useSinonChai();
@@ -8,29 +8,28 @@ const expect = useSinonChai();
 describe('test utils', () => {
 
   describe('the doNothingIf function', () => {
-    const obj = {hello: (arg: any) => `hello ${arg}`};
-    const sinonStub = stub(obj, 'hello');
+    let sinonStub: SinonStub;
 
-    afterEach(() => {
-      sinonStub.resetHistory();
+    beforeEach(() => {
+      sinonStub = stub({foo: () => 'bar'}, 'foo');
     });
 
     it('should not do anything if arguments match matcher', () => {
       doNothingIf(sinonStub, match(42));
-      expect(obj.hello(42)).to.be.undefined;
+      expect(sinonStub(42)).to.be.undefined;
     });
 
     it('should call through if arguments do not match matcher', () => {
       doNothingIf(sinonStub, match(42));
-      expect(obj.hello(3)).to.be.equal('hello 3');
+      expect(sinonStub(3)).to.be.equal('bar');
     });
   });
 
   describe('the tick function', () => {
-    const sinonSpy = spy();
+    let sinonSpy: SinonSpy;
 
-    afterEach(() => {
-      sinonSpy.resetHistory();
+    beforeEach(() => {
+      sinonSpy = spy();
     });
 
     it('should return a promise that resolves in 0 ms by default', async () => {
@@ -52,14 +51,11 @@ describe('test utils', () => {
 
   describe('the matchesError matcher', () => {
     const error = new Error('some error message');
-    const callback = spy();
+    let callback: SinonSpy;
 
     beforeEach(() => {
+      callback = spy();
       callback(error);
-    });
-
-    afterEach(() => {
-      callback.resetHistory();
     });
 
     it('should match when the message of the Error is the same as the provided Error', () => {
@@ -86,14 +82,11 @@ describe('test utils', () => {
   describe('the matchesCause matcher', () => {
     const cause = new Error('some cause');
     const error = new VError(cause, 'some error message');
-    const callback = spy();
+    let callback: SinonSpy;
 
     beforeEach(() => {
+      callback = spy();
       callback(error);
-    });
-
-    afterEach(() => {
-      callback.resetHistory();
     });
 
     it('should match when the message of the cause is the same as the provided Error', () => {

@@ -1,18 +1,20 @@
 import {ID3WriterService} from '@src/download/metadata/id3-writer-service';
 import {useSinonChai} from '@test/test-initializers';
-import {createStubInstance} from 'sinon';
+import {createStubInstance, restore} from 'sinon';
 
 const expect = useSinonChai();
 const ID3Writer = require('browser-id3-writer');
 
 describe('id3 writer service', () => {
   const fixture = ID3WriterService;
-  const stubWriter: typeof ID3Writer = createStubInstance(ID3Writer);
+  let stubWriter: typeof ID3Writer;
+
+  beforeEach(() => {
+    stubWriter = createStubInstance(ID3Writer);
+  });
 
   afterEach(() => {
-    stubWriter.addTag.reset();
-    stubWriter.getURL.reset();
-    stubWriter.setFrame.reset();
+    restore();
   });
 
   it('should create an id3 writer', () => {

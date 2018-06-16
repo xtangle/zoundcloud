@@ -7,14 +7,12 @@ import {ContentPage} from '@src/page/content-page';
 import {InjectionService} from '@src/page/injection/injection-service';
 import {useSinonChai} from '@test/test-initializers';
 import {Subject, Subscription} from 'rxjs';
-import {SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
 describe('content page', () => {
   let fixture: ContentPage;
-  let subscriptions: Subscription;
-
   let spyUnload: SinonSpy;
   let stubInjectDownloadButtons: SinonStub;
   let stubOnMessage: SinonStub;
@@ -22,8 +20,6 @@ describe('content page', () => {
 
   beforeEach(() => {
     fixture = new ContentPage();
-    subscriptions = (fixture as any).subscriptions;
-
     spyUnload = spy(fixture, 'unload');
     stubInjectDownloadButtons = stub(InjectionService, 'injectDownloadButtons');
     stubOnMessage = stub(ContentPageMessenger, 'onMessage');
@@ -31,14 +27,12 @@ describe('content page', () => {
   });
 
   afterEach(() => {
-    subscriptions.unsubscribe();
-    spyUnload.restore();
-    stubInjectDownloadButtons.restore();
-    stubOnMessage.restore();
+    fixture.subscriptions.unsubscribe();
+    restore();
   });
 
   it('should keep track of all subscriptions', () => {
-    expect(subscriptions.closed).to.be.false;
+    expect(fixture.subscriptions.closed).to.be.false;
   });
 
   describe('loading', () => {
@@ -48,7 +42,7 @@ describe('content page', () => {
     });
 
     it('should inject the download buttons', () => {
-      expect(stubInjectDownloadButtons).to.have.been.calledOnce.calledWithExactly(subscriptions);
+      expect(stubInjectDownloadButtons).to.have.been.calledOnce.calledWithExactly(fixture.subscriptions);
     });
 
     it('should not unload when unload content page message is not received', () => {
@@ -67,7 +61,7 @@ describe('content page', () => {
     });
 
     it('should unsubscribe from all subscriptions', () => {
-      expect(subscriptions.closed).to.be.true;
+      expect(fixture.subscriptions.closed).to.be.true;
     });
   });
 });

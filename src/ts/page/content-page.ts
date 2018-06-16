@@ -6,7 +6,7 @@ import {Subscription} from 'rxjs';
 import {first} from 'rxjs/operators';
 
 export class ContentPage {
-  private subscriptions: Subscription = new Subscription();
+  public subscriptions: Subscription = new Subscription();
 
   public load(): void {
     InjectionService.injectDownloadButtons(this.subscriptions);
