@@ -4,12 +4,12 @@ import {RequestDownloadMessage} from '@src/messaging/page/request-download.messa
 import {logger} from '@src/util/logger';
 import * as $ from 'jquery';
 import {fromEvent, Subscription} from 'rxjs';
-import {mapTo, throttleTime} from 'rxjs/operators';
+import {throttleTime} from 'rxjs/operators';
 
 export const DownloadButtonFactory = {
-  create(subscriptions: Subscription, downloadInfoUrl: string): JQuery<HTMLElement> {
+  create(subscriptions: Subscription, resourceInfoUrl: string): JQuery<HTMLElement> {
     const dlButton = createDlButton();
-    addDlButtonBehavior(dlButton, subscriptions, downloadInfoUrl);
+    addDlButtonBehavior(dlButton, subscriptions, resourceInfoUrl);
     return dlButton;
   }
 };
@@ -24,16 +24,13 @@ function createDlButton(): JQuery<HTMLElement> {
 
 function addDlButtonBehavior(dlButton: JQuery<HTMLElement>,
                              subscriptions: Subscription,
-                             downloadInfoUrl: string) {
-  const downloadClick$ = fromEvent(dlButton, 'click').pipe(throttleTime(3000));
+                             resourceInfoUrl: string) {
   subscriptions.add(
-    downloadClick$.pipe(mapTo(downloadInfoUrl))
-      .subscribe(
-        (dlInfoUrl: string) => {
-          logger.debug('Downloading', dlInfoUrl);
-          ContentPageMessenger.sendToExtension(new RequestDownloadMessage(dlInfoUrl));
-        },
-        (err) => logger.error('Error downloading', err)
-      )
+    fromEvent(dlButton, 'click')
+      .pipe(throttleTime(3000))
+      .subscribe(() => {
+        logger.debug('Downloading', resourceInfoUrl);
+        ContentPageMessenger.sendToExtension(new RequestDownloadMessage(resourceInfoUrl));
+      })
   );
 }

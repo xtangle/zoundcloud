@@ -4,10 +4,10 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {ContentPage} from '@src/page/content-page';
+import {InjectionService} from '@src/page/injection/injection-service';
 import {useSinonChai} from '@test/test-initializers';
-import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 import {Subject, Subscription} from 'rxjs';
-import {InjectionService} from '@src/page/injection-service';
+import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = useSinonChai();
 
