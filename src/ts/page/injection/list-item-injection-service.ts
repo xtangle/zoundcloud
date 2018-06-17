@@ -1,6 +1,6 @@
 import {ZC_DL_BUTTON_SMALL_CLASS} from '@src/constants';
 import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {InjectionCommonsService} from '@src/page/injection/injection-commons-service';
+import {addToButtonGroup} from '@src/page/injection/injection-commons';
 import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
 import {Subscription} from 'rxjs';
 
@@ -21,5 +21,5 @@ function addToListItem(subscriptions: Subscription, listItem: JQuery<HTMLElement
   const downloadButton = DownloadButtonFactory.create(subscriptions, downloadInfoUrl)
     .addClass(['sc-button-small', ZC_DL_BUTTON_SMALL_CLASS]);
   const buttonGroup = listItem.find('.soundActions .sc-button-group');
-  InjectionCommonsService.addToButtonGroup(downloadButton, buttonGroup);
+  addToButtonGroup(downloadButton, buttonGroup);
 }

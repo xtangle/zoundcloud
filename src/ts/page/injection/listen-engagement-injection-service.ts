@@ -1,6 +1,6 @@
 import {ZC_DL_BUTTON_MEDIUM_CLASS} from '@src/constants';
 import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {InjectionCommonsService} from '@src/page/injection/injection-commons-service';
+import {addToButtonGroup} from '@src/page/injection/injection-commons';
 import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
 import {UrlService} from '@src/util/url-service';
 import {Subscription} from 'rxjs';
@@ -21,5 +21,5 @@ function addToListenEngagement(subscriptions: Subscription, listenEngagement: JQ
     .addClass(['sc-button-medium', ZC_DL_BUTTON_MEDIUM_CLASS]);
   const buttonGroup = listenEngagement
     .find('.listenEngagement__footer .soundActions .sc-button-group');
-  InjectionCommonsService.addToButtonGroup(downloadButton, buttonGroup);
+  addToButtonGroup(downloadButton, buttonGroup);
 }

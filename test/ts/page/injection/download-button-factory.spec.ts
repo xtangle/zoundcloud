@@ -35,11 +35,13 @@ describe('download button factory', () => {
     });
 
     it('should have the SoundCloud button classes', () => {
-      expect(button.is('.sc-button.sc-button-responsive')).to.be.true;
+      expect(button.hasClass('sc-button')).to.be.true;
+      expect(button.hasClass('sc-button-responsive')).to.be.true;
     });
 
     it('should have the ZoundCloud button classes', () => {
-      expect(button.is(`.${ZC_DL_BUTTON_CLASS}.${ZC_DL_BUTTON_ICON_CLASS}`)).to.be.true;
+      expect(button.hasClass(ZC_DL_BUTTON_CLASS)).to.be.true;
+      expect(button.hasClass(ZC_DL_BUTTON_ICON_CLASS)).to.be.true;
     });
 
     it('should have a title of Download', () => {
