@@ -3,11 +3,11 @@ import {ITrackInfo} from '@src/download/resource/resource-info';
 import {TrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError} from 'rxjs';
 import {match, restore, SinonMatcher, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('track download method service', () => {
   const rx = useRxTesting();

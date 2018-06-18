@@ -1,10 +1,10 @@
 import {Bootstrapper} from '@src/page/bootstrapper';
 import {ContentPage} from '@src/page/content-page';
 import {ContentScript} from '@src/runnable/content-script';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {restore, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('content script', () => {
   let fixture: ContentScript;

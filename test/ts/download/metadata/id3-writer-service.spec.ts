@@ -1,8 +1,8 @@
 import {ID3WriterService} from '@src/download/metadata/id3-writer-service';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {createStubInstance, restore} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 const ID3Writer = require('browser-id3-writer');
 
 describe('id3 writer service', () => {

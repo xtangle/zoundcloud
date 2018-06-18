@@ -3,10 +3,10 @@ import {Message} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
-import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {match} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('extension messenger', () => {
   const sinonChrome = useSinonChrome();

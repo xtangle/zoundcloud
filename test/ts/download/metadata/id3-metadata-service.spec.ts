@@ -3,12 +3,12 @@ import {ID3WriterService, IID3Writer} from '@src/download/metadata/id3-writer-se
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, match, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('id3 metadata service', () => {
   const rx = useRxTesting();

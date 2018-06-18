@@ -3,11 +3,11 @@ import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('metadata adapter', () => {
   const rx = useRxTesting();

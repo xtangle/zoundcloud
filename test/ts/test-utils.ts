@@ -1,5 +1,4 @@
-import {match, SinonMatcher, SinonStub} from 'sinon';
-import * as VError from 'verror';
+import {SinonMatcher, SinonStub} from 'sinon';
 
 /**
  * Noop.
@@ -33,27 +32,9 @@ export async function tick(delay: number = 0): Promise<any> {
 }
 
 /**
- * Helper Sinon matcher for matching against an Error thrown. It matches if the actual Error
- * contains the same message as the provided Error (or message) to test against.
- * @param {Error | string} error
- * @returns {Sinon.SinonMatcher}
+ * Helper function to get the current window's base url in tests.
+ * @returns {string}
  */
-export function matchesError(error: Error | string): SinonMatcher {
-  const errorMessage = getErrorMessage(error);
-  return match((actual: Error) => actual.message === errorMessage, errorMessage);
-}
-
-/**
- * Helper Sinon matcher for matching against an VError thrown. It matches if the actual VError
- * contains an Error cause that has the same message as the provided Error (or message) to test against.
- * @param {Error | string} cause
- * @returns {Sinon.SinonMatcher}
- */
-export function matchesCause(cause: Error | string): SinonMatcher {
-  const errorMessage = getErrorMessage(cause);
-  return match((actual: VError) => actual.cause() && actual.cause().message === errorMessage, errorMessage);
-}
-
-function getErrorMessage(error: Error | string): string {
-  return (typeof error === 'string') ? error : error.message;
+export function getLocationBaseUrl(): string {
+  return `${location.protocol}//${location.hostname}:${location.port}`;
 }

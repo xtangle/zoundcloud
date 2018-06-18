@@ -1,10 +1,10 @@
 import {elementAdded$, elementExist$, elementExistOrAdded$, elementRemoved$} from '@src/util/dom-observer';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {Observable} from 'rxjs';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('dom observer', () => {
   const rx = useRxTesting();

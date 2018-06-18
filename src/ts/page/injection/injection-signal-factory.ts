@@ -31,6 +31,6 @@ function toJQuery(node: Node): JQuery<HTMLElement> {
   return $(node);
 }
 
-function hasNoDownloadButton(node: JQuery<HTMLElement>) {
+function hasNoDownloadButton(node: JQuery<HTMLElement>): boolean {
   return node.find(`.${ZC_DL_BUTTON_CLASS}`).length === 0;
 }

@@ -2,12 +2,12 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {Bootstrapper, TAG_ID} from '@src/page/bootstrapper';
 import {ContentPage} from '@src/page/content-page';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {restore, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('bootstrapper', () => {
   const fixture = Bootstrapper;

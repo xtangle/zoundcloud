@@ -9,14 +9,14 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {TrackContentPage, ZC_TRACK_DL_BUTTON_ID} from '@src/page/track-content-page';
 import {UrlService} from '@src/util/url-service';
-import {useFakeTimer, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {useFakeTimer, configureChai, useSinonChrome} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {BehaviorSubject, Subject, Subscription} from 'rxjs';
 import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const forEach = require('mocha-each');
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('track content page', () => {
   let fixture: TrackContentPage;

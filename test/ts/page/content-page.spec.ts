@@ -5,11 +5,11 @@ import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {ContentPage} from '@src/page/content-page';
 import {InjectionService} from '@src/page/injection/injection-service';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {Subject, Subscription} from 'rxjs';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('content page', () => {
   let fixture: ContentPage;

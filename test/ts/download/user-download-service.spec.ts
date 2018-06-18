@@ -3,12 +3,12 @@ import {ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resour
 import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {TrackDownloadService} from '@src/download/track-download-service';
 import {UserDownloadService} from '@src/download/user-download-service';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, match, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('user download service', () => {
   const rx = useRxTesting();

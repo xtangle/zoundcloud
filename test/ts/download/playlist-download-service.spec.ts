@@ -2,10 +2,10 @@ import {ITrackDownloadResult} from '@src/download/download-result';
 import {PlaylistDownloadService} from '@src/download/playlist-download-service';
 import {IPlaylistInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
 import {TrackDownloadService} from '@src/download/track-download-service';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {match, restore, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('playlist download service', () => {
 

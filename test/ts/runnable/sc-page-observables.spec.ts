@@ -1,12 +1,12 @@
 import {SC_URL_PATTERN} from '@src/constants';
 import {ScPageObservables} from '@src/runnable/sc-page-observables';
-import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {doNothingIf} from '@test/test-utils';
 import {clock, match, restore, SinonMatcher, SinonStub, stub, useFakeTimers} from 'sinon';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 const forEach = require('mocha-each');
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('sc page visited observable factory', () => {
   const sinonChrome = useSinonChrome();

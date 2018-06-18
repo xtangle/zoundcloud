@@ -3,14 +3,14 @@ import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {TrackDownloadService} from '@src/download/track-download-service';
-import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
-import {matchesCause, matchesError} from '@test/test-utils';
+import {matchesCause, matchesError} from '@test/sinon-matchers';
+import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, match, restore, SinonSpy, SinonStub, spy, stub, useFakeTimers} from 'sinon';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe(`track download service`, () => {
   const sinonChrome = useSinonChrome();

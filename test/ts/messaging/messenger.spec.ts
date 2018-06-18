@@ -3,12 +3,12 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {DefaultMessenger, IMessenger} from '@src/messaging/messenger';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
-import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {match, SinonSpy, spy} from 'sinon';
 import MessageSender = chrome.runtime.MessageSender;
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('default messenger', () => {
   const sinonChrome = useSinonChrome();

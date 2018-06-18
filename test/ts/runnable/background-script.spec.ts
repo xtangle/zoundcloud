@@ -9,13 +9,13 @@ import {RequestContentPageReloadMessage} from '@src/messaging/page/request-conte
 import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
 import {BackgroundScript} from '@src/runnable/background-script';
 import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
-import {useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {configureChai, useSinonChrome} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {SinonSpy, SinonStub, spy, stub} from 'sinon';
 import Tab = chrome.tabs.Tab;
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('background script', () => {
   const sinonChrome = useSinonChrome();

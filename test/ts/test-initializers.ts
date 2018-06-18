@@ -1,11 +1,13 @@
 import {Observable, Subscription} from 'rxjs';
 import {createSandbox, SinonSpy} from 'sinon';
 
-export function useSinonChai(): Chai.ExpectStatic {
+export function configureChai(): Chai.ExpectStatic & typeof chaiJq {
   const chai = require('chai');
   const sinonChai = require('sinon-chai');
+  const chaiJq = require('chai-jq');
 
   chai.use(sinonChai);
+  chai.use(chaiJq);
   return chai.expect;
 }
 

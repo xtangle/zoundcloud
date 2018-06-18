@@ -2,11 +2,11 @@ import {CLIENT_ID, SC_API_URL} from '@src/constants';
 import {IPlaylistInfo, IResourceInfo, ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {ResourceInfoService} from '@src/download/resource/resource-info-service';
 import {XhrRequestService} from '@src/util/xhr-request-service';
-import {useRxTesting, useSinonChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('resource info service', () => {
   const rx = useRxTesting();

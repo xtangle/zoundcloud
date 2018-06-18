@@ -1,8 +1,8 @@
 import {logger} from '@src/util/logger';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {restore, SinonStub, stub} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('logger', () => {
   let prevNodeEnv: string; // Previous stored value in NODE_ENV

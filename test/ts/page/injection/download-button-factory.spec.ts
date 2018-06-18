@@ -2,11 +2,11 @@ import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {useSinonChai} from '@test/test-initializers';
+import {configureChai} from '@test/test-initializers';
 import {Subscription} from 'rxjs';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('download button factory', () => {
   const fixture = DownloadButtonFactory;
@@ -31,17 +31,17 @@ describe('download button factory', () => {
 
   context('button properties', () => {
     it('should be a button', () => {
-      expect(button[0].tagName.toLowerCase()).to.be.equals('button');
+      expect(button[0].tagName.toLowerCase()).to.be.equal('button');
     });
 
     it('should have the SoundCloud button classes', () => {
-      expect(button.hasClass('sc-button')).to.be.true;
-      expect(button.hasClass('sc-button-responsive')).to.be.true;
+      expect(button).to.have.$class('sc-button');
+      expect(button).to.have.$class('sc-button-responsive');
     });
 
     it('should have the ZoundCloud button classes', () => {
-      expect(button.hasClass(ZC_DL_BUTTON_CLASS)).to.be.true;
-      expect(button.hasClass(ZC_DL_BUTTON_ICON_CLASS)).to.be.true;
+      expect(button).to.have.$class(ZC_DL_BUTTON_CLASS);
+      expect(button).to.have.$class(ZC_DL_BUTTON_ICON_CLASS);
     });
 
     it('should have a title of Download', () => {

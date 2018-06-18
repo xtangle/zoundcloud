@@ -3,10 +3,10 @@ import {MessageResponse} from '@src/messaging/message-response';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
-import {useRxTesting, useSinonChai, useSinonChrome} from '@test/test-initializers';
+import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {match} from 'sinon';
 
-const expect = useSinonChai();
+const expect = configureChai();
 
 describe('content page messenger', () => {
   const sinonChrome = useSinonChrome();
