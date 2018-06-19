@@ -7,43 +7,36 @@ import {RequestDownloadMessage} from '@src/messaging/page/request-download.messa
 import {IRunnable} from '@src/runnable/runnable';
 import {ScPageObservables} from '@src/runnable/sc-page-observables';
 import {logger} from '@src/util/logger';
-import {fromEventPattern, Observable, Subscription} from 'rxjs';
+import {fromEventPattern, Observable} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 export class BackgroundScript implements IRunnable {
 
   private onSuspend$: Observable<any> = fromEventPattern<any>(
     (handler: () => void) => chrome.runtime.onSuspend.addListener(handler));
-  private subscriptions: Subscription = new Subscription();
-
-  public cleanUp(): void {
-    logger.debug('Unloading background script');
-    this.subscriptions.unsubscribe();
-  }
 
   public run(): void {
-    this.subscriptions.add(
-      this.onSuspend$.subscribe(this.cleanUp.bind(this))
-    );
-    this.subscriptions.add(
-      ScPageObservables.scPageVisited$().subscribe((details: WebNavigationUrlCallbackDetails) => {
-        logger.debug('Loading content script', details);
+    ScPageObservables.scPageVisited$()
+      .pipe(takeUntil(this.onSuspend$))
+      .subscribe((details: WebNavigationUrlCallbackDetails) => {
         chrome.tabs.insertCSS(details.tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(details.tabId, {file: 'vendor.js'});
         chrome.tabs.executeScript(details.tabId, {file: 'content.js'});
-      })
-    );
-    this.subscriptions.add(
-      ExtensionMessenger.onMessage(RequestContentPageReloadMessage.TYPE).subscribe(
-        (args: IMessageHandlerArgs<RequestContentPageReloadMessage>) => {
-          ExtensionMessenger.sendToContentPage(args.sender.tab.id, new ReloadContentPageMessage());
-        })
-    );
-    this.subscriptions.add(
-      ExtensionMessenger.onMessage(RequestDownloadMessage.TYPE).subscribe(
-        (args: IMessageHandlerArgs<RequestDownloadMessage>) => {
-          DownloadService.download$(args.message.downloadInfoUrl);
-        })
-    );
+      });
+
+    ExtensionMessenger.onMessage$(RequestContentPageReloadMessage.TYPE)
+      .pipe(takeUntil(this.onSuspend$))
+      .subscribe((args: IMessageHandlerArgs<RequestContentPageReloadMessage>) => {
+        ExtensionMessenger.sendToContentPage$(args.sender.tab.id, new ReloadContentPageMessage());
+      });
+
+    ExtensionMessenger.onMessage$(RequestDownloadMessage.TYPE)
+      .pipe(takeUntil(this.onSuspend$))
+      .subscribe((args: IMessageHandlerArgs<RequestDownloadMessage>) => {
+        DownloadService.download$(args.message.resourceInfoUrl);
+      });
+
+    logger.debug('Loaded background script');
   }
 }

@@ -21,7 +21,7 @@ export const InjectionSignalFactory = {
 function forcefullyInjectSignal$(selector: string): Observable<Node> {
   return merge(
     interval(3000),
-    ContentPageMessenger.onMessage(ReloadContentPageMessage.TYPE)
+    ContentPageMessenger.onMessage$(ReloadContentPageMessage.TYPE)
   ).pipe(
     switchMapTo(elementExist$(selector))
   );

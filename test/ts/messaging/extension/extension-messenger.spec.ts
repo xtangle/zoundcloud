@@ -19,7 +19,7 @@ describe('extension messenger', () => {
   describe('sending message to content page', () => {
     context('when not expecting a response', () => {
       beforeEach(() => {
-        rx.subscribeTo(fixture.sendToContentPage(tabId, fakeMessage));
+        rx.subscribeTo(fixture.sendToContentPage$(tabId, fakeMessage));
       });
 
       it('should send message to given tab id', () => {
@@ -34,7 +34,7 @@ describe('extension messenger', () => {
 
     context('when expecting a response', () => {
       beforeEach(() => {
-        rx.subscribeTo(fixture.sendToContentPage(tabId, fakeMessage, true));
+        rx.subscribeTo(fixture.sendToContentPage$(tabId, fakeMessage, true));
       });
 
       it('should send message to given tab id', () => {

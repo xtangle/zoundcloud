@@ -11,13 +11,13 @@ export interface IMessageHandlerArgs<T extends Message, U extends MessageRespons
 }
 
 export interface IMessenger {
-  onMessage(messageType: MessageType,
-            sendResponse?: boolean): Observable<IMessageHandlerArgs<Message, MessageResponse>>;
+  onMessage$(messageType: MessageType,
+             sendResponse?: boolean): Observable<IMessageHandlerArgs<Message, MessageResponse>>;
 }
 
-export abstract class DefaultMessenger implements IMessenger {
-  public onMessage(messageType: MessageType,
-                   doSendResponse: boolean = false): Observable<IMessageHandlerArgs<Message, MessageResponse>> {
+export abstract class BaseMessenger implements IMessenger {
+  public onMessage$(messageType: MessageType,
+                    doSendResponse: boolean = false): Observable<IMessageHandlerArgs<Message, MessageResponse>> {
 
     const handlerArgs$: Subject<IMessageHandlerArgs<Message, MessageResponse>> =
       new Subject<IMessageHandlerArgs<Message, MessageResponse>>();

@@ -20,7 +20,7 @@ export const TAG_ID = 'zc-content-page';
 export const Bootstrapper = {
   bootstrap(contentPage: ContentPage): void {
     if (idTagIsInDOM()) {
-      ContentPageMessenger.sendToExtension(new RequestContentPageReloadMessage());
+      ContentPageMessenger.sendToExtension$(new RequestContentPageReloadMessage());
     } else {
       const idTag = createIdTag();
       contentPage.subscriptions.add(

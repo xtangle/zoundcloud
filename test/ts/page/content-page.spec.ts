@@ -1,29 +1,19 @@
-import {UnloadContentPageMessage} from '@src/messaging/extension/unload-content-page.message';
-import {Message} from '@src/messaging/message';
-import {MessageResponse} from '@src/messaging/message-response';
-import {IMessageHandlerArgs} from '@src/messaging/messenger';
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {ContentPage} from '@src/page/content-page';
 import {InjectionService} from '@src/page/injection/injection-service';
 import {configureChai} from '@test/test-initializers';
-import {Subject, Subscription} from 'rxjs';
-import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {restore, SinonStub, stub} from 'sinon';
 
 const expect = configureChai();
 
 describe('content page', () => {
   let fixture: ContentPage;
-  let spyUnload: SinonSpy;
+
   let stubInjectDownloadButtons: SinonStub;
-  let stubOnMessage: SinonStub;
-  let message$: Subject<IMessageHandlerArgs<Message, MessageResponse>>;
 
   beforeEach(() => {
     fixture = new ContentPage();
-    spyUnload = spy(fixture, 'unload');
+
     stubInjectDownloadButtons = stub(InjectionService, 'injectDownloadButtons');
-    stubOnMessage = stub(ContentPageMessenger, 'onMessage');
-    message$ = new Subject();
   });
 
   afterEach(() => {
@@ -35,33 +25,13 @@ describe('content page', () => {
     expect(fixture.subscriptions.closed).to.be.false;
   });
 
-  describe('loading', () => {
-    beforeEach(() => {
-      stubOnMessage.withArgs(UnloadContentPageMessage.TYPE).returns(message$);
-      fixture.load();
-    });
-
-    it('should inject the download buttons', () => {
-      expect(stubInjectDownloadButtons).to.have.been.calledOnce.calledWithExactly(fixture.subscriptions);
-    });
-
-    it('should not unload when unload content page message is not received', () => {
-      expect(spyUnload).to.not.have.been.called;
-    });
-
-    it('should unload when unload content page message is received', () => {
-      message$.next();
-      expect(spyUnload).to.have.been.calledOnce;
-    });
+  it('should inject the download buttons when loaded', () => {
+    fixture.load();
+    expect(stubInjectDownloadButtons).to.have.been.calledOnce.calledWithExactly(fixture.subscriptions);
   });
 
-  describe('unloading', () => {
-    beforeEach(() => {
-      fixture.unload();
-    });
-
-    it('should unsubscribe from all subscriptions', () => {
-      expect(fixture.subscriptions.closed).to.be.true;
-    });
+  it('should unsubscribe from all subscriptions when unloaded', () => {
+    fixture.unload();
+    expect(fixture.subscriptions.closed).to.be.true;
   });
 });

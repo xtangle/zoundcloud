@@ -30,7 +30,7 @@ function addDlButtonBehavior(dlButton: JQuery<HTMLElement>,
       .pipe(throttleTime(3000))
       .subscribe(() => {
         logger.debug('Downloading', resourceInfoUrl);
-        ContentPageMessenger.sendToExtension(new RequestDownloadMessage(resourceInfoUrl));
+        ContentPageMessenger.sendToExtension$(new RequestDownloadMessage(resourceInfoUrl));
       })
   );
 }

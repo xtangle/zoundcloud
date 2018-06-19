@@ -4,7 +4,6 @@ import {InjectionSignalFactory} from '@src/page/injection/injection-signal-facto
 import {ListItemInjectionService} from '@src/page/injection/list-item-injection-service';
 import {matchesElements} from '@test/sinon-matchers';
 import {configureChai} from '@test/test-initializers';
-import {getLocationBaseUrl} from '@test/test-utils';
 import * as $ from 'jquery';
 import {EMPTY, of, Subscription} from 'rxjs';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
@@ -92,7 +91,7 @@ describe('list item injection service', () => {
           `should create the download button with the correct parameters for ${listItem.name}`,
         (listItem: IListItemTestObj) => {
           stubCreateInjectionSignal$.returns(of(listItem.item));
-          const expectedUrl = `${getLocationBaseUrl()}${listItem.href}`;
+          const expectedUrl = `${location.origin}${listItem.href}`;
           fixture.injectDownloadButtons(subscriptions);
 
           expect(spyCreateDownloadButton).to.have.been.calledOnce.calledWithExactly(subscriptions, expectedUrl);

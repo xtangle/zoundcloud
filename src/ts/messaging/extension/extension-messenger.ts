@@ -1,12 +1,12 @@
 import {Message} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
-import {DefaultMessenger} from '@src/messaging/messenger';
+import {BaseMessenger} from '@src/messaging/messenger';
 import {EMPTY, Observable, Subject} from 'rxjs';
 
-class ExtensionMessengerImpl extends DefaultMessenger {
-  public sendToContentPage<T extends MessageResponse = undefined>(tabId: number,
-                                                                  message: Message,
-                                                                  expectResponse: boolean = false): Observable<T> {
+class ExtensionMessengerImpl extends BaseMessenger {
+  public sendToContentPage$<T extends MessageResponse = undefined>(tabId: number,
+                                                                   message: Message,
+                                                                   expectResponse: boolean = false): Observable<T> {
     let response$: Observable<T>;
 
     if (expectResponse) {

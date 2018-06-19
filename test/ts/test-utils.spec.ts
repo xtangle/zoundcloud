@@ -1,5 +1,5 @@
 import {configureChai} from '@test/test-initializers';
-import {doNothingIf, getLocationBaseUrl, tick} from '@test/test-utils';
+import {doNothingIf, tick} from '@test/test-utils';
 import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = configureChai();
@@ -45,13 +45,6 @@ describe('test utils', () => {
       expect(sinonSpy).to.not.have.been.called;
       await tick(1);
       expect(sinonSpy).to.have.been.called;
-    });
-  });
-
-  describe('the getLocationBaseUrl function', () => {
-    it('should return the base url', () => {
-      const expected = `${location.protocol}//${location.hostname}:${location.port}`;
-      expect(getLocationBaseUrl()).to.be.equal(expected);
     });
   });
 });

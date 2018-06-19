@@ -21,7 +21,7 @@ describe('bootstrapper', () => {
     contentPage = new ContentPage();
     stubLoad = stub(contentPage, 'load');
     stubUnload = stub(contentPage, 'unload');
-    stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+    stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension$');
   });
 
   afterEach(() => {

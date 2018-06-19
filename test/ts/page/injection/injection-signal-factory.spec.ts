@@ -20,15 +20,15 @@ describe('injection signal factory', () => {
   let diva: JQuery<HTMLElement>;
 
   let message$: Subject<IMessageHandlerArgs<Message, MessageResponse>>;
-  let stubOnMessage: SinonStub;
+  let stubOnMessage$: SinonStub;
 
   beforeEach(() => {
     useFakeTimers();
     diva = $('<div class="a"></div>');
 
     message$ = new Subject();
-    stubOnMessage = stub(ContentPageMessenger, 'onMessage');
-    stubOnMessage.withArgs(ReloadContentPageMessage.TYPE).returns(message$);
+    stubOnMessage$ = stub(ContentPageMessenger, 'onMessage$');
+    stubOnMessage$.withArgs(ReloadContentPageMessage.TYPE).returns(message$);
   });
 
   afterEach(() => {

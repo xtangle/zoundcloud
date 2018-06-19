@@ -30,11 +30,3 @@ export async function tick(delay: number = 0): Promise<any> {
     }, delay);
   });
 }
-
-/**
- * Helper function to get the current window's base url in tests.
- * @returns {string}
- */
-export function getLocationBaseUrl(): string {
-  return `${location.protocol}//${location.hostname}:${location.port}`;
-}

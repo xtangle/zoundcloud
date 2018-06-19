@@ -1,156 +1,128 @@
-/*
-import {ITrackInfo} from '@src/download/download-info';
-import {DownloadService} from '@src/download/track-download-service';
+import {DownloadService} from '@src/download/download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
-import {Message} from '@src/messaging/message';
 import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {RequestTrackDownloadMessage} from '@src/messaging/page/request-track-download.message';
+import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {BackgroundScript} from '@src/runnable/background-script';
-import {ScPageVisitedObservableFactory} from '@src/runnable/sc-page-visited-observable.factory';
+import {ScPageObservables} from '@src/runnable/sc-page-observables';
 import {configureChai, useSinonChrome} from '@test/test-initializers';
-import {Subject} from 'rxjs';
-import {SinonSpy, SinonStub, spy, stub} from 'sinon';
-import Tab = chrome.tabs.Tab;
-import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
+import {EMPTY, of, Subject} from 'rxjs';
+import {restore, SinonStub, stub} from 'sinon';
 
 const expect = configureChai();
 
 describe('background script', () => {
   const sinonChrome = useSinonChrome();
+
   let fixture: BackgroundScript;
+
+  let stubScPageVisited$: SinonStub;
+  let stubOnMessage$: SinonStub;
+  let stubSendToContentPage: SinonStub;
+  let stubDownload$: SinonStub;
 
   beforeEach(() => {
     fixture = new BackgroundScript();
+
+    stubScPageVisited$ = stub(ScPageObservables, 'scPageVisited$');
+    stubScPageVisited$.returns(EMPTY);
+    stubOnMessage$ = stub(ExtensionMessenger, 'onMessage$');
+    stubOnMessage$.returns(EMPTY);
+    stubSendToContentPage = stub(ExtensionMessenger, 'sendToContentPage$');
+    stubDownload$ = stub(DownloadService, 'download$');
   });
 
   afterEach(() => {
-    fixture.cleanUp();
+    restore();
   });
 
-  context('when background script has run', () => {
-    describe('running the content script', () => {
-      let scPageVisited$: Subject<WebNavigationUrlCallbackDetails>;
-      let stubScPageVisitedCreate: SinonStub;
+  context('running the content script', () => {
+    it('should run when visiting a SoundCloud page', () => {
+      const tabId = 123;
+      stubScPageVisited$.returns(of({tabId}));
+      fixture.run();
 
-      beforeEach(() => {
-        scPageVisited$ = new Subject<WebNavigationUrlCallbackDetails>();
-        stubScPageVisitedCreate = stub(ScPageVisitedObservableFactory, 'create$');
-        stubScPageVisitedCreate.returns(scPageVisited$);
-        fixture.run();
-      });
-
-      afterEach(() => {
-        stubScPageVisitedCreate.restore();
-      });
-
-      it('should run when visiting a SoundCloud page', () => {
-        const tabId = 123;
-        scPageVisited$.next({tabId, timeStamp: 432.1, url: 'some-url'});
-
-        expect(sinonChrome.tabs.insertCSS.withArgs(tabId, {file: 'styles.css'})).to.have.been.calledOnce;
-        expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
-        expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(tabId, {file: 'vendor.js'});
-        expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
-      });
-
-      it('should not run when not visiting a SoundCloud page', () => {
-        expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
-        expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
-      });
+      expect(sinonChrome.tabs.insertCSS.withArgs(tabId, {file: 'styles.css'})).to.have.been.calledOnce;
+      expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
+      expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(tabId, {file: 'vendor.js'});
+      expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
     });
 
-    describe('downloading a track', () => {
-      let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
-      let stubOnMessage: SinonStub;
-      let stubDownloadTrack: SinonStub;
-
-      beforeEach(() => {
-        fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
-        stubOnMessage = stub(ExtensionMessenger, 'onMessage');
-        stubOnMessage.withArgs(RequestTrackDownloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
-        stubOnMessage.callThrough();
-        stubDownloadTrack = stub(DownloadService, 'downloadTrack');
-        fixture.run();
-      });
-
-      afterEach(() => {
-        stubOnMessage.restore();
-        stubDownloadTrack.restore();
-      });
-
-      it('should download a track when a request track download message is received', () => {
-        const fakeTrackInfo: ITrackInfo = {
-          downloadable: false,
-          id: 123,
-          original_format: 'mp3',
-          title: 'title',
-          user: {username: 'foo'}
-        };
-        fakeMessageHandlerArgs$.next({message: new RequestTrackDownloadMessage(fakeTrackInfo), sender: null});
-        expect(stubDownloadTrack).to.have.been.calledOnce.calledWithExactly(fakeTrackInfo);
-      });
-
-      it('should not download a track when a request track download message is not received', () => {
-        expect(stubDownloadTrack).to.not.have.been.called;
-      });
+    it('should not run when not visiting a SoundCloud page', () => {
+      fixture.run();
+      expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
+      expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
     });
 
-    describe('sending the reload content page message', () => {
-      let fakeMessageHandlerArgs$: Subject<IMessageHandlerArgs<Message>>;
-      let stubOnMessage: SinonStub;
-      let spySendToContentPage: SinonSpy;
+    it('should not run after the onSuspend event has emitted', () => {
+      const scPageVisited$ = new Subject();
+      stubScPageVisited$.returns(scPageVisited$);
+      fixture.run();
+      sinonChrome.runtime.onSuspend.trigger();
+      scPageVisited$.next({tabId: 123});
 
-      beforeEach(() => {
-        fakeMessageHandlerArgs$ = new Subject<IMessageHandlerArgs<Message>>();
-        stubOnMessage = stub(ExtensionMessenger, 'onMessage');
-        stubOnMessage.withArgs(RequestContentPageReloadMessage.TYPE).returns(fakeMessageHandlerArgs$);
-        stubOnMessage.callThrough();
-        spySendToContentPage = spy(ExtensionMessenger, 'sendToContentPage');
-        fixture.run();
-      });
+      expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
+      expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
+    });
+  });
 
-      afterEach(() => {
-        stubOnMessage.restore();
-        spySendToContentPage.restore();
-      });
+  context('reloading the content page', () => {
+    it('should send a reload message when a request reload content page message is received', () => {
+      const messageHandlerArgs = {
+        sender: {
+          tab: {id: 123}
+        }
+      } as IMessageHandlerArgs<RequestContentPageReloadMessage>;
+      stubOnMessage$.withArgs(RequestContentPageReloadMessage.TYPE).returns(of(messageHandlerArgs));
+      fixture.run();
 
-      it('should send a message when a request content page reload message is received', () => {
-        const contentPageId = 'content-page-id';
-        const fakeTab = {id: 123} as Tab;
-        fakeMessageHandlerArgs$.next({
-          message: new RequestContentPageReloadMessage(contentPageId),
-          sender: {tab: fakeTab}
-        });
-        expect(spySendToContentPage).to.have.been.calledOnce
-          .calledWithExactly(fakeTab.id, new ReloadContentPageMessage(contentPageId));
-      });
-
-      it('should not send a message when a request content page reload message is not received', () => {
-        expect(spySendToContentPage).to.not.have.been.called;
-      });
+      expect(stubSendToContentPage).to.have.been.calledOnce
+        .calledWithExactly(123, new ReloadContentPageMessage());
     });
 
-    describe('cleaning up', () => {
-      it('should clean up when the onSuspend event is emitted', () => {
-        const spyCleanUp = spy(fixture, 'cleanUp');
-        fixture.run();
-        expect(spyCleanUp).to.not.have.been.called;
-        sinonChrome.runtime.onSuspend.trigger();
-        expect(spyCleanUp).to.have.been.called;
-      });
+    it('should not send a reload message when no request reload content page message is received', () => {
+      fixture.run();
+      expect(stubSendToContentPage).to.not.have.been.called;
+    });
 
-      it('should unsubscribe from all subscriptions', () => {
-        const SUBS_PROP = 'subscriptions';
-        const spyUnsubscribe = spy(fixture[SUBS_PROP], 'unsubscribe');
+    it('should not send a reload message after the onSuspend event has emitted', () => {
+      const message$ = new Subject();
+      stubOnMessage$.withArgs(RequestContentPageReloadMessage.TYPE).returns(message$);
+      fixture.run();
+      sinonChrome.runtime.onSuspend.trigger();
+      message$.next({sender: {tab: {id: 123}}});
 
-        fixture.run();
-        fixture.cleanUp();
+      expect(stubSendToContentPage).to.not.have.been.called;
+    });
+  });
 
-        expect(spyUnsubscribe).to.have.been.called;
-      });
+  context('downloading', () => {
+    it('should download when a request download message is received', () => {
+      const messageHandlerArgs = {
+        message: {
+          resourceInfoUrl: 'some-url'
+        }
+      } as IMessageHandlerArgs<RequestDownloadMessage>;
+      stubOnMessage$.withArgs(RequestDownloadMessage.TYPE).returns(of(messageHandlerArgs));
+      fixture.run();
+
+      expect(stubDownload$).to.have.been.calledOnce.calledWithExactly('some-url');
+    });
+
+    it('should not download when no request download message is received', () => {
+      fixture.run();
+      expect(stubDownload$).to.not.have.been.called;
+    });
+
+    it('should not download after the onSuspend event has emitted', () => {
+      const message$ = new Subject();
+      stubOnMessage$.withArgs(RequestDownloadMessage.TYPE).returns(message$);
+      fixture.run();
+      sinonChrome.runtime.onSuspend.trigger();
+      message$.next({message: {resourceInfoUrl: 'some-url'}});
+
+      expect(stubDownload$).to.not.have.been.called;
     });
   });
 });
-*/

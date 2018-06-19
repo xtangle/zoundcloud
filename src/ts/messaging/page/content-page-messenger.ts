@@ -1,11 +1,11 @@
 import {Message} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
-import {DefaultMessenger} from '@src/messaging/messenger';
+import {BaseMessenger} from '@src/messaging/messenger';
 import {EMPTY, Observable, Subject} from 'rxjs';
 
-class ContentPageMessengerImpl extends DefaultMessenger {
-  public sendToExtension<T extends MessageResponse = undefined>(message: Message,
-                                                                expectResponse: boolean = false): Observable<T> {
+class ContentPageMessengerImpl extends BaseMessenger {
+  public sendToExtension$<T extends MessageResponse = undefined>(message: Message,
+                                                                 expectResponse: boolean = false): Observable<T> {
     let response$: Observable<T>;
 
     if (expectResponse) {

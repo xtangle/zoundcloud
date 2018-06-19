@@ -21,7 +21,7 @@ describe('download button factory', () => {
 
     subscriptions = new Subscription();
     button = fixture.create(subscriptions, resourceInfoUrl);
-    stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension');
+    stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension$');
   });
 
   afterEach(() => {

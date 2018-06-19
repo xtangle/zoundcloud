@@ -1,6 +1,6 @@
 import {Message, MessageType} from '@src/messaging/message';
 import {MessageResponse} from '@src/messaging/message-response';
-import {DefaultMessenger, IMessenger} from '@src/messaging/messenger';
+import {BaseMessenger, IMessenger} from '@src/messaging/messenger';
 import {DummyMessage} from '@test/messaging/dummy-message';
 import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
 import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
@@ -10,7 +10,7 @@ import MessageSender = chrome.runtime.MessageSender;
 
 const expect = configureChai();
 
-describe('default messenger', () => {
+describe('base messenger', () => {
   const sinonChrome = useSinonChrome();
   const rx = useRxTesting();
 
@@ -28,7 +28,7 @@ describe('default messenger', () => {
   describe('listening on a message', () => {
     context('when not sending a response', () => {
       beforeEach(() => {
-        rx.subscribeTo(fixture.onMessage(msgType1));
+        rx.subscribeTo(fixture.onMessage$(msgType1));
       });
 
       it('should emit the message and sender when message of specified type is received', () => {
@@ -57,7 +57,7 @@ describe('default messenger', () => {
 
       beforeEach(() => {
         responseCallback = spy();
-        rx.subscribeTo(fixture.onMessage(msgType1, true));
+        rx.subscribeTo(fixture.onMessage$(msgType1, true));
       });
 
       it('should emit message, sender, and response subject when message of specified type is received', () => {
@@ -110,5 +110,5 @@ describe('default messenger', () => {
   });
 });
 
-class DummyConcreteMessenger extends DefaultMessenger {
+class DummyConcreteMessenger extends BaseMessenger {
 }

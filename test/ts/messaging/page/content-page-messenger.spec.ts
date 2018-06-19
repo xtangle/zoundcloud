@@ -18,7 +18,7 @@ describe('content page messenger', () => {
   describe('sending message to extension', () => {
     context('when not expecting a response', () => {
       beforeEach(() => {
-        rx.subscribeTo(fixture.sendToExtension(fakeMessage));
+        rx.subscribeTo(fixture.sendToExtension$(fakeMessage));
       });
 
       it('should send message to the extension', () => {
@@ -33,7 +33,7 @@ describe('content page messenger', () => {
 
     context('when expecting a response', () => {
       beforeEach(() => {
-        rx.subscribeTo(fixture.sendToExtension(fakeMessage, true));
+        rx.subscribeTo(fixture.sendToExtension$(fakeMessage, true));
       });
 
       it('should send message to the extension', () => {
