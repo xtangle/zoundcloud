@@ -2,7 +2,7 @@ export function addToButtonGroup(downloadButton: JQuery<HTMLElement>,
                                  buttonGroup: JQuery<HTMLElement>) {
   if (buttonGroup.length) {
     const buttons = buttonGroup.children('button');
-    if (buttons.first().hasClass('sc-button-icon')) {
+    if (buttons.hasClass('sc-button-icon')) {
       downloadButton.addClass('sc-button-icon');
     }
     const shareButton = buttons.filter('.sc-button-share');

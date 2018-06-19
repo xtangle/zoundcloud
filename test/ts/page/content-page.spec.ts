@@ -16,14 +16,14 @@ describe('content page', () => {
   let spyUnload: SinonSpy;
   let stubInjectDownloadButtons: SinonStub;
   let stubOnMessage: SinonStub;
-  let messages$: Subject<IMessageHandlerArgs<Message, MessageResponse>>;
+  let message$: Subject<IMessageHandlerArgs<Message, MessageResponse>>;
 
   beforeEach(() => {
     fixture = new ContentPage();
     spyUnload = spy(fixture, 'unload');
     stubInjectDownloadButtons = stub(InjectionService, 'injectDownloadButtons');
     stubOnMessage = stub(ContentPageMessenger, 'onMessage');
-    messages$ = new Subject();
+    message$ = new Subject();
   });
 
   afterEach(() => {
@@ -37,7 +37,7 @@ describe('content page', () => {
 
   describe('loading', () => {
     beforeEach(() => {
-      stubOnMessage.withArgs(UnloadContentPageMessage.TYPE).returns(messages$);
+      stubOnMessage.withArgs(UnloadContentPageMessage.TYPE).returns(message$);
       fixture.load();
     });
 
@@ -50,7 +50,7 @@ describe('content page', () => {
     });
 
     it('should unload when unload content page message is received', () => {
-      messages$.next();
+      message$.next();
       expect(spyUnload).to.have.been.calledOnce;
     });
   });

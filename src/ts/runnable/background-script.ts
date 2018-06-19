@@ -22,7 +22,9 @@ export class BackgroundScript implements IRunnable {
   }
 
   public run(): void {
-    this.subscriptions.add(this.onSuspend$.subscribe(() => this.cleanUp()));
+    this.subscriptions.add(
+      this.onSuspend$.subscribe(this.cleanUp.bind(this))
+    );
     this.subscriptions.add(
       ScPageObservables.scPageVisited$().subscribe((details: WebNavigationUrlCallbackDetails) => {
         logger.debug('Loading content script', details);
