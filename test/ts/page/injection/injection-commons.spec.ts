@@ -32,19 +32,19 @@ describe('injection commons', () => {
       expect($(getDownloadButton()).length).to.be.equal(0);
     });
 
-    it('should not specify download button to have an icon if no other button has an icon', () => {
+    it('should not specify download button to be an icon if the first button is not an icon', () => {
       buttonGroup.append(`
         <button class="sc-button sc-button-small sc-button-responsive"></button>
-        <button class="sc-button sc-button-small sc-button-responsive"></button>
+        <button class="sc-button sc-button-small sc-button-responsive sc-button-icon"></button>
       `);
       addToButtonGroup(downloadButton, buttonGroup);
       expect($(getDownloadButton())).to.not.have.$class('sc-button-icon');
     });
 
-    it('should specify download button to have an icon if at least one other button has an icon', () => {
+    it('should specify download button to be an icon if the first button is an icon', () => {
       buttonGroup.append(`
+        <button class="sc-button sc-button-small sc-button-responsive sc-button-icon"></button>
         <button class="sc-button sc-button-small sc-button-responsive"></button>
-        <button class="sc-button sc-button-small sc-button-icon sc-button-responsive"></button>
       `);
       addToButtonGroup(downloadButton, buttonGroup);
       expect($(getDownloadButton())).to.have.$class('sc-button-icon');

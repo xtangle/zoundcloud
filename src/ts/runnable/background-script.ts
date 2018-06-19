@@ -8,7 +8,7 @@ import {IRunnable} from '@src/runnable/runnable';
 import {ScPageObservables} from '@src/runnable/sc-page-observables';
 import {logger} from '@src/util/logger';
 import {fromEventPattern, Observable} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {first, takeUntil} from 'rxjs/operators';
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 
 export class BackgroundScript implements IRunnable {
@@ -36,6 +36,9 @@ export class BackgroundScript implements IRunnable {
       .subscribe((args: IMessageHandlerArgs<RequestDownloadMessage>) => {
         DownloadService.download$(args.message.resourceInfoUrl);
       });
+
+    this.onSuspend$.pipe(first())
+      .subscribe(() => logger.debug('Unloaded background script'));
 
     logger.debug('Loaded background script');
   }
