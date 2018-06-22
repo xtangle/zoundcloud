@@ -5,7 +5,7 @@ import {ListItemInjectionService} from '@src/page/injection/list-item-injection-
 import {matchesElements} from '@test/sinon-matchers';
 import {configureChai} from '@test/test-initializers';
 import * as $ from 'jquery';
-import {EMPTY, of, Subscription} from 'rxjs';
+import {EMPTY, of, Subject} from 'rxjs';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const forEach = require('mocha-each');
@@ -13,7 +13,7 @@ const expect = configureChai();
 
 describe('list item injection service', () => {
   const fixture = ListItemInjectionService;
-  let subscriptions: Subscription;
+  let onUnload$: Subject<any>;
 
   let stubCreateInjectionSignal$: SinonStub;
   let spyCreateDownloadButton: SinonSpy;
@@ -31,7 +31,7 @@ describe('list item injection service', () => {
   const listItemTestObjs: IListItemTestObj[] = [soundListItem, searchListItem, trackListItem, chartTracksItem];
 
   beforeEach(() => {
-    subscriptions = new Subscription();
+    onUnload$ = new Subject();
     document.body.innerHTML = `
       <body>
         ${getSoundListItemHTML(soundListItem.href)}
@@ -52,31 +52,36 @@ describe('list item injection service', () => {
   });
 
   afterEach(() => {
-    subscriptions.unsubscribe();
+    onUnload$.complete();
     restore();
   });
 
   describe('injecting download buttons', () => {
     it('should inject the download buttons', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       expect(getDownloadButtons().length).to.be.equal(4);
     });
 
     it('should not inject when injection signal did not emit', () => {
       stubCreateInjectionSignal$.returns(EMPTY);
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
+      expect(getDownloadButtons().length).to.be.equal(0);
+    });
+
+    it('should stop injecting when unloaded', () => {
+      fixture.injectDownloadButtons(of(true));
       expect(getDownloadButtons().length).to.be.equal(0);
     });
 
     it('should create an injection signal with a selector that matches all list items', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       const expectedListItems = listItemTestObjs.map((o) => o.item).reduce((a, b) => a.add(b));
       expect(stubCreateInjectionSignal$).to.have.been.calledOnce
         .calledWithMatch(matchesElements(expectedListItems));
     });
 
     it('should add classes to the download button to indicate a small-sized button', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       const downloadButtons = getDownloadButtons();
       $.each(downloadButtons, (_, button) =>
         expect($(button)).to.have.$class('sc-button-small')
@@ -92,9 +97,9 @@ describe('list item injection service', () => {
         (listItem: IListItemTestObj) => {
           stubCreateInjectionSignal$.returns(of(listItem.item));
           const expectedUrl = `${location.origin}${listItem.href}`;
-          fixture.injectDownloadButtons(subscriptions);
+          fixture.injectDownloadButtons(onUnload$);
 
-          expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(subscriptions, expectedUrl);
+          expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(onUnload$, expectedUrl);
         }
       );
 
@@ -105,7 +110,7 @@ describe('list item injection service', () => {
         (listItem: IListItemTestObj) => {
           stubCreateInjectionSignal$.returns(of(listItem.item));
           const buttonGroup = listItem.item.find('#buttonGroupTestId');
-          fixture.injectDownloadButtons(subscriptions);
+          fixture.injectDownloadButtons(onUnload$);
           const downloadButton = getDownloadButtons();
 
           expect(downloadButton.length).to.be.equal(1);

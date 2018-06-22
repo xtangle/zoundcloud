@@ -3,7 +3,7 @@ import {RequestContentPageReloadMessage} from '@src/messaging/page/request-conte
 import {ContentPage} from '@src/page/content-page';
 import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
-import {first} from 'rxjs/operators';
+import {first, take, takeUntil} from 'rxjs/operators';
 
 export const TAG_ID = 'zc-content-page';
 
@@ -23,16 +23,12 @@ export const Bootstrapper = {
       ContentPageMessenger.sendToExtension$(new RequestContentPageReloadMessage());
     } else {
       const idTag = createIdTag();
-      contentPage.subscriptions.add(
-        elementAdded$((node: Node) => node.isSameNode(idTag))
-          .pipe(first())
-          .subscribe(() => contentPage.load())
-      );
-      contentPage.subscriptions.add(
-        elementRemoved$(idTag)
-          .pipe(first())
-          .subscribe(() => contentPage.unload())
-      );
+      elementAdded$((node: Node) => node.isEqualNode(idTag))
+        .pipe(takeUntil(contentPage.onUnload$), take(1))
+        .subscribe(() => contentPage.load());
+      elementRemoved$(idTag)
+        .pipe(takeUntil(contentPage.onUnload$), take(1))
+        .subscribe(() => contentPage.unload());
       addIdTagToDOM(idTag);
     }
   }

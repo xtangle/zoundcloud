@@ -3,7 +3,7 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
 import {configureChai} from '@test/test-initializers';
-import {Subscription} from 'rxjs';
+import {Subject} from 'rxjs';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
 
 const expect = configureChai();
@@ -11,7 +11,7 @@ const expect = configureChai();
 describe('download button factory', () => {
   const fixture = DownloadButtonFactory;
   const resourceInfoUrl = 'resource-info-url';
-  let subscriptions: Subscription;
+  let onUnload$: Subject<any>;
   let button: JQuery<HTMLElement>;
 
   let stubSendToExtension: SinonStub;
@@ -19,13 +19,13 @@ describe('download button factory', () => {
   beforeEach(() => {
     useFakeTimers();
 
-    subscriptions = new Subscription();
-    button = fixture.create(subscriptions, resourceInfoUrl);
+    onUnload$ = new Subject();
+    button = fixture.create(onUnload$, resourceInfoUrl);
     stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension$');
   });
 
   afterEach(() => {
-    subscriptions.unsubscribe();
+    onUnload$.complete();
     restore();
   });
 
@@ -71,8 +71,8 @@ describe('download button factory', () => {
       expect(stubSendToExtension).to.have.been.calledTwice;
     });
 
-    it('should not send request download message when subscription is unsubscribed', () => {
-      subscriptions.unsubscribe();
+    it('should not send request download message when unloaded', () => {
+      onUnload$.next();
       button.trigger('click');
       expect(stubSendToExtension).to.not.have.been.called;
     });

@@ -1,13 +1,14 @@
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
 import {InjectionService} from '@src/page/injection/injection-service';
-import {Subscription} from 'rxjs';
+import {AsyncSubject, Observable} from 'rxjs';
 
 export class ContentPage {
-  public subscriptions: Subscription = new Subscription();
+
+  private readonly onUnloadSubject$ = new AsyncSubject();
 
   public load(): void {
-    InjectionService.injectDownloadButtons(this.subscriptions);
+    InjectionService.injectDownloadButtons(this.onUnload$);
 
     window.onbeforeunload = this.unload.bind(this);
 
@@ -16,9 +17,14 @@ export class ContentPage {
   }
 
   public unload(): void {
-    this.subscriptions.unsubscribe();
+    this.onUnloadSubject$.next(true);
+    this.onUnloadSubject$.complete();
 
     ContentPageMessenger.sendToExtension$(
       new LogToConsoleMessage('Unloaded content page'));
+  }
+
+  public get onUnload$(): Observable<any> {
+    return this.onUnloadSubject$.asObservable();
   }
 }

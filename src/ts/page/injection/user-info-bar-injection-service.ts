@@ -3,23 +3,28 @@ import {DownloadButtonFactory} from '@src/page/injection/download-button-factory
 import {addToButtonGroup} from '@src/page/injection/injection-commons';
 import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
 import {UrlService} from '@src/util/url-service';
-import {Subscription} from 'rxjs';
+import {Observable} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+
+const USER_URL_PATTERN = /https:\/\/soundcloud.com\/[^\/]+/;
 
 export const UserInfoBarInjectionService = {
-  injectDownloadButtons(subscriptions: Subscription) {
+  injectDownloadButtons(onUnload$: Observable<any>) {
     const selector = '.userInfoBar';
-    subscriptions.add(
-      InjectionSignalFactory.create$(selector)
-        .subscribe(addToUserInfoBar.bind(null, subscriptions))
-    );
+    InjectionSignalFactory.create$(selector)
+      .pipe(takeUntil(onUnload$))
+      .subscribe(addToUserInfoBar.bind(null, onUnload$));
   }
 };
 
-function addToUserInfoBar(subscriptions: Subscription, userInfoBar: JQuery<HTMLElement>): void {
-  const USER_URL_PATTERN = /https:\/\/soundcloud.com\/[^\/]+/;
+function createDownloadButton(onUnload$: Observable<any>): JQuery<HTMLElement> {
   const userInfoUrl = USER_URL_PATTERN.exec(UrlService.getCurrentUrl())[0];
-  const downloadButton = DownloadButtonFactory.create(subscriptions, userInfoUrl)
+  return DownloadButtonFactory.create(onUnload$, userInfoUrl)
     .addClass(['sc-button-medium', ZC_DL_BUTTON_MEDIUM_CLASS]);
+}
+
+function addToUserInfoBar(onUnload$: Observable<any>, userInfoBar: JQuery<HTMLElement>): void {
+  const downloadButton = createDownloadButton(onUnload$);
   const buttonGroup = userInfoBar.find('.sc-button-group');
   addToButtonGroup(downloadButton, buttonGroup);
 }

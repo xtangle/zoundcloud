@@ -2,13 +2,15 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
 import {ContentPage} from '@src/page/content-page';
 import {InjectionService} from '@src/page/injection/injection-service';
-import {configureChai} from '@test/test-initializers';
+import {configureChai, useRxTesting} from '@test/test-initializers';
 import {noop} from '@test/test-utils';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = configureChai();
 
 describe('content page', () => {
+  const rx = useRxTesting();
+
   let fixture: ContentPage;
   let spyUnload: SinonSpy;
 
@@ -26,19 +28,21 @@ describe('content page', () => {
   });
 
   afterEach(() => {
-    fixture.subscriptions.unsubscribe();
     restore();
   });
 
   context('when loaded', () => {
     it('should keep track of all subscriptions', () => {
+      rx.subscribeTo(fixture.onUnload$);
       fixture.load();
-      expect(fixture.subscriptions.closed).to.be.false;
+      expect(rx.next).to.not.have.been.called;
+      expect(rx.complete).to.not.have.been.called;
     });
 
     it('should inject the download buttons', () => {
       fixture.load();
-      expect(stubInjectDownloadButtons).to.have.been.calledOnceWithExactly(fixture.subscriptions);
+      expect(stubInjectDownloadButtons).to.have.been
+        .calledOnceWithExactly(fixture.onUnload$);
     });
 
     it('should trigger unload before the window is unloaded', () => {
@@ -56,8 +60,10 @@ describe('content page', () => {
 
   context('when unloaded', () => {
     it('should unsubscribe from all subscriptions', () => {
+      rx.subscribeTo(fixture.onUnload$);
       fixture.unload();
-      expect(fixture.subscriptions.closed).to.be.true;
+      expect(rx.next).to.have.been.called;
+      expect(rx.complete).to.have.been.called;
     });
 
     it('should log a message to the console', () => {

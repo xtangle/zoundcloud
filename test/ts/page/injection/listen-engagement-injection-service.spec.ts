@@ -6,7 +6,7 @@ import {UrlService} from '@src/util/url-service';
 import {matchesElements} from '@test/sinon-matchers';
 import {configureChai} from '@test/test-initializers';
 import * as $ from 'jquery';
-import {EMPTY, of, Subscription} from 'rxjs';
+import {EMPTY, of, Subject} from 'rxjs';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
 
 const expect = configureChai();
@@ -14,7 +14,7 @@ const expect = configureChai();
 describe('listen engagement injection service', () => {
   const fixture = ListenEngagementInjectionService;
   const currentUrl = 'current-url-of-page';
-  let subscriptions: Subscription;
+  let onUnload$: Subject<any>;
 
   let stubCreateInjectionSignal$: SinonStub;
   let stubGetCurrentUrl: SinonStub;
@@ -24,7 +24,7 @@ describe('listen engagement injection service', () => {
   let buttonGroup: JQuery<HTMLElement>;
 
   beforeEach(() => {
-    subscriptions = new Subscription();
+    onUnload$ = new Subject();
     document.body.innerHTML = `
       <body>
         <div id="listenEngagementTestId" class="listenEngagement sc-clearfix">
@@ -50,42 +50,47 @@ describe('listen engagement injection service', () => {
   });
 
   afterEach(() => {
-    subscriptions.unsubscribe();
+    onUnload$.complete();
     restore();
   });
 
   describe('injecting download buttons', () => {
     it('should inject the download button', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       expect(getDownloadButton().length).to.be.equal(1);
     });
 
     it('should not inject when injection signal did not emit', () => {
       stubCreateInjectionSignal$.returns(EMPTY);
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
+      expect(getDownloadButton().length).to.be.equal(0);
+    });
+
+    it('should stop injecting when unloaded', () => {
+      fixture.injectDownloadButtons(of(true));
       expect(getDownloadButton().length).to.be.equal(0);
     });
 
     it('should create an injection signal with a selector that matches the listen engagement element', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       expect(stubCreateInjectionSignal$).to.have.been.calledOnce
         .calledWithMatch(matchesElements(listenEngagement));
     });
 
     it('should create the download button with the correct parameters', () => {
-      fixture.injectDownloadButtons(subscriptions);
-      expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(subscriptions, currentUrl);
+      fixture.injectDownloadButtons(onUnload$);
+      expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(onUnload$, currentUrl);
     });
 
     it('should add classes to the download button to indicate a medium-sized button', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       const downloadButton = getDownloadButton();
       expect(downloadButton).to.have.$class('sc-button-medium');
       expect(downloadButton).to.have.$class(ZC_DL_BUTTON_MEDIUM_CLASS);
     });
 
     it('should add the download button to the button group', () => {
-      fixture.injectDownloadButtons(subscriptions);
+      fixture.injectDownloadButtons(onUnload$);
       expect($.contains(buttonGroup[0], getDownloadButton()[0])).to.be.true;
     });
   });

@@ -5,6 +5,7 @@ import {ContentPage} from '@src/page/content-page';
 import {configureChai} from '@test/test-initializers';
 import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
+import {Subject} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
 
 const expect = configureChai();
@@ -12,6 +13,7 @@ const expect = configureChai();
 describe('bootstrapper', () => {
   const fixture = Bootstrapper;
   let contentPage: ContentPage;
+  let onUnload$: Subject<any>;
 
   let stubLoad: SinonStub;
   let stubUnload: SinonStub;
@@ -19,13 +21,15 @@ describe('bootstrapper', () => {
 
   beforeEach(() => {
     contentPage = new ContentPage();
+    onUnload$ = new Subject();
     stubLoad = stub(contentPage, 'load');
     stubUnload = stub(contentPage, 'unload');
+    stub(contentPage, 'onUnload$').get(() => onUnload$.asObservable());
     stubSendToExtension = stub(ContentPageMessenger, 'sendToExtension$');
   });
 
   afterEach(() => {
-    contentPage.subscriptions.unsubscribe();
+    onUnload$.complete();
     restore();
   });
 
@@ -34,8 +38,9 @@ describe('bootstrapper', () => {
       document.body.innerHTML = `<body><div id="${TAG_ID}"></div></body>`;
     });
 
-    it('should send request content page reload message to extension', () => {
+    it('should send request content page reload message to extension', async () => {
       fixture.bootstrap(contentPage);
+      await tick();
       expect(stubSendToExtension).to.have.been.calledOnceWithExactly(new RequestContentPageReloadMessage());
     });
 
@@ -45,8 +50,9 @@ describe('bootstrapper', () => {
       expect(stubLoad).to.not.have.been.called;
     });
 
-    it('should not add another id tag to the DOM', () => {
+    it('should not add another id tag to the DOM', async () => {
       fixture.bootstrap(contentPage);
+      await tick();
       verifyOneIdTagInDOM();
     });
   });
@@ -56,8 +62,9 @@ describe('bootstrapper', () => {
       document.body.innerHTML = '<body></body>';
     });
 
-    it('should add the id tag to the DOM', () => {
+    it('should add the id tag to the DOM', async () => {
       fixture.bootstrap(contentPage);
+      await tick();
       verifyOneIdTagInDOM();
     });
 
@@ -80,9 +87,9 @@ describe('bootstrapper', () => {
       expect(stubUnload).to.not.have.been.called;
     });
 
-    it('should not unload the content page when content page is unsubscribed', async () => {
+    it('should not unload the content page when the tag is removed and content page was already unloaded', async () => {
       fixture.bootstrap(contentPage);
-      contentPage.subscriptions.unsubscribe();
+      onUnload$.next();
       removeIdTagFromDOM();
       await tick();
       expect(stubUnload).to.not.have.been.called;

@@ -2,13 +2,13 @@ import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import * as $ from 'jquery';
-import {fromEvent, Subscription} from 'rxjs';
-import {throttleTime} from 'rxjs/operators';
+import {fromEvent, Observable} from 'rxjs';
+import {takeUntil, throttleTime} from 'rxjs/operators';
 
 export const DownloadButtonFactory = {
-  create(subscriptions: Subscription, resourceInfoUrl: string): JQuery<HTMLElement> {
+  create(onUnload$: Observable<any>, resourceInfoUrl: string): JQuery<HTMLElement> {
     const dlButton = createDlButton();
-    addDlButtonBehavior(dlButton, subscriptions, resourceInfoUrl);
+    addDlButtonBehavior(dlButton, onUnload$, resourceInfoUrl);
     return dlButton;
   }
 };
@@ -22,11 +22,9 @@ function createDlButton(): JQuery<HTMLElement> {
 }
 
 function addDlButtonBehavior(dlButton: JQuery<HTMLElement>,
-                             subscriptions: Subscription,
+                             onUnload$: Observable<any>,
                              resourceInfoUrl: string) {
-  subscriptions.add(
-    fromEvent(dlButton, 'click')
-      .pipe(throttleTime(3000))
-      .subscribe(() => ContentPageMessenger.sendToExtension$(new RequestDownloadMessage(resourceInfoUrl)))
-  );
+  fromEvent(dlButton, 'click')
+    .pipe(takeUntil(onUnload$), throttleTime(3000))
+    .subscribe(() => ContentPageMessenger.sendToExtension$(new RequestDownloadMessage(resourceInfoUrl)));
 }
