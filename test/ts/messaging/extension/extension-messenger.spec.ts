@@ -23,7 +23,7 @@ describe('extension messenger', () => {
       });
 
       it('should send message to given tab id', () => {
-        expect(sinonChrome.tabs.sendMessage).to.have.been.calledOnce.calledWithExactly(tabId, fakeMessage);
+        expect(sinonChrome.tabs.sendMessage).to.have.been.calledOnceWithExactly(tabId, fakeMessage);
       });
 
       it('should return an empty observable', () => {
@@ -53,7 +53,7 @@ describe('extension messenger', () => {
           const fakeResponse: MessageResponse = new DummyMessageResponse('some-content');
           sendResponse(fakeResponse);
 
-          expect(rx.next).to.have.been.calledOnce.calledWithExactly(fakeResponse);
+          expect(rx.next).to.have.been.calledOnceWithExactly(fakeResponse);
           expect(rx.error).to.not.have.been.called;
           expect(rx.complete).to.have.been.called;
         });

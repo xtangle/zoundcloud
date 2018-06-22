@@ -33,7 +33,7 @@ describe('base messenger', () => {
 
       it('should emit the message and sender when message of specified type is received', () => {
         sinonChrome.runtime.onMessage.trigger(fakeMsgOfType1, fakeSender);
-        expect(rx.next).to.have.been.calledOnce.calledWithExactly({message: fakeMsgOfType1, sender: fakeSender});
+        expect(rx.next).to.have.been.calledOnceWithExactly({message: fakeMsgOfType1, sender: fakeSender});
       });
 
       it('should emit multiple times when message of specified type is received multiple times', () => {
@@ -92,14 +92,14 @@ describe('base messenger', () => {
 
         it('should send response when the response subject emits a response', () => {
           response$.next(fakeResponse);
-          expect(responseCallback).to.have.been.calledOnce.calledWithExactly(fakeResponse);
+          expect(responseCallback).to.have.been.calledOnceWithExactly(fakeResponse);
         });
 
         it('should send only the first response when the response subject emits a multiple responses', () => {
           const anotherFakeResponse = new DummyMessageResponse('some-other-content');
           response$.next(fakeResponse);
           response$.next(anotherFakeResponse);
-          expect(responseCallback).to.have.been.calledOnce.calledWithExactly(fakeResponse);
+          expect(responseCallback).to.have.been.calledOnceWithExactly(fakeResponse);
         });
 
         it('should not send response when not calling next on response subject', () => {

@@ -74,7 +74,7 @@ describe('listen engagement injection service', () => {
 
     it('should create the download button with the correct parameters', () => {
       fixture.injectDownloadButtons(subscriptions);
-      expect(spyCreateDownloadButton).to.have.been.calledOnce.calledWithExactly(subscriptions, currentUrl);
+      expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(subscriptions, currentUrl);
     });
 
     it('should add classes to the download button to indicate a medium-sized button', () => {

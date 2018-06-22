@@ -22,7 +22,7 @@ describe('content page messenger', () => {
       });
 
       it('should send message to the extension', () => {
-        expect(sinonChrome.runtime.sendMessage).to.have.been.calledOnce.calledWithExactly(fakeMessage);
+        expect(sinonChrome.runtime.sendMessage).to.have.been.calledOnceWithExactly(fakeMessage);
       });
 
       it('should return an empty observable', () => {
@@ -37,7 +37,7 @@ describe('content page messenger', () => {
       });
 
       it('should send message to the extension', () => {
-        expect(sinonChrome.runtime.sendMessage).to.have.been.calledOnce.calledWithExactly(fakeMessage, match.func);
+        expect(sinonChrome.runtime.sendMessage).to.have.been.calledOnceWithExactly(fakeMessage, match.func);
       });
 
       describe('the returned observable', () => {
@@ -51,7 +51,7 @@ describe('content page messenger', () => {
           const fakeResponse: MessageResponse = new DummyMessageResponse('some-content');
           sendResponse(fakeResponse);
 
-          expect(rx.next).to.have.been.calledOnce.calledWithExactly(fakeResponse);
+          expect(rx.next).to.have.been.calledOnceWithExactly(fakeResponse);
           expect(rx.error).to.not.have.been.called;
           expect(rx.complete).to.have.been.called;
         });

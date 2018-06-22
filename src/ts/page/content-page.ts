@@ -1,5 +1,6 @@
+import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
+import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
 import {InjectionService} from '@src/page/injection/injection-service';
-import {logger} from '@src/util/logger';
 import {Subscription} from 'rxjs';
 
 export class ContentPage {
@@ -7,11 +8,17 @@ export class ContentPage {
 
   public load(): void {
     InjectionService.injectDownloadButtons(this.subscriptions);
-    logger.debug('Loaded content page');
+
+    window.onbeforeunload = this.unload.bind(this);
+
+    ContentPageMessenger.sendToExtension$(
+      new LogToConsoleMessage('Loaded content page'));
   }
 
   public unload(): void {
     this.subscriptions.unsubscribe();
-    logger.debug('Unloaded content page');
+
+    ContentPageMessenger.sendToExtension$(
+      new LogToConsoleMessage('Unloaded content page'));
   }
 }

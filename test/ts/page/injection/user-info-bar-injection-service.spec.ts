@@ -73,7 +73,7 @@ describe('user info bar injection service', () => {
     it('should create the download button with the correct parameters', () => {
       const expectedUrl = 'https://soundcloud.com/some-user';
       fixture.injectDownloadButtons(subscriptions);
-      expect(spyCreateDownloadButton).to.have.been.calledOnce.calledWithExactly(subscriptions, expectedUrl);
+      expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(subscriptions, expectedUrl);
     });
 
     it('should add classes to the download button to indicate a medium-sized button', () => {

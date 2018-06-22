@@ -63,7 +63,7 @@ describe('dom observer', () => {
       rx.subscribeTo(elementAdded$((node: Node) => node.textContent === 'Dos'));
       $('#appendToMe').append(addMe);
       await tick();
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(addMe);
+      expect(rx.next).to.have.been.calledOnceWithExactly(addMe);
     });
 
     it('should not emit any value when node is added but does not pass test', async () => {
@@ -102,7 +102,7 @@ describe('dom observer', () => {
     it('should emit node and complete when one node exists and matches selector', async () => {
       rx.subscribeTo(elementExist$('.iExist'));
       await tick();
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist);
+      expect(rx.next).to.have.been.calledOnceWithExactly(iExist);
       expect(rx.complete).to.be.have.been.called;
     });
 
@@ -119,8 +119,8 @@ describe('dom observer', () => {
       rx.subscribeTo(elementExist$('.iExist'));
       await tick();
       expect(rx.next).to.have.been.calledTwice;
-      expect(rx.next.getCall(0)).to.have.been.calledWithExactly(iExist2);
-      expect(rx.next.getCall(1)).to.have.been.calledWithExactly(iExist);
+      expect(rx.next.firstCall).to.have.been.calledWithExactly(iExist2);
+      expect(rx.next.secondCall).to.have.been.calledWithExactly(iExist);
       expect(rx.complete).to.be.have.been.called;
     });
   });
@@ -137,7 +137,7 @@ describe('dom observer', () => {
     it('should emit node when a node matching the selector exists or is added', async () => {
       rx.subscribeTo(elementExistOrAdded$('.iExist'));
       await tick();
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(iExist);
+      expect(rx.next).to.have.been.calledOnceWithExactly(iExist);
       $('#appendToMe').append(addMe);
       await tick();
       expect(rx.next).to.have.been.calledTwice.calledWith(addMe);

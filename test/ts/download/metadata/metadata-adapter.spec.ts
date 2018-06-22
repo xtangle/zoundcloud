@@ -37,7 +37,7 @@ describe('metadata adapter', () => {
       stubAddIDV2Metadata.withArgs(metadata, inputDlInfo).returns(of(expectedDlInfo));
 
       rx.subscribeTo(fixture.addMetadata$(inputDlInfo));
-      expect(rx.next).to.be.calledOnce.calledWithExactly(expectedDlInfo);
+      expect(rx.next).to.be.calledOnceWithExactly(expectedDlInfo);
       expect(rx.complete).to.be.called;
     });
 
@@ -45,7 +45,7 @@ describe('metadata adapter', () => {
       inputDlInfo.downloadOptions.filename = 'file.name.wav';
 
       rx.subscribeTo(fixture.addMetadata$(inputDlInfo));
-      expect(rx.next).to.be.calledOnce.calledWithExactly(inputDlInfo);
+      expect(rx.next).to.be.calledOnceWithExactly(inputDlInfo);
       expect(rx.complete).to.be.called;
     });
   });

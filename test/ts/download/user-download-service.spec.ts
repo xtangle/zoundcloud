@@ -64,7 +64,7 @@ describe('user download service', () => {
     it('should emit a user download result and complete if download started successfully', () => {
       rx.subscribeTo(fixture.download$(userInfo));
 
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly({
+      expect(rx.next).to.have.been.calledOnceWithExactly({
         kind: ResourceType.User,
         tracks: [trackOneDlResult, trackTwoDlResult],
         userInfo

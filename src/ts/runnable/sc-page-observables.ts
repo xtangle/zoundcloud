@@ -1,27 +1,39 @@
-import {SC_URL_PATTERN} from '@src/constants';
-import {fromEventPattern, merge, Observable} from 'rxjs';
-import {debounceTime} from 'rxjs/operators';
-import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
+import {SC_URL_HOST} from '@src/constants';
+import {concatFilter} from '@src/util/rxjs-operators';
+import {bindCallback, fromEventPattern, merge, Observable} from 'rxjs';
+import {debounceTime, map} from 'rxjs/operators';
+import Tab = chrome.tabs.Tab;
+import WebNavigationFramedCallbackDetails = chrome.webNavigation.WebNavigationFramedCallbackDetails;
+import WebNavigationTransitionCallbackDetails = chrome.webNavigation.WebNavigationTransitionCallbackDetails;
+
+const initialNavigationToScPage$: Observable<number> =
+  fromEventPattern<number>((handler: (tabId: number) => void) =>
+    chrome.webNavigation.onCompleted.addListener(
+      (details: WebNavigationFramedCallbackDetails) => handler(details.tabId),
+      {url: [{hostEquals: SC_URL_HOST}]}
+    )
+  );
+
+/**
+ * onHistoryStateUpdated emits two events on every navigation: one event with URL of the old page and
+ * one with URL of the new page. This is the reason why there is a debounceTime.
+ */
+const navigateBetweenScPages$: Observable<number> =
+  fromEventPattern<number>((handler: (tabId: number) => void) =>
+    chrome.webNavigation.onHistoryStateUpdated.addListener(
+      (details: WebNavigationTransitionCallbackDetails) => handler(details.tabId),
+      {url: [{hostEquals: SC_URL_HOST}]}
+    )
+  ).pipe(debounceTime(20));
+
+const tabExists$: (tabId: number) => Observable<boolean> =
+  (tabId: number) => bindCallback(chrome.tabs.get)(tabId).pipe(
+    map((tab: Tab) => !chrome.runtime.lastError && tab !== undefined)
+  );
 
 export const ScPageObservables = {
-  scPageVisited$(): Observable<WebNavigationUrlCallbackDetails> {
-    const scWebNavOnCompleted$: Observable<WebNavigationUrlCallbackDetails> =
-      fromEventPattern<WebNavigationUrlCallbackDetails>(
-        (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
-          chrome.webNavigation.onCompleted.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-      );
-
-    /**
-     * onHistoryStateUpdated emits two events on every navigation: one event with URL of the old page and
-     * one with URL of the new page.
-     */
-    const scWebNavOnHistoryUpdated$: Observable<WebNavigationUrlCallbackDetails> =
-      fromEventPattern<WebNavigationUrlCallbackDetails>(
-        (handler: (details: WebNavigationUrlCallbackDetails) => void) =>
-          chrome.webNavigation.onHistoryStateUpdated.addListener(handler, {url: [{urlMatches: SC_URL_PATTERN}]})
-      );
-
-    // The de-bounce ensures we do not unnecessarily load multiple content scripts
-    return merge(scWebNavOnCompleted$, scWebNavOnHistoryUpdated$).pipe(debounceTime(20));
+  goToSoundCloudPage$(): Observable<number> {
+    return merge(initialNavigationToScPage$, navigateBetweenScPages$)
+      .pipe(concatFilter(tabExists$));
   }
 };

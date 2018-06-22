@@ -54,7 +54,7 @@ describe('injection signal factory', () => {
     it('should emit if element already exists in DOM', () => {
       $('body').append(diva);
       rx.subscribeTo(fixture.create$(selector));
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(diva);
+      expect(rx.next).to.have.been.calledOnceWithExactly(diva);
     });
 
     it('should not emit if element exists but already has download button', () => {
@@ -68,7 +68,7 @@ describe('injection signal factory', () => {
       rx.subscribeTo(fixture.create$(selector));
       $('body').append(diva);
       clock.next();
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(diva);
+      expect(rx.next).to.have.been.calledOnceWithExactly(diva);
     });
 
     it('should not emit if element not matching selector is added to DOM', () => {

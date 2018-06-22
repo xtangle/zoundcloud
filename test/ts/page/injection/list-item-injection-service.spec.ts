@@ -94,7 +94,7 @@ describe('list item injection service', () => {
           const expectedUrl = `${location.origin}${listItem.href}`;
           fixture.injectDownloadButtons(subscriptions);
 
-          expect(spyCreateDownloadButton).to.have.been.calledOnce.calledWithExactly(subscriptions, expectedUrl);
+          expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(subscriptions, expectedUrl);
         }
       );
 

@@ -88,7 +88,7 @@ describe('resource info service', () => {
   }
 
   function verifyFetched<T = ITrackInfo | IPlaylistInfo>(downloadInfo: T) {
-    expect(rx.next).to.have.been.calledOnce.calledWithExactly(downloadInfo);
+    expect(rx.next).to.have.been.calledOnceWithExactly(downloadInfo);
     expect(rx.error).to.not.have.been.called;
     expect(rx.complete).to.have.been.called;
   }

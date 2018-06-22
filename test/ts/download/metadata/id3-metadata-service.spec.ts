@@ -173,7 +173,7 @@ describe('id3 metadata service', () => {
         url
       }
     };
-    expect(rx.next).to.have.been.calledOnce.calledWithExactly(expectedDownloadInfo);
+    expect(rx.next).to.have.been.calledOnceWithExactly(expectedDownloadInfo);
     expect(rx.error).to.not.have.been.called;
     expect(rx.complete).to.have.been.called;
   }

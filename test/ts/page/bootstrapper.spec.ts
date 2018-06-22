@@ -36,7 +36,7 @@ describe('bootstrapper', () => {
 
     it('should send request content page reload message to extension', () => {
       fixture.bootstrap(contentPage);
-      expect(stubSendToExtension).to.have.been.calledOnce.calledWithExactly(new RequestContentPageReloadMessage());
+      expect(stubSendToExtension).to.have.been.calledOnceWithExactly(new RequestContentPageReloadMessage());
     });
 
     it('should not load the content page', async () => {

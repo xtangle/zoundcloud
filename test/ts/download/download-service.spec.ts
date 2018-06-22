@@ -62,7 +62,7 @@ describe('download service', () => {
       it('should download track when download info is track type', () => {
         fixture.download$(resourceInfoUrl);
 
-        expect(stubTrackDownload).to.have.been.calledOnce.calledWithExactly(trackDlInfo);
+        expect(stubTrackDownload).to.have.been.calledOnceWithExactly(trackDlInfo);
         expect(stubPlaylistDownload).to.not.have.been.called;
         expect(stubUserDownload$).to.not.have.been.called;
       });
@@ -70,7 +70,7 @@ describe('download service', () => {
       it('should emit the track download result', () => {
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
 
-        expect(rx.next).to.have.been.calledOnce.calledWithExactly(trackDownloadResult);
+        expect(rx.next).to.have.been.calledOnceWithExactly(trackDownloadResult);
         expect(rx.complete).to.have.been.called;
       });
     });
@@ -86,7 +86,7 @@ describe('download service', () => {
       it('should download playlist when download info is playlist type', () => {
         fixture.download$(resourceInfoUrl);
 
-        expect(stubPlaylistDownload).to.have.been.calledOnce.calledWithExactly(playlistDlInfo);
+        expect(stubPlaylistDownload).to.have.been.calledOnceWithExactly(playlistDlInfo);
         expect(stubTrackDownload).to.not.have.been.called;
         expect(stubUserDownload$).to.not.have.been.called;
       });
@@ -94,7 +94,7 @@ describe('download service', () => {
       it('should emit the playlist download result', () => {
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
 
-        expect(rx.next).to.have.been.calledOnce.calledWithExactly(playlistDownloadResult);
+        expect(rx.next).to.have.been.calledOnceWithExactly(playlistDownloadResult);
         expect(rx.complete).to.have.been.called;
       });
     });
@@ -110,7 +110,7 @@ describe('download service', () => {
       it('should download user tracks when download info is user type', () => {
         fixture.download$(resourceInfoUrl);
 
-        expect(stubUserDownload$).to.have.been.calledOnce.calledWithExactly(userDlInfo);
+        expect(stubUserDownload$).to.have.been.calledOnceWithExactly(userDlInfo);
         expect(stubTrackDownload).to.not.have.been.called;
         expect(stubPlaylistDownload).to.not.have.been.called;
       });
@@ -118,7 +118,7 @@ describe('download service', () => {
       it('should emit the the user download result', () => {
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
 
-        expect(rx.next).to.have.been.calledOnce.calledWithExactly(userDownloadResult);
+        expect(rx.next).to.have.been.calledOnceWithExactly(userDownloadResult);
         expect(rx.complete).to.have.been.called;
       });
 

@@ -63,7 +63,7 @@ describe('xhr request service', () => {
     }
 
     function verifyStatusCodeEmitted(statusCode: number) {
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly(statusCode);
+      expect(rx.next).to.have.been.calledOnceWithExactly(statusCode);
       expect(rx.complete).to.have.been.called;
     }
 
@@ -90,7 +90,7 @@ describe('xhr request service', () => {
         const response = createFakeResponse();
         const responseAsStr = new TextDecoder().decode(response);
         firstRequest().respond(200, {}, responseAsStr);
-        expect(rx.next).to.have.been.calledOnce.calledWithExactly(response);
+        expect(rx.next).to.have.been.calledOnceWithExactly(response);
         expect(rx.complete).to.have.been.called;
       });
 
@@ -124,7 +124,7 @@ describe('xhr request service', () => {
       it('should fetch a json response', () => {
         const response = '{"id": 123, "title": "abc"}';
         firstRequest().respond(200, {}, response);
-        expect(rx.next).to.have.been.calledOnce.calledWithExactly({id: 123, title: 'abc'});
+        expect(rx.next).to.have.been.calledOnceWithExactly({id: 123, title: 'abc'});
         expect(rx.complete).to.have.been.called;
       });
 

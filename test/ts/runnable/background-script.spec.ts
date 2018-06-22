@@ -2,10 +2,12 @@ import {DownloadService} from '@src/download/download-service';
 import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
 import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
 import {IMessageHandlerArgs} from '@src/messaging/messenger';
+import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {BackgroundScript} from '@src/runnable/background-script';
 import {ScPageObservables} from '@src/runnable/sc-page-observables';
+import {logger} from '@src/util/logger';
 import {configureChai, useSinonChrome} from '@test/test-initializers';
 import {EMPTY, of, Subject} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
@@ -21,32 +23,33 @@ describe('background script', () => {
   let stubOnMessage$: SinonStub;
   let stubSendToContentPage: SinonStub;
   let stubDownload$: SinonStub;
+  let stubLog: SinonStub;
 
   beforeEach(() => {
     fixture = new BackgroundScript();
 
-    stubScPageVisited$ = stub(ScPageObservables, 'scPageVisited$');
+    stubScPageVisited$ = stub(ScPageObservables, 'goToSoundCloudPage$');
     stubScPageVisited$.returns(EMPTY);
     stubOnMessage$ = stub(ExtensionMessenger, 'onMessage$');
     stubOnMessage$.returns(EMPTY);
     stubSendToContentPage = stub(ExtensionMessenger, 'sendToContentPage$');
     stubDownload$ = stub(DownloadService, 'download$');
+    stubLog = stub(logger, 'log');
   });
 
   afterEach(() => {
     restore();
   });
 
-  context('running the content script', () => {
+  context('when to run the content script', () => {
     it('should run when visiting a SoundCloud page', () => {
-      const tabId = 123;
-      stubScPageVisited$.returns(of({tabId}));
+      stubScPageVisited$.returns(of(123));
       fixture.run();
 
-      expect(sinonChrome.tabs.insertCSS.withArgs(tabId, {file: 'styles.css'})).to.have.been.calledOnce;
+      expect(sinonChrome.tabs.insertCSS.withArgs(123, {file: 'styles.css'})).to.have.been.calledOnce;
       expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
-      expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(tabId, {file: 'vendor.js'});
-      expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(tabId, {file: 'content.js'});
+      expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(123, {file: 'vendor.js'});
+      expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(123, {file: 'content.js'});
     });
 
     it('should not run when not visiting a SoundCloud page', () => {
@@ -60,21 +63,21 @@ describe('background script', () => {
       stubScPageVisited$.returns(scPageVisited$);
       fixture.run();
       sinonChrome.runtime.onSuspend.trigger();
-      scPageVisited$.next({tabId: 123});
+      scPageVisited$.next(123);
 
       expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
       expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
     });
   });
 
-  context('reloading the content page', () => {
+  context('when to reload the content page', () => {
     it('should send a reload message when a request reload content page message is received', () => {
-      const messageHandlerArgs = {
+      const handlerArgs = {
         sender: {
           tab: {id: 123}
         }
       } as IMessageHandlerArgs<RequestContentPageReloadMessage>;
-      stubOnMessage$.withArgs(RequestContentPageReloadMessage.TYPE).returns(of(messageHandlerArgs));
+      stubOnMessage$.withArgs(RequestContentPageReloadMessage.TYPE).returns(of(handlerArgs));
       fixture.run();
 
       expect(stubSendToContentPage).to.have.been.calledOnce
@@ -97,17 +100,17 @@ describe('background script', () => {
     });
   });
 
-  context('downloading', () => {
+  context('when to download', () => {
     it('should download when a request download message is received', () => {
-      const messageHandlerArgs = {
+      const handlerArgs = {
         message: {
           resourceInfoUrl: 'some-url'
         }
       } as IMessageHandlerArgs<RequestDownloadMessage>;
-      stubOnMessage$.withArgs(RequestDownloadMessage.TYPE).returns(of(messageHandlerArgs));
+      stubOnMessage$.withArgs(RequestDownloadMessage.TYPE).returns(of(handlerArgs));
       fixture.run();
 
-      expect(stubDownload$).to.have.been.calledOnce.calledWithExactly('some-url');
+      expect(stubDownload$).to.have.been.calledOnceWithExactly('some-url');
     });
 
     it('should not download when no request download message is received', () => {
@@ -123,6 +126,29 @@ describe('background script', () => {
       message$.next({message: {resourceInfoUrl: 'some-url'}});
 
       expect(stubDownload$).to.not.have.been.called;
+    });
+  });
+
+  context('when to log to the console', () => {
+    it('should log to console when a log to console message is received', () => {
+      const handlerArgs = {
+        message: {
+          message: 'some-message',
+          optionalParams: [1, 2]
+        },
+        sender: {
+          tab: {id: 123}
+        }
+      } as IMessageHandlerArgs<LogToConsoleMessage>;
+      stubOnMessage$.withArgs(LogToConsoleMessage.TYPE).returns(of(handlerArgs));
+      fixture.run();
+
+      expect(stubLog).to.have.been.calledWithExactly('some-message (tabId: 123)', 1, 2);
+    });
+
+    it('should log when the background script has been loaded', () => {
+      fixture.run();
+      expect(stubLog).to.have.been.calledWithExactly('Loaded background script');
     });
   });
 });

@@ -32,7 +32,7 @@ describe('id3 writer service', () => {
 
   it('should set a frame if value is not nil', () => {
     const actual = fixture.setFrame(stubWriter, 'TIT2', 'foo');
-    expect(stubWriter.setFrame).to.have.been.calledOnce.calledWithExactly('TIT2', 'foo');
+    expect(stubWriter.setFrame).to.have.been.calledOnceWithExactly('TIT2', 'foo');
     expect(actual).to.be.equal(stubWriter);
   });
 

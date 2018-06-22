@@ -66,7 +66,7 @@ describe(`track download service`, () => {
       stubCreateDownloadInfo$.withArgs(trackInfo, '').returns(of(inputDownloadInfo));
       fixture.download(trackInfo);
 
-      expect(stubCreateDownloadInfo$).to.have.been.calledOnce.calledWithExactly(trackInfo, '');
+      expect(stubCreateDownloadInfo$).to.have.been.calledOnceWithExactly(trackInfo, '');
       expect(sinonChrome.downloads.download).to.have.been.called;
     });
 
@@ -80,7 +80,7 @@ describe(`track download service`, () => {
     it('should return an item in download metadata if download started successfully', () => {
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
 
-      expect(rx.next).to.have.been.calledOnce.calledWithExactly({downloadId: 123, downloadInfo});
+      expect(rx.next).to.have.been.calledOnceWithExactly({downloadId: 123, downloadInfo});
       expect(rx.complete).to.have.been.called;
     });
 

@@ -4,7 +4,7 @@ import {Observable, Subject} from 'rxjs';
 import {first} from 'rxjs/operators';
 import MessageSender = chrome.runtime.MessageSender;
 
-export interface IMessageHandlerArgs<T extends Message, U extends MessageResponse = undefined> {
+export interface IMessageHandlerArgs<T extends Message = Message, U extends MessageResponse = undefined> {
   message: T;
   sender: MessageSender;
   response$?: Subject<U>;

@@ -1,4 +1,4 @@
 export abstract class MessageResponse {
-  protected constructor(protected readonly content: any) {
+  protected constructor(protected readonly content?: any) {
   }
 }

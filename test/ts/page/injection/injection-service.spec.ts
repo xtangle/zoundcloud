@@ -30,14 +30,14 @@ describe('injection service', () => {
   });
 
   it('should inject download buttons to listen engagement', () => {
-    expect(stubInjectToListenEngagement).to.have.been.calledOnce.calledWithExactly(subscriptions);
+    expect(stubInjectToListenEngagement).to.have.been.calledOnceWithExactly(subscriptions);
   });
 
   it('should inject download buttons to list items', () => {
-    expect(stubInjectToListItem).to.have.been.calledOnce.calledWithExactly(subscriptions);
+    expect(stubInjectToListItem).to.have.been.calledOnceWithExactly(subscriptions);
   });
 
   it('should inject download buttons to user info bar', () => {
-    expect(stubInjectToUserInfoBar).to.have.been.calledOnce.calledWithExactly(subscriptions);
+    expect(stubInjectToUserInfoBar).to.have.been.calledOnceWithExactly(subscriptions);
   });
 });

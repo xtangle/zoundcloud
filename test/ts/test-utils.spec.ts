@@ -1,28 +1,10 @@
 import {configureChai} from '@test/test-initializers';
-import {doNothingIf, tick} from '@test/test-utils';
-import {match, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {tick} from '@test/test-utils';
+import {SinonSpy, spy} from 'sinon';
 
 const expect = configureChai();
 
 describe('test utils', () => {
-
-  describe('the doNothingIf function', () => {
-    let sinonStub: SinonStub;
-
-    beforeEach(() => {
-      sinonStub = stub({foo: () => 'bar'}, 'foo');
-    });
-
-    it('should not do anything if arguments match matcher', () => {
-      doNothingIf(sinonStub, match(42));
-      expect(sinonStub(42)).to.be.undefined;
-    });
-
-    it('should call through if arguments do not match matcher', () => {
-      doNothingIf(sinonStub, match(42));
-      expect(sinonStub(3)).to.be.equal('bar');
-    });
-  });
 
   describe('the tick function', () => {
     let sinonSpy: SinonSpy;
