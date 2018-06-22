@@ -27,7 +27,7 @@ function forcefullyInjectSignal$(selector: string): Observable<Node> {
   );
 }
 
-function toJQuery(node: Node): JQuery<HTMLElement> {
+function toJQuery(node: HTMLElement): JQuery<HTMLElement> {
   return $(node);
 }
 
