@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v1.2.0] - 2018-06-22
+### Added
+- Download functionality for user tracks.
+- Download functionality for playlists.
+- Download functionality for track lists.
+
+### Changed
+- Increased timeout for downloading tracks.
+- Changed format of log messages to include the tab id and timestamp.
+
+### Fixed
+- Fixed issue where download buttons are sometimes not injected to the page.
+- Fixed issue where content page is not cleaned up when tab is closed or navigating away from a SoundCloud page.
+
 ## [v1.1.0] - 2018-05-13
 ### Added
 - Metadata information and cover art to files downloaded in .mp3 format.
@@ -19,5 +33,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.2.0...HEAD
+[v1.2.0]: https://github.com/xtangle/ZoundCloud/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/xtangle/ZoundCloud/compare/v1.0.0...v1.1.0
