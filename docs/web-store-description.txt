@@ -1,6 +1,6 @@
 Extension that adds download buttons to SoundCloud pages.
 
-This extension will add download buttons to any track pages, playlists,
+This extension will add download buttons to track pages, playlists,
 track lists, and user pages (to download all of a user's tracks).
 
 Track will be downloaded its uploaded format if available. For mp3 files, 
