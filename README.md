@@ -1,4 +1,4 @@
-# ZoundCloud
+# ZoundCloud Downloader
 
 [![Build Status](https://img.shields.io/travis/xtangle/ZoundCloud.svg)](https://travis-ci.org/xtangle/ZoundCloud)
 [![DevDependencies Status](https://img.shields.io/david/dev/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud?type=dev)
@@ -20,7 +20,7 @@ resort to the streamable 128kb mp3 version if no better quality is available.
 
 Metadata information and cover art is automatically added to files in .mp3 format (in ID3v2.3).
 
-All tracks will be downloaded to the user's Downloads folder:
+All tracks will be downloaded to the default Downloads folder:
 
 * Tracks are downloaded with the name `track_title`.
 * Playlists are downloaded to a folder with the name `user_name - playlist_name`.
