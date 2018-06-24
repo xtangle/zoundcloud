@@ -1,4 +1,4 @@
-<img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="128" height="128">
+<img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="96" height="96">
 
 # ZoundCloud Downloader
 
@@ -6,6 +6,7 @@
 [![DevDependencies Status](https://img.shields.io/david/dev/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud?type=dev)
 [![Coverage Status](https://img.shields.io/coveralls/github/xtangle/ZoundCloud.svg)](https://coveralls.io/github/xtangle/ZoundCloud?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/xtangle/zoundcloud/badge)](https://www.codefactor.io/repository/github/xtangle/zoundcloud)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nimelepbpejjlbmoobocpfnjhihnpked.svg)](https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij)
 
 ## Description
 
@@ -38,11 +39,18 @@ case it is replaced by a dash (-) symbol).
 
 ## Installation
 
+### From Chrome Web Store
+
+- Install from the [extension page here](https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij).
+
+### From Archive
+
+- Go to the [Releases](https://github.com/xtangle/ZoundCloud/releases) page and download the `zoundcloud-<version-number>.zip` file of the release you wish to install.
 - Extract the downloaded zip file to a folder anywhere.
 - Open Google Chrome and navigate to `chrome://extensions`.
 - Click `Load Unpacked` and choose the folder where the contents were extracted to in the first step. 
 
-## Building
+### From Source
 
 The extension is created as a Node.js project and does not come pre-packaged. 
 To build, make sure Node.js (version >= 7.6) and yarn is installed.
@@ -56,6 +64,5 @@ To build, make sure Node.js (version >= 7.6) and yarn is installed.
 ## Todo
 
 * Make download options configurable through a menu interface.
-* Better explanation of how the extension works and some pictures.
-* Publish extension to Chrome Web Store.
+* Some visual indicator to track current download status and previous downloads.
 * Protractor tests to cover integration.
