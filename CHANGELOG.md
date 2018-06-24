@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added short description and pictures to be used in the Chrome web store.
+
+### Changed
+- Changed name to 'ZoundCloud Downloader'.
+- Changed extension logo.
+
+### Fixed
+- Fix download buttons not sometimes injecting at page load by adding a slight delay.
 
 ## [v1.2.0] - 2018-06-22
 ### Added

@@ -58,5 +58,9 @@ export function useRxTesting(): IRxTestingWrapper {
     }
   });
 
+  after(() => {
+    sandbox.restore();
+  });
+
   return rx;
 }
