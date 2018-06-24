@@ -1,4 +1,6 @@
-<img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="96" height="96">
+<a href="https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij">
+  <img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="96" height="96">
+</a>
 
 # ZoundCloud Downloader
 
