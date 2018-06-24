@@ -30,7 +30,7 @@ All tracks will be downloaded to the default Downloads folder:
 
 * Tracks are downloaded with the name `track_title`.
 * Playlists are downloaded to a folder with the name `user_name - playlist_name`.
-* User tracks are downloaded to a folder wih the name `user_name`.
+* User tracks are downloaded to a folder with the name `user_name`.
 
 If a file with the same name exists, it will not be overwritten.
 
