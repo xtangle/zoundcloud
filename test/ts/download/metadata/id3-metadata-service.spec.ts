@@ -2,7 +2,7 @@ import {ID3MetadataService} from '@src/download/metadata/id3-metadata-service';
 import {ID3WriterService, IID3Writer} from '@src/download/metadata/id3-writer-service';
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {XhrRequestService} from '@src/util/xhr-request-service';
+import {XhrService} from '@src/util/xhr-service';
 import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
@@ -34,7 +34,7 @@ describe('id3 metadata service', () => {
   beforeEach(() => {
     useFakeTimers();
 
-    stubGetArrayBuffer$ = stub(XhrRequestService, 'getArrayBuffer$');
+    stubGetArrayBuffer$ = stub(XhrService, 'getArrayBuffer$');
     stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url).returns(of(songData));
     stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(of(coverArtData));
 

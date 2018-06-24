@@ -1,6 +1,6 @@
 import {AsyncSubject, Observable} from 'rxjs';
 
-export const XhrRequestService = {
+export const XhrService = {
   ping$(url: string): Observable<number> {
     return pingUrl$(url);
   },

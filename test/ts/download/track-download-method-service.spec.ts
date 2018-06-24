@@ -2,7 +2,7 @@ import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/resource/resource-info';
 import {TrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
-import {XhrRequestService} from '@src/util/xhr-request-service';
+import {XhrService} from '@src/util/xhr-service';
 import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError} from 'rxjs';
 import {match, restore, SinonMatcher, SinonStub, stub} from 'sinon';
@@ -17,10 +17,10 @@ describe('track download method service', () => {
   let stubGetJSON$: SinonStub;
 
   beforeEach(() => {
-    stubPing$ = stub(XhrRequestService, 'ping$');
+    stubPing$ = stub(XhrService, 'ping$');
     stubPing$.returns(of(200));
 
-    stubGetJSON$ = stub(XhrRequestService, 'getJSON$');
+    stubGetJSON$ = stub(XhrService, 'getJSON$');
     stubGetJSON$.returns(of({http_mp3_128_url: 'foo'}));
   });
 

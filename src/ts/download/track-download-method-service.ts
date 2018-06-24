@@ -1,7 +1,7 @@
 import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
 import {ITrackInfo} from '@src/download/resource/resource-info';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from '@src/download/track-download-method';
-import {XhrRequestService} from '@src/util/xhr-request-service';
+import {XhrService} from '@src/util/xhr-service';
 import {combineLatest, Observable, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
@@ -29,7 +29,7 @@ function canUseDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
   if (!trackInfo.downloadable) {
     return of(false);
   } else {
-    return XhrRequestService.ping$(getDownloadUrl(trackInfo)).pipe(map((status) => status === 200));
+    return XhrService.ping$(getDownloadUrl(trackInfo)).pipe(map((status) => status === 200));
   }
 }
 
@@ -41,7 +41,7 @@ function canUseStreamUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
   if (!trackInfo.stream_url) {
     return of(false);
   } else {
-    return XhrRequestService.ping$(getStreamUrl(trackInfo)).pipe(map((status) => status === 200));
+    return XhrService.ping$(getStreamUrl(trackInfo)).pipe(map((status) => status === 200));
   }
 }
 
@@ -67,7 +67,7 @@ function useStreamUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMe
 
 function useI1ApiMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethodInfo> {
   const dlInfoEndpoint = `${SC_I1_API_URL}/tracks/${trackInfo.id}/streams?client_id=${I1_CLIENT_ID}`;
-  return XhrRequestService.getJSON$<IScI1ApiTrackDownloadInfo>(dlInfoEndpoint).pipe(
+  return XhrService.getJSON$<IScI1ApiTrackDownloadInfo>(dlInfoEndpoint).pipe(
     map((downloadInfo: IScI1ApiTrackDownloadInfo) => {
       if (downloadInfo.http_mp3_128_url) {
         return {

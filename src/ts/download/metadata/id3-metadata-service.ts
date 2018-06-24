@@ -2,7 +2,7 @@ import {ID3WriterService, IID3Writer} from '@src/download/metadata/id3-writer-se
 import {ITrackMetadata} from '@src/download/metadata/track-metadata';
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {logger} from '@src/util/logger';
-import {XhrRequestService} from '@src/util/xhr-request-service';
+import {XhrService} from '@src/util/xhr-service';
 import {Observable, of} from 'rxjs';
 import {catchError, map, switchMap, timeout} from 'rxjs/operators';
 
@@ -13,7 +13,7 @@ import {catchError, map, switchMap, timeout} from 'rxjs/operators';
  */
 export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
-    return XhrRequestService.getArrayBuffer$(downloadInfo.downloadOptions.url).pipe(
+    return XhrService.getArrayBuffer$(downloadInfo.downloadOptions.url).pipe(
       timeout(300000),
       switchMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
@@ -61,7 +61,7 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
   if (!metadata.cover_url) {
     return of(writer);
   }
-  return XhrRequestService.getArrayBuffer$(metadata.cover_url).pipe(
+  return XhrService.getArrayBuffer$(metadata.cover_url).pipe(
     map((arrayBuffer: ArrayBuffer) =>
       ID3WriterService.setFrame(writer, 'APIC', {
         data: arrayBuffer,

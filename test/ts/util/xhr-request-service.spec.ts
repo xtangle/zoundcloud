@@ -1,14 +1,14 @@
-import {XhrRequestService} from '@src/util/xhr-request-service';
+import {XhrService} from '@src/util/xhr-service';
 import {matchesError} from '@test/sinon-matchers';
 import {configureChai, useRxTesting} from '@test/test-initializers';
 import {restore, server, SinonFakeXMLHttpRequest, useFakeServer} from 'sinon';
 
 const expect = configureChai();
 
-describe('xhr request service', () => {
+describe('xhr service', () => {
   const rx = useRxTesting();
 
-  const fixture = XhrRequestService;
+  const fixture = XhrService;
   const url = '/some/url';
 
   beforeEach(() => {
