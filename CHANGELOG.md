@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Changed extension logo.
 
 ### Fixed
-- Fix download buttons not sometimes injecting at page load by adding a slight delay.
+- Fix download buttons not sometimes injecting at page load.
 
 ## [v1.2.0] - 2018-06-22
 ### Added

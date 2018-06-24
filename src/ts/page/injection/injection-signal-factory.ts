@@ -4,12 +4,12 @@ import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {elementExist$, elementExistOrAdded$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
 import {interval, merge, Observable} from 'rxjs';
-import {delay, filter, map, switchMapTo} from 'rxjs/operators';
+import {filter, map, switchMapTo, take} from 'rxjs/operators';
 
 export const InjectionSignalFactory = {
   create$(selector: string): Observable<JQuery<HTMLElement>> {
     return merge(
-      elementExistOrAdded$(selector).pipe(delay(20)),
+      elementExistOrAdded$(selector),
       forcefullyInjectSignal$(selector)
     ).pipe(
       map(toJQuery),
@@ -20,8 +20,10 @@ export const InjectionSignalFactory = {
 
 function forcefullyInjectSignal$(selector: string): Observable<Node> {
   return merge(
-    interval(3000),
-    ContentPageMessenger.onMessage$(ReloadContentPageMessage.TYPE)
+    ContentPageMessenger.onMessage$(ReloadContentPageMessage.TYPE).pipe(
+      switchMapTo(interval(100).pipe(take(20)))
+    ),
+    interval(5000),
   ).pipe(
     switchMapTo(elementExist$(selector))
   );

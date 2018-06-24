@@ -6,7 +6,6 @@ import {IMessageHandlerArgs} from '@src/messaging/messenger';
 import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
 import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
 import {configureChai, useRxTesting} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {Subject} from 'rxjs';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
@@ -24,8 +23,9 @@ describe('injection signal factory', () => {
   let stubOnMessage$: SinonStub;
 
   beforeEach(() => {
-    diva = $('<div class="a"></div>');
+    useFakeTimers();
 
+    diva = $('<div class="a"></div>');
     message$ = new Subject();
     stubOnMessage$ = stub(ContentPageMessenger, 'onMessage$');
     stubOnMessage$.withArgs(ReloadContentPageMessage.TYPE).returns(message$);
@@ -46,73 +46,46 @@ describe('injection signal factory', () => {
    * Awesome, isn't it?
    */
   context('triggering by the element existing or added to DOM', () => {
-    const delayWait = 21; // ms
-
     beforeEach(() => {
       document.body.innerHTML = `<body><div></div></body>`;
     });
 
-    it('should not emit if element does not exist', async () => {
+    it('should not emit if element does not exist', () => {
       rx.subscribeTo(fixture.create$(selector));
-
-      await tick(delayWait);
       expect(rx.next).to.not.have.been.called;
     });
 
-    it('should emit if element already exists in DOM', async () => {
+    it('should emit if element already exists in DOM', () => {
       $('body').append(diva);
       rx.subscribeTo(fixture.create$(selector));
-
-      await tick(delayWait);
       expect(rx.next).to.have.been.calledOnceWithExactly(diva);
     });
 
-    it('should not emit before the delay while element exists', async () => {
-      $('body').append(diva);
-      rx.subscribeTo(fixture.create$(selector));
-
-      await tick(delayWait - 2);
-      expect(rx.next).to.not.have.been.called;
-    });
-
-    it('should not emit if element exists but already has download button', async () => {
+    it('should not emit if element exists but already has download button', () => {
       diva.append(`<button class="${ZC_DL_BUTTON_CLASS}"></button>`);
       $('body').append(diva);
       rx.subscribeTo(fixture.create$(selector));
-
-      await tick(delayWait);
       expect(rx.next).to.not.have.been.called;
     });
 
-    it('should emit if element is added to DOM', async () => {
+    it('should emit if element is added to DOM', () => {
       rx.subscribeTo(fixture.create$(selector));
       $('body').append(diva);
-
-      await tick(delayWait);
+      clock.next();
       expect(rx.next).to.have.been.calledOnceWithExactly(diva);
     });
 
-    it('should emit before the delay while element is added to DOM', async () => {
-      rx.subscribeTo(fixture.create$(selector));
-      $('body').append(diva);
-
-      await tick(delayWait - 2);
-      expect(rx.next).to.not.have.been.called;
-    });
-
-    it('should not emit if element not matching selector is added to DOM', async () => {
+    it('should not emit if element not matching selector is added to DOM', () => {
       const divb = $('<div class="b"></div>');
       rx.subscribeTo(fixture.create$(selector));
       $('body').append(divb);
-
-      await tick(delayWait);
+      clock.next();
       expect(rx.next).to.not.have.been.called;
     });
   });
 
   context('triggering by forceful injection', () => {
     beforeEach(() => {
-      useFakeTimers();
       document.body.innerHTML = `<body><div></div></body>`;
       $('body').append(diva);
 
@@ -120,20 +93,27 @@ describe('injection signal factory', () => {
       discardPreviousEmissions();
     });
 
-    it('should forcefully emit every 3 seconds', () => {
-      clock.tick(2999);
+    it('should forcefully emit every 5 seconds', () => {
+      clock.tick(4999);
       expect(rx.next).to.not.have.been.called;
       clock.tick(1);
       expect(rx.next).to.have.been.calledOnceWithExactly(diva);
-      clock.tick(2999);
+      clock.tick(4999);
       expect(rx.next).to.have.been.calledOnce;
       clock.tick(1);
       expect(rx.next).to.have.been.calledTwice;
     });
 
-    it('should forcefully emit on receiving a reload content page message', () => {
+    it('should forcefully emit every 100 ms for 20 times on receiving a reload content page message', () => {
       message$.next();
+      clock.tick(100);
       expect(rx.next).to.have.been.calledOnceWithExactly(diva);
+      clock.tick(900);
+      expect(rx.next.callCount).to.be.equal(10);
+      clock.tick(1000);
+      expect(rx.next.callCount).to.be.equal(20);
+      clock.tick(1000);
+      expect(rx.next.callCount).to.be.equal(20);
     });
 
     it('should not emit if existing element already has download button', () => {
