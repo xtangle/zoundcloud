@@ -11,14 +11,14 @@
 
 A Google Chrome extension that adds download buttons to SoundCloud web pages. 
 
+<img src="https://github.com/xtangle/ZoundCloud/blob/master/docs/img1.png" width="800">
+
 This extension will add download buttons to:
 
 * Individual track pages.
 * User pages (will download all of a user's tracks).
 * Playlist pages (will download the playlist).
 * Tracks that are contained in scrollable lists.
-
-<img src="https://github.com/xtangle/ZoundCloud/blob/master/docs/img1.png" width="800">
 
 When a download is initiated, it attempts to download a track in its uploaded format (i.e. highest quality) and will only
 resort to the streamable 128kb mp3 version if no better quality is available.
