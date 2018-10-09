@@ -3,7 +3,7 @@ import {ITrackInfo} from '@src/download/resource/resource-info';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from '@src/download/track-download-method';
 import {XhrService} from '@src/util/xhr-service';
 import {combineLatest, Observable, of} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {flatMap, map} from 'rxjs/operators';
 
 export interface IScI1ApiTrackDownloadInfo {
   http_mp3_128_url?: string;
@@ -12,7 +12,7 @@ export interface IScI1ApiTrackDownloadInfo {
 export const TrackDownloadMethodService = {
   getDownloadMethodInfo$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethodInfo> {
     return combineLatest(canUseDownloadUrlMethod$(trackInfo), canUseStreamUrlMethod$(trackInfo)).pipe(
-      switchMap(([canUseDownloadUrlMethod, canUseStreamUrlMethod]) => {
+      flatMap(([canUseDownloadUrlMethod, canUseStreamUrlMethod]) => {
         if (canUseDownloadUrlMethod) {
           return useDownloadUrlMethod$(trackInfo);
         } else if (canUseStreamUrlMethod) {

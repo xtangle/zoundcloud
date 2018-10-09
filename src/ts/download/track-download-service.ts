@@ -5,7 +5,7 @@ import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {logger} from '@src/util/logger';
 import {AsyncSubject} from 'rxjs';
-import {switchMap, tap, timeout} from 'rxjs/operators';
+import {flatMap, tap, timeout} from 'rxjs/operators';
 import * as VError from 'verror';
 
 export const TrackDownloadService = {
@@ -13,7 +13,7 @@ export const TrackDownloadService = {
     const downloadMetadata$: AsyncSubject<ITrackDownloadMetadata> = new AsyncSubject();
     TrackDownloadInfoFactory.create$(trackInfo, downloadLocation).pipe(
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Downloading track', downloadInfo)),
-      switchMap(MetadataAdapter.addMetadata$),
+      flatMap(MetadataAdapter.addMetadata$),
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Added metadata', downloadInfo)),
       timeout(300000)
     ).subscribe(
