@@ -14,7 +14,6 @@ describe('id3 metadata service', () => {
   const rx = useRxTesting();
 
   const fixture = ID3MetadataService;
-  const metadata = createMetadata();
   const downloadInfo = {
     downloadOptions: {url: 'download-options-url'},
     trackInfo: {title: 'track-title'}
@@ -22,9 +21,9 @@ describe('id3 metadata service', () => {
   const writer = {foo: 'bar'} as IID3Writer;
   const metadataAddedURL = 'url-with-metadata-added';
 
+  let metadata: ITrackMetadata;
   let stubGetArrayBuffer$: SinonStub;
   const songData: ArrayBuffer = new Int8Array([1, 2, 3]).buffer;
-  const coverArtData: ArrayBuffer = new Int8Array([4, 5, 6]).buffer;
 
   let stubAddTag: SinonStub;
   let stubSetFrame: SinonStub;
@@ -33,10 +32,10 @@ describe('id3 metadata service', () => {
 
   beforeEach(() => {
     useFakeTimers();
+    metadata = createMetadata();
 
     stubGetArrayBuffer$ = stub(XhrService, 'getArrayBuffer$');
     stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url).returns(of(songData));
-    stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(of(coverArtData));
 
     stubAddTag = stub(ID3WriterService, 'addTag');
     stubAddTag.withArgs(writer).returns(writer);
@@ -92,19 +91,6 @@ describe('id3 metadata service', () => {
       expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
     });
 
-    it('should add cover art metadata', () => {
-      rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-
-      expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'APIC', {
-        data: coverArtData,
-        description: 'Soundcloud artwork',
-        type: 3,
-        useUnicodeEncoding: false
-      });
-      expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
-      verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
-    });
-
     it('should not add cover art metadata if cover art url is not defined', () => {
       const metadataWithNoCoverArtUrl = createMetadata({cover_url: undefined});
       rx.subscribeTo(fixture.addID3V2Metadata$(metadataWithNoCoverArtUrl, downloadInfo));
@@ -138,30 +124,60 @@ describe('id3 metadata service', () => {
       verifyDownloadOptionsEmittedWithUrl(downloadInfo.downloadOptions.url);
     });
 
-    it('should add cover art metadata if fetching cover art data takes less than 60 seconds', () => {
-      stubGetArrayBuffer$.withArgs(metadata.cover_url)
-        .returns(timer(59999).pipe(mapTo(coverArtData)));
-      rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      clock.tick(60000);
+    describe('adding cover art metadata', () => {
+      const coverArtData: ArrayBuffer = new Int8Array([4, 5, 6]).buffer;
+      const expectedFrame = {
+        data: coverArtData,
+        description: 'Soundcloud artwork',
+        type: 3,
+        useUnicodeEncoding: false
+      };
 
-      expect(stubSetFrame).to.have.been.calledWith(writer, 'APIC', match.any);
-    });
+      beforeEach(() => {
+        metadata = createMetadata({cover_url: 'cover-url'});
+        // Set up so that cover art metadata can be downloaded from the cover art url from the api
+        stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(of(coverArtData));
+      });
 
-    it('should not add cover art metadata if fetching cover art data takes 60 seconds or more', () => {
-      stubGetArrayBuffer$.withArgs(metadata.cover_url)
-        .returns(timer(60000).pipe(mapTo(coverArtData)));
-      rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      clock.tick(60001);
+      it('should not add cover art url if there is none', () => {
+        const metadataWithNoCoverArtUrl = {...metadata, cover_url: ''};
+        rx.subscribeTo(fixture.addID3V2Metadata$(metadataWithNoCoverArtUrl, downloadInfo));
+        expect(stubSetFrame).not.to.have.been.calledWith(writer, 'APIC', match.any);
+      });
 
-      expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
-    });
+      it('should add cover art metadata', () => {
+        rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
 
-    it('should not add cover art metadata if there is an error while fetching cover art', () => {
-      stubGetArrayBuffer$.withArgs(metadata.cover_url)
-        .returns(throwError('Some error'));
-      rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
+        expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'APIC', expectedFrame);
+        expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
+        verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
+      });
 
-      expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
+      it('should add cover art metadata if fetching cover art data takes less than 20 seconds', () => {
+        stubGetArrayBuffer$.withArgs(metadata.cover_url)
+          .returns(timer(19999).pipe(mapTo(coverArtData)));
+        rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
+        clock.tick(20000);
+
+        expect(stubSetFrame).to.have.been.calledWith(writer, 'APIC', expectedFrame);
+      });
+
+      it('should not add cover art metadata if fetching cover art data takes 20 seconds or more', () => {
+        stubGetArrayBuffer$.withArgs(metadata.cover_url)
+          .returns(timer(20000).pipe(mapTo(coverArtData)));
+        rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
+        clock.tick(20001);
+
+        expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
+      });
+
+      it('should not add cover art metadata if there is an error while fetching cover art', () => {
+        stubGetArrayBuffer$.withArgs(metadata.cover_url)
+          .returns(throwError('Some error'));
+        rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
+
+        expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
+      });
     });
   });
 
@@ -184,7 +200,7 @@ describe('id3 metadata service', () => {
       artist_url: 'artist-url',
       audio_source_url: 'audio-source-url',
       bpm: 200,
-      cover_url: 'cover-url',
+      cover_url: '', // No cover art url
       description: 'soundcloud-track-description',
       duration: 12345,
       genres: ['rock', 'classical'],
