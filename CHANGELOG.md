@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v1.3.1] - 2018-10-08
+### Added
+- Added high resolution cover art (if available) in downloaded metadata.
+
 ## [v1.3.0] - 2018-06-24
 ### Added
 - Added short description and pictures to be used in the Chrome web store.
@@ -44,6 +48,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.3.1...HEAD
+[v1.3.1]: https://github.com/xtangle/ZoundCloud/compare/v1.3.0...v1.3.1
+[v1.3.0]: https://github.com/xtangle/ZoundCloud/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/xtangle/ZoundCloud/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/xtangle/ZoundCloud/compare/v1.0.0...v1.1.0
