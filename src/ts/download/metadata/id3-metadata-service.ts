@@ -63,15 +63,15 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
     return of(writer);
   }
   return XhrService.getArrayBuffer$(url).pipe(
+    timeout(20000),
     map((arrayBuffer: ArrayBuffer) =>
       ID3WriterService.setFrame(writer, 'APIC', {
         data: arrayBuffer,
-        description: 'Soundcloud artwork',
+        description: `Soundcloud artwork. Source: ${url}`,
         type: 3,
         useUnicodeEncoding: false
       })
     ),
-    timeout(20000),
     catchError((err: Error) => {
       logger.error(`Unable to fetch cover art for track ${metadata.title}`, err);
       return of(writer);

@@ -4,7 +4,7 @@ import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factor
 import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {XhrService} from '@src/util/xhr-service';
 import {Observable, of} from 'rxjs';
-import {flatMap, map} from 'rxjs/operators';
+import {catchError, flatMap, map, timeout} from 'rxjs/operators';
 
 export const MetadataAdapter = {
   addMetadata$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
@@ -26,10 +26,15 @@ export const MetadataAdapter = {
 
 function withUpdatedCoverArtUrl$(metadata: ITrackMetadata): Observable<ITrackMetadata> {
   const origUrl = metadata.cover_url;
+  if (!origUrl) {
+    return of(metadata);
+  }
   const highResUrl = getCoverArtUrlForResolution(origUrl, 500);
   return XhrService.ping$(highResUrl).pipe(
+    timeout(5000),
     map((status: number) => (status === 200) ? highResUrl : origUrl),
-    map((url: string) => ({...metadata, cover_url: url}))
+    map((url: string) => ({...metadata, cover_url: url})),
+    catchError(() => of(metadata) as Observable<ITrackMetadata>),
   );
 }
 

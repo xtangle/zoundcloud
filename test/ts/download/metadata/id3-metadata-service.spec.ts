@@ -126,26 +126,26 @@ describe('id3 metadata service', () => {
 
     describe('adding cover art metadata', () => {
       const coverArtData: ArrayBuffer = new Int8Array([4, 5, 6]).buffer;
-      const expectedFrame = {
-        data: coverArtData,
-        description: 'Soundcloud artwork',
-        type: 3,
-        useUnicodeEncoding: false
-      };
+      let expectedFrame: any;
 
       beforeEach(() => {
         metadata = createMetadata({cover_url: 'cover-url'});
-        // Set up so that cover art metadata can be downloaded from the cover art url from the api
+        expectedFrame = {
+          data: coverArtData,
+          description: `Soundcloud artwork. Source: ${metadata.cover_url}`,
+          type: 3,
+          useUnicodeEncoding: false
+        };
         stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(of(coverArtData));
       });
 
-      it('should not add cover art url if there is none', () => {
+      it('should not add cover art metadata if there is no cover art url', () => {
         const metadataWithNoCoverArtUrl = {...metadata, cover_url: ''};
         rx.subscribeTo(fixture.addID3V2Metadata$(metadataWithNoCoverArtUrl, downloadInfo));
         expect(stubSetFrame).not.to.have.been.calledWith(writer, 'APIC', match.any);
       });
 
-      it('should add cover art metadata', () => {
+      it('should add cover art metadata if there is cover art url', () => {
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
 
         expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'APIC', expectedFrame);
