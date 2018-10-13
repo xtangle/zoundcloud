@@ -4,7 +4,7 @@ import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {logger} from '@src/util/logger';
 import {XhrService} from '@src/util/xhr-service';
 import {Observable, of} from 'rxjs';
-import {catchError, map, switchMap, timeout} from 'rxjs/operators';
+import {catchError, flatMap, map, timeout} from 'rxjs/operators';
 
 /**
  * Adds ID3 v2.4 tags and returns downloadInfo with url in downloadOptions set to the updated URL.
@@ -15,7 +15,7 @@ export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
     return XhrService.getArrayBuffer$(downloadInfo.downloadOptions.url).pipe(
       timeout(300000),
-      switchMap(writeMetadata$.bind(null, metadata)),
+      flatMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
       map((url: string) => ({
         ...downloadInfo,
@@ -23,7 +23,7 @@ export const ID3MetadataService = {
           ...downloadInfo.downloadOptions,
           url
         }
-      })),
+      } as any)),
       catchError((err: Error) => {
         logger.error(`Unable to fetch metadata for track ${downloadInfo.trackInfo.title}`, err);
         return of(downloadInfo);
@@ -35,7 +35,7 @@ export const ID3MetadataService = {
 function writeMetadata$(metadata: ITrackMetadata, arrayBuffer: ArrayBuffer): Observable<IID3Writer> {
   return of(ID3WriterService.createWriter(arrayBuffer)).pipe(
     map(withTextualMetadata.bind(null, metadata)),
-    switchMap(withCoverArt$.bind(null, metadata)),
+    flatMap(withCoverArt$.bind(null, metadata)),
     map(ID3WriterService.addTag)
   );
 }
@@ -58,19 +58,20 @@ function withTextualMetadata(metadata: ITrackMetadata, writer: IID3Writer): IID3
 }
 
 function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable<IID3Writer> {
-  if (!metadata.cover_url) {
+  const url = metadata.cover_url;
+  if (!url) {
     return of(writer);
   }
-  return XhrService.getArrayBuffer$(metadata.cover_url).pipe(
+  return XhrService.getArrayBuffer$(url).pipe(
+    timeout(20000),
     map((arrayBuffer: ArrayBuffer) =>
       ID3WriterService.setFrame(writer, 'APIC', {
         data: arrayBuffer,
-        description: 'Soundcloud artwork',
+        description: `Soundcloud artwork. Source: ${url}`,
         type: 3,
         useUnicodeEncoding: false
       })
     ),
-    timeout(60000),
     catchError((err: Error) => {
       logger.error(`Unable to fetch cover art for track ${metadata.title}`, err);
       return of(writer);

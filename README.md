@@ -1,10 +1,13 @@
-<img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="96" height="96">
+<a href="https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij">
+  <img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="96" height="96">
+</a>
 
 # ZoundCloud Downloader
 
 [![Build Status](https://img.shields.io/travis/xtangle/ZoundCloud.svg)](https://travis-ci.org/xtangle/ZoundCloud)
 [![DevDependencies Status](https://img.shields.io/david/dev/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud?type=dev)
 [![Coverage Status](https://img.shields.io/coveralls/github/xtangle/ZoundCloud.svg)](https://coveralls.io/github/xtangle/ZoundCloud?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/xtangle/ZoundCloud/badge.svg?targetFile=package.json)](https://snyk.io/test/github/xtangle/ZoundCloud?targetFile=package.json)
 [![CodeFactor](https://www.codefactor.io/repository/github/xtangle/zoundcloud/badge)](https://www.codefactor.io/repository/github/xtangle/zoundcloud)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/bhnpokjikdldjiimbmoakkfekcnpkkij.svg)](https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij)
 
