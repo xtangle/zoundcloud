@@ -22,9 +22,9 @@ module.exports = {
         "browserName": "chrome",
         "chromeOptions" : {
           "args" : [
-            "headless",
-            "no-sandbox",
-            `load-extension=${extensionPath}`
+            "--headless",
+            "--no-sandbox",
+            `--load-extension=${extensionPath}`
           ]
         },
         "acceptSslCerts": true
