@@ -3,5 +3,5 @@
 
 dist/
 coverage/
-e2e/reports/
+e2e/output/
 **/node_modules/
