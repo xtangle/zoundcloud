@@ -12,7 +12,7 @@ module.exports = {
   "test_settings" : {
     "default" : {
       "selenium_port"  : 9515,
-      "selenium_host"  : "localhost",
+      "selenium_host"  : "127.0.0.1",
       "default_path_prefix" : "",
       "request_timeout_options": {
         "timeout": 20000
