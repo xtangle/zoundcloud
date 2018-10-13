@@ -3,6 +3,5 @@
 
 dist/
 coverage/
+e2e/reports/
 **/node_modules/
-
-!build/index.html
