@@ -93,27 +93,27 @@ describe('injection signal factory', () => {
       discardPreviousEmissions();
     });
 
-    it('should forcefully emit every 5 seconds', () => {
-      clock.tick(4999);
+    it('should forcefully emit every 1 second', () => {
+      clock.tick(999);
       expect(rx.next).to.not.have.been.called;
       clock.tick(1);
       expect(rx.next).to.have.been.calledOnceWithExactly(diva);
-      clock.tick(4999);
+      clock.tick(999);
       expect(rx.next).to.have.been.calledOnce;
       clock.tick(1);
       expect(rx.next).to.have.been.calledTwice;
     });
 
-    it('should forcefully emit every 100 ms for 20 times on receiving a reload content page message', () => {
+    it('should forcefully emit every 200 ms for 20 times upon receiving a reload content page message', () => {
       message$.next();
-      clock.tick(100);
+      clock.tick(200);
       expect(rx.next).to.have.been.calledOnceWithExactly(diva);
-      clock.tick(900);
-      expect(rx.next.callCount).to.be.equal(10);
-      clock.tick(1000);
-      expect(rx.next.callCount).to.be.equal(20);
-      clock.tick(1000);
-      expect(rx.next.callCount).to.be.equal(20);
+      clock.tick(1800);
+      expect(rx.next.callCount).to.be.equal(12);
+      clock.tick(2000);
+      expect(rx.next.callCount).to.be.equal(24);
+      clock.tick(2000);
+      expect(rx.next.callCount).to.be.equal(26);
     });
 
     it('should not emit if existing element already has download button', () => {

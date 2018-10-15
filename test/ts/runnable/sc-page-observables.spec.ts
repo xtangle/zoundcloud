@@ -41,7 +41,7 @@ describe('sc page visited observables', () => {
   beforeEach(() => {
     useFakeTimers();
 
-    stubOnCompleted = stub(sinonChrome.webNavigation.onCompleted, 'trigger');
+    stubOnCompleted = stub(sinonChrome.webNavigation.onDOMContentLoaded, 'trigger');
     stubOnCompleted.withArgs(doesNotEqualScUrlHost).callsFake(noop);
     stubOnCompleted.callThrough();
 
@@ -59,18 +59,18 @@ describe('sc page visited observables', () => {
   });
 
   describe('the go to sc page observable', () => {
-    context('triggering through the Web Navigation On Completed event', () => {
+    context('triggering through the Web Navigation On DOM Content Loaded event', () => {
       forEach(validScUrls)
         .it('should emit when the URL is %s', (url: string) => {
           const details = {tabId: 1, timeStamp: 123, url};
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(rx.next).to.have.been.calledOnceWithExactly(details.tabId);
         });
 
       forEach(invalidScUrls)
         .it('should not emit when the URL is %s', (url: string) => {
           const details = {tabId: 1, timeStamp: 123, url};
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(rx.next).to.not.have.been.called;
         });
     });
@@ -110,13 +110,13 @@ describe('sc page visited observables', () => {
 
       context('when tab exists', () => {
         it('should emit', () => {
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(rx.next).to.have.been.called;
         });
 
         it('should not emit when there was an error', () => {
           sinonChrome.runtime.lastError = Error('some error!');
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(rx.next).to.not.have.been.called;
         });
       });
@@ -127,20 +127,20 @@ describe('sc page visited observables', () => {
         });
 
         it('should not emit', () => {
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(rx.next).to.not.have.been.called;
         });
 
         it('should not raise an error by checking chrome.runtime.lastError', () => {
           const callback = spy();
           stub(sinonChrome.runtime, 'lastError').get(callback);
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(callback).to.have.been.called;
         });
 
         it('should not emit when there was an error', () => {
           sinonChrome.runtime.lastError = Error('some error!');
-          sinonChrome.webNavigation.onCompleted.trigger(details);
+          sinonChrome.webNavigation.onDOMContentLoaded.trigger(details);
           expect(rx.next).to.not.have.been.called;
         });
       });
