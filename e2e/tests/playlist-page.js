@@ -21,7 +21,8 @@ module.exports = {
     // with some that are unsuitable for filenames, has cover art
     const song3Path = path.join(playlistDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
     // song 4: uses the download_url method, does not have a .mp3 file extension,
-    // has cover art but won't get added as it's not an mp3 file
+    // has cover art but won't get added as it's not an mp3 file,
+    // original song title has ' - FREE DOWNLOAD' as suffix which should be removed
     const song4Path = path.join(playlistDir, 'Hardwell & Joey Dale feat. Luciana - Arcadia (Acapella).wav');
     browser
       .click(zcBtnSelector)

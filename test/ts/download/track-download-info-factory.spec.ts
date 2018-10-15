@@ -61,14 +61,21 @@ describe('track download info factory', () => {
 
   context('cleaning the track info', () => {
     const titleSuffixes = [
-      '- FREE DOWNLOAD',
-      'Free Download',
-      'FREE_DL'
+      ' - FREE DOWNLOAD',
+      '|[FREE DOWNLOAD]',
+      ' ** FREE DOWNLOAD **',
+      ' // FREE DOWNLOAD!!! //',
+      ' * FREE DOWNLOAD !!!',
+      '_Free Download',
+      ' (Free Download)',
+      ' free download',
+      '| free dl',
+      ' FREE_DL'
     ];
 
     forEach(titleSuffixes)
       .it(`should remove '%s' from the end of the song title`, (suffix: string) => {
-        const newTrackInfo = {...trackInfo, title: `${trackInfo.title} ${suffix}`};
+        const newTrackInfo = {...trackInfo, title: `${trackInfo.title}${suffix}`};
         rx.subscribeTo(fixture.create$(newTrackInfo, downloadLocation));
         const actual: ITrackDownloadInfo = rx.next.firstCall.args[0];
 
