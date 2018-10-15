@@ -22,7 +22,7 @@ module.exports = {
     const song3Path = path.join(playlistDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
     // song 4: uses the download_url method, does not have a .mp3 file extension,
     // has cover art but won't get added as it's not an mp3 file
-    const song4Path = path.join(playlistDir, 'Kalafina X Prodigy - No Good Magia(Start The Witch).m4a');
+    const song4Path = path.join(playlistDir, 'Hardwell & Joey Dale feat. Luciana - Arcadia (Acapella).wav');
     browser
       .click(zcBtnSelector)
       .assert.fileDownloaded(song1Path)
@@ -32,7 +32,7 @@ module.exports = {
       .assert.fileDownloaded(song3Path)
       .verify.fileHasSize(song3Path, 5551831)
       .assert.fileDownloaded(song4Path)
-      .verify.fileHasSize(song4Path, 6326420);
+      .verify.fileHasSize(song4Path, 13891544);
   },
 
   'Adds a Download button to every item in the track list': function (browser) {

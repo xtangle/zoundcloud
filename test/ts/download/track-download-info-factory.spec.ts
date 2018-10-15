@@ -1,4 +1,5 @@
 import {ITrackInfo} from '@src/download/resource/resource-info';
+import {ITrackDownloadInfo} from '@src/download/track-download-info';
 import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from '@src/download/track-download-method';
 import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
@@ -8,13 +9,14 @@ import {of} from 'rxjs';
 import {match, restore, SinonStub, stub} from 'sinon';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
+const forEach = require('mocha-each');
 const expect = configureChai();
 
 describe('track download info factory', () => {
   const rx = useRxTesting();
 
   const fixture = TrackDownloadInfoFactory;
-  const trackInfo = {title: 'track?title/with\\special>characters'} as ITrackInfo;
+  const trackInfo = Object.freeze({title: 'track?title/with\\special>characters'}) as ITrackInfo;
   const downloadLocation = 'download?location/with\\special<characters';
   const downloadMethodInfo: ITrackDownloadMethodInfo = {
     downloadMethod: TrackDownloadMethod.DownloadUrlMethod,
@@ -57,13 +59,30 @@ describe('track download info factory', () => {
       .calledWithMatch(match.has('trackInfo', trackInfo));
   });
 
+  context('cleaning the track info', () => {
+    const titleSuffixes = [
+      '- FREE DOWNLOAD',
+      'Free Download',
+      'FREE_DL'
+    ];
+
+    forEach(titleSuffixes)
+      .it(`should remove '%s' from the end of the song title`, (suffix: string) => {
+        const newTrackInfo = {...trackInfo, title: `${trackInfo.title} ${suffix}`};
+        rx.subscribeTo(fixture.create$(newTrackInfo, downloadLocation));
+        const actual: ITrackDownloadInfo = rx.next.firstCall.args[0];
+
+        expect(actual.trackInfo.title).to.be.equal(trackInfo.title);
+        expect(actual.downloadOptions.filename).not.to.contain(suffix);
+      });
+  });
+
   context('the download options', () => {
-    const DL_OPTIONS_KEY = 'downloadOptions';
     let actual: DownloadOptions;
 
     beforeEach(() => {
       rx.subscribeTo(fixture.create$(trackInfo, downloadLocation));
-      actual = rx.next.firstCall.args[0][DL_OPTIONS_KEY];
+      actual = rx.next.firstCall.args[0].downloadOptions;
     });
 
     it('should set the correct filepath with special characters removed', () => {

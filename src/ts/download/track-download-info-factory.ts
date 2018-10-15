@@ -10,8 +10,9 @@ import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export const TrackDownloadInfoFactory = {
   create$(trackInfo: ITrackInfo, downloadLocation: string): Observable<ITrackDownloadInfo> {
-    return TrackDownloadMethodService.getDownloadMethodInfo$(trackInfo).pipe(
-      map(toDownloadInfo.bind(null, trackInfo, downloadLocation))
+    const cleanTrackInfo = cleanTrackTitle(trackInfo);
+    return TrackDownloadMethodService.getDownloadMethodInfo$(cleanTrackInfo).pipe(
+      map(toDownloadInfo.bind(null, cleanTrackInfo, downloadLocation))
     );
   }
 };
@@ -25,6 +26,13 @@ function toDownloadInfo(trackInfo: ITrackInfo,
     downloadOptions: getDownloadOptions(filePath, downloadMethodInfo.url),
     originalUrl: downloadMethodInfo.url,
     trackInfo
+  };
+}
+
+function cleanTrackTitle(trackInfo: ITrackInfo): ITrackInfo {
+  return {
+    ...trackInfo,
+    title: trackInfo.title.replace(/\s(-\s)?free[\s_]?(download|dl)\s*$/gi, '')
   };
 }
 
