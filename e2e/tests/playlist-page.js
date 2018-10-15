@@ -17,11 +17,11 @@ module.exports = {
     const song1Path = path.join(playlistDir, '23. M2U - Blythe.mp3');
     // song 2: uses the a1_api method
     const song2Path = path.join(playlistDir, 'Ryuusei.mp3');
-    // song 3: uses the download_url method, has a long song title with weird characters
-    // and characters unsuitable for filenames, has cover art
+    // song 3: uses the stream_url method, has a long song title with weird characters
+    // with some that are unsuitable for filenames, has cover art
     const song3Path = path.join(playlistDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
     // song 4: uses the download_url method, does not have a .mp3 file extension,
-    // has cover art but won't get added as it's not an .mp3 file
+    // has cover art but won't get added as it's not an mp3 file
     const song4Path = path.join(playlistDir, 'Kalafina X Prodigy - No Good Magia(Start The Witch).m4a');
     browser
       .click(zcBtnSelector)
@@ -40,7 +40,7 @@ module.exports = {
       .elements('css selector', '.listenDetails .trackList__item .sc-button-share + button.zc-button-download', function (result) {
         browser.assert.strictEqual(4, result.value.length, 'Should add a download button for every track item');
       })
-      .assert.hidden(`${trackItemSelector} button.zc-button-download`, 'Download button on a track item is not visible initially')
+      .assert.hidden(`${trackItemSelector} button.zc-button-download`, 'Download button is hidden on a track item')
       .moveToElement(trackItemSelector, 100, 20)
       .assert.visible(`${trackItemSelector} button.zc-button-download`, 'Download button is visible when hovering over a track item');
   },
