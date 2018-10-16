@@ -8,6 +8,7 @@ module.exports = {
   "src_folders" : path.join(e2ePath, 'tests'),
   "output_folder" : path.join(e2ePath, 'output'),
   "page_objects_path" : "",
+  "custom_commands_path": path.join(e2ePath, 'commands'),
   "custom_assertions_path": path.join(e2ePath, 'assertions'),
   "globals_path" : path.join(e2ePath, 'globals.js'),
   "selenium" : {

@@ -4,9 +4,14 @@ const zcBtnSelector = '.listenEngagement .sc-button-share + button.zc-button-dow
 const trackItemSelector = '.listenDetails .trackList__item:nth-of-type(3)';
 
 module.exports = {
-  'Adds a Download button to a SoundCloud playlist page': function (browser) {
+  before: function (browser) {
     browser
       .url('https://soundcloud.com/xtangle/sets/test-playlist')
+      .dismissCookiePolicyNotification()
+  },
+
+  'Adds a Download button to a SoundCloud playlist page': function (browser) {
+    browser
       .waitForElementVisible(zcBtnSelector)
       .assert.containsText(zcBtnSelector, 'Download');
   },

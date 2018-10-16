@@ -15,6 +15,6 @@ module.exports = {
     done();
   },
   downloadDir: path.join(outputPath, 'downloads'),
-  waitForConditionTimeout: 10000,
+  waitForConditionTimeout: 5000,
   throwOnMultipleElementsReturned: true
 };

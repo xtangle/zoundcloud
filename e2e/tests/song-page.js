@@ -4,9 +4,14 @@ const shareBtnSelector = '.listenEngagement .sc-button-share';
 const zcBtnSelector = `${shareBtnSelector} + button.zc-button-download`;
 
 module.exports = {
-  'Adds a Download button to a SoundCloud song page': function (browser) {
+  before: function (browser) {
     browser
       .url('https://soundcloud.com/lil-baby-4pf/drip-too-hard')
+      .dismissCookiePolicyNotification()
+  },
+
+  'Adds a Download button to a SoundCloud song page': function (browser) {
+    browser
       .waitForElementVisible(zcBtnSelector)
       .assert.containsText(zcBtnSelector, 'Download');
   },
