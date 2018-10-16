@@ -3,6 +3,9 @@
  */
 
 module.exports.command = function () {
-  this.click('.announcements .announcement button');
+  const btnSelector = '.announcements .announcement button';
+  this
+    .waitForElementVisible(btnSelector)
+    .click(btnSelector);
   return this;
 };
