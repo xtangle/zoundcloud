@@ -35,6 +35,7 @@ module.exports = {
 
   'Adds a Download button for every item posted by the user in the All tab': function (browser) {
     browser
+      .waitForElementVisible('.userMain .soundList__item')
       .elements('css selector', '.userMain .soundList__item .sc-button-share + button.zc-button-download', function (result) {
         browser.assert.strictEqual(result.value.length, 3,
           'Should add a download button for every item posted by the user');
@@ -66,7 +67,7 @@ module.exports = {
       .useXpath()
       .click('//*[contains(@class,\'g-tabs-item\')]//a[contains(text(),\'Tracks\')]')
       .useCss()
-      .waitForElementVisible('.userMain .soundList')
+      .waitForElementVisible('.userMain .soundList__item')
       .elements('css selector', '.userMain .soundList__item .sc-button-share + button.zc-button-download', function (result) {
         browser.assert.strictEqual(result.value.length, 2,
           'Should add a download button for every track posted by the user');
@@ -78,7 +79,7 @@ module.exports = {
       .useXpath()
       .click('//*[contains(@class,\'g-tabs-item\')]//a[contains(text(),\'Playlists\')]')
       .useCss()
-      .waitForElementVisible('.userMain .soundList')
+      .waitForElementVisible('.userMain .soundList__item')
       .elements('css selector', '.userMain .soundList__item .sc-button-share + button.zc-button-download', function (result) {
         browser.assert.strictEqual(result.value.length, 1,
           'Should add a download button for every playlist posted by the user');
