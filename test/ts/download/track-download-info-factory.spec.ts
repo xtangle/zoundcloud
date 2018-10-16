@@ -69,6 +69,9 @@ describe('track download info factory', () => {
       '_Free Download',
       ' (Free Download)',
       ' free download',
+      ' [Buy = Free Download]',
+      '*BUY=FREE DOWNLOAD*',
+      ' BUY= Free Download',
       '| free dl',
       ' FREE_DL'
     ];
