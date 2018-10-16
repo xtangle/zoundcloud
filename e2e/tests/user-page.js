@@ -11,6 +11,10 @@ module.exports = {
       .dismissCookiePolicyNotification();
   },
 
+  after: function (browser) {
+    browser.end();
+  },
+
   'Adds a Download button to a SoundCloud user page': function (browser) {
     browser
       .waitForElementVisible(zcBtnSelector)

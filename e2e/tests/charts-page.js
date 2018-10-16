@@ -7,6 +7,10 @@ module.exports = {
       .dismissCookiePolicyNotification();
   },
 
+  after: function (browser) {
+    browser.end();
+  },
+
   'Adds a Download button for every track in the charts list': function (browser) {
     browser
       .elements('css selector', '.chartsMain .chartTracks__item', function (results) {

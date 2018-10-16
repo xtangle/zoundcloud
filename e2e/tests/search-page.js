@@ -9,6 +9,10 @@ module.exports = {
       .dismissCookiePolicyNotification();
   },
 
+  after: function (browser) {
+    browser.end();
+  },
+
   'Adds a Download button for every track or playlist item in the Everything list': function (browser) {
     browser
       .waitForElementVisible('.searchResultGroupHeading')
