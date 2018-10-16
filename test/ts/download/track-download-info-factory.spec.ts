@@ -63,7 +63,7 @@ describe('track download info factory', () => {
     const titleSuffixes = [
       ' - FREE DOWNLOAD',
       '|[FREE DOWNLOAD]',
-      ' ** FREE DOWNLOAD **',
+      '** FREE DOWNLOAD **',
       ' // FREE DOWNLOAD!!! //',
       ' * FREE DOWNLOAD !!!',
       '_Free Download',

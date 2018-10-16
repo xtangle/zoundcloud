@@ -14,21 +14,23 @@
  */
 
 const fs = require('fs');
+const util = require('util');
 
 const POLL_INTERVAL_IN_MS = 1000;
 const TIMEOUT_IN_MS = 15000;
 
 exports.assertion = function (filepath, msg) {
   const DEFAULT_MSG = `Testing if file was downloaded to '${filepath}'.`;
-  const MSG_FILE_NOT_FOUND = `${DEFAULT_MSG} File was not found after ${TIMEOUT_IN_MS} ms.`;
+  const MSG_SUCCESSFUL = `${DEFAULT_MSG} File found after %d ms.`;
+  const MSG_FILE_NOT_FOUND = `${DEFAULT_MSG} File not found after %d ms.`;
+  let startTime;
 
   this.message = msg || DEFAULT_MSG;
   this.expected = true;
 
   this.pass = function (value) {
-    if (!value) {
-      this.message = msg || MSG_FILE_NOT_FOUND;
-    }
+    const elapsedTime = Date.now() - startTime;
+    this.message = msg || util.format(value ? MSG_SUCCESSFUL : MSG_FILE_NOT_FOUND, elapsedTime);
     return value;
   };
 
@@ -37,7 +39,8 @@ exports.assertion = function (filepath, msg) {
   };
 
   this.command = function (callback) {
-    pollStats(Date.now(), filepath, callback);
+    startTime = Date.now();
+    pollStats(startTime, filepath, callback);
     return this;
   };
 };

@@ -1,7 +1,7 @@
 const path = require('path');
 
 const zcBtnSelector = '.listenEngagement .sc-button-share + button.zc-button-download';
-const trackItemSelector = '.listenDetails .trackList__item:nth-of-type(3)';
+const trackItemSelector = '.listenDetails .trackList__item:last-of-type';
 
 module.exports = {
   before: function (browser) {
@@ -18,27 +18,28 @@ module.exports = {
 
   'Downloads all songs in the playlist when clicked': function (browser) {
     const playlistDir = path.join(browser.globals.downloadDir, 'xtangle - test playlist');
-    // song 1: uses the stream_url method, does not have cover art
-    const song1Path = path.join(playlistDir, '23. M2U - Blythe.mp3');
-    // song 2: uses the a1_api method
-    const song2Path = path.join(playlistDir, 'Ryuusei.mp3');
-    // song 3: uses the stream_url method, has a long song title with weird characters
-    // with some that are unsuitable for filenames, has cover art
-    const song3Path = path.join(playlistDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
-    // song 4: uses the download_url method, does not have a .mp3 file extension,
+    // song 1: uses the download_url method, does not have a .mp3 file extension,
     // has cover art but won't get added as it's not an mp3 file,
-    // original song title has ' - FREE DOWNLOAD' as suffix which should be removed
-    const song4Path = path.join(playlistDir, 'Hardwell & Joey Dale feat. Luciana - Arcadia (Acapella).wav');
+    // original song title has '__FREE DOWNLOAD__' as suffix which should be removed
+    const song1Path = path.join(playlistDir, 'Rather Be (Marimba Remix).m4a');
+    // song 2: uses the stream_url method, does not have cover art
+    const song2Path = path.join(playlistDir, '23. M2U - Blythe.mp3');
+    // song 3: uses the a1_api method
+    const song3Path = path.join(playlistDir, 'Ryuusei.mp3');
+    // song 4: uses the stream_url method, has a long song title with weird characters
+    // with some that are unsuitable for filenames, has cover art
+    const song4Path = path.join(playlistDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
+
     browser
       .click(zcBtnSelector)
       .assert.fileDownloaded(song1Path)
-      .verify.fileHasSize(song1Path, 2189492)
+      .verify.fileHasSize(song1Path, 1392074)
       .assert.fileDownloaded(song2Path)
-      .verify.fileHasSize(song2Path, 5099728)
+      .verify.fileHasSize(song2Path, 2189492)
       .assert.fileDownloaded(song3Path)
-      .verify.fileHasSize(song3Path, 5551831)
+      .verify.fileHasSize(song3Path, 5099728)
       .assert.fileDownloaded(song4Path)
-      .verify.fileHasSize(song4Path, 13891544);
+      .verify.fileHasSize(song4Path, 5551831);
   },
 
   'Adds a Download button to every item in the track list': function (browser) {

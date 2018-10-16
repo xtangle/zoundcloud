@@ -30,7 +30,7 @@ function toDownloadInfo(trackInfo: ITrackInfo,
 }
 
 function cleanTrackTitle(trackInfo: ITrackInfo): ITrackInfo {
-  const freeDlRegex = /[-_| ]+[-_|/*! ]*[\[(]?free[\s_]?(download|dl)[\])]?\s?[-_|/*! ]*$/i;
+  const freeDlRegex = /[-_|/*! ]*[\[(]?free[\s_]?(download|dl)[\])]?\s?[-_|/*! ]*$/i;
   return {
     ...trackInfo,
     title: trackInfo.title.replace(freeDlRegex, '')
