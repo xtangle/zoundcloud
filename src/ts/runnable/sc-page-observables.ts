@@ -8,7 +8,7 @@ import WebNavigationTransitionCallbackDetails = chrome.webNavigation.WebNavigati
 
 const initialNavigationToScPage$: Observable<number> =
   fromEventPattern<number>((handler: (tabId: number) => void) =>
-    chrome.webNavigation.onCompleted.addListener(
+    chrome.webNavigation.onDOMContentLoaded.addListener(
       (details: WebNavigationFramedCallbackDetails) => handler(details.tabId),
       {url: [{hostEquals: SC_URL_HOST}]}
     )
