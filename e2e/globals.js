@@ -14,6 +14,10 @@ module.exports = {
     chromedriver.stop();
     done();
   },
+  afterEach: function (browser, done) {
+    browser.end();
+    done();
+  },
   downloadDir: path.join(outputPath, 'downloads'),
   waitForConditionTimeout: 5000,
   throwOnMultipleElementsReturned: true
