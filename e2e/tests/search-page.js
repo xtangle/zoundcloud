@@ -25,7 +25,7 @@ module.exports = {
       .perform(function () {
         browser.assert.ok(browser.globals.numSoundItemsInitial > 1,
           `Number of track or playlist items loaded (${browser.globals.numSoundItemsInitial}) should be more than 1.`);
-        browser.assert.strictEqual(browser.globals.numSoundItemsInitial, browser.globals.numZcBtnsInitial,
+        browser.assert.strictEqual(browser.globals.numZcBtnsInitial, browser.globals.numSoundItemsInitial,
           'Should add a Download button for every track or playlist item in the list.');
       });
   },
@@ -43,7 +43,7 @@ module.exports = {
         browser.assert.ok(browser.globals.numSoundItemsFinal > browser.globals.numSoundItemsInitial,
           `Number of track or playlist items loaded (${browser.globals.numSoundItemsFinal}) `
           + `should be more than initial (${browser.globals.numSoundItemsInitial}).`);
-        browser.assert.strictEqual(browser.globals.numSoundItemsFinal, browser.globals.numZcBtnsFinal,
+        browser.assert.strictEqual(browser.globals.numZcBtnsFinal, browser.globals.numSoundItemsFinal,
           'Should add a Download button for every track or playlist item in the list.');
       });
   },
@@ -63,7 +63,7 @@ module.exports = {
       .perform(function () {
         browser.assert.ok(browser.globals.numTracks > 1,
           `Number of tracks loaded (${browser.globals.numTracks}) should be more than 1.`);
-        browser.assert.strictEqual(browser.globals.numTracks, browser.globals.numZcBtns,
+        browser.assert.strictEqual(browser.globals.numZcBtns, browser.globals.numTracks,
           'Should add a Download button for every track in the list.');
       });
   },
@@ -83,7 +83,7 @@ module.exports = {
       .perform(function () {
         browser.assert.ok(browser.globals.numTracks > 1,
           `Number of tracks loaded (${browser.globals.numTracks}) should be more than 1.`);
-        browser.assert.strictEqual(browser.globals.numTracks, browser.globals.numZcBtns,
+        browser.assert.strictEqual(browser.globals.numZcBtns, browser.globals.numTracks,
           'Should add a Download button for every track in the list.');
       });
   },
@@ -116,7 +116,7 @@ module.exports = {
       .perform(function () {
         browser.assert.ok(browser.globals.numAlbums > 1,
           `Number of albums loaded (${browser.globals.numAlbums}) should be more than 1.`);
-        browser.assert.strictEqual(browser.globals.numAlbums, browser.globals.numZcBtns,
+        browser.assert.strictEqual(browser.globals.numZcBtns, browser.globals.numAlbums,
           'Should add a Download button for every album in the list.');
       });
   },
@@ -136,7 +136,7 @@ module.exports = {
       .perform(function () {
         browser.assert.ok(browser.globals.numPlaylists > 1,
           `Number of playlists loaded (${browser.globals.numPlaylists}) should be more than 1.`);
-        browser.assert.strictEqual(browser.globals.numPlaylists, browser.globals.numZcBtns,
+        browser.assert.strictEqual(browser.globals.numZcBtns, browser.globals.numPlaylists,
           'Should add a Download button for every playlist in the list.');
       });
   },

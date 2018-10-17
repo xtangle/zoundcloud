@@ -13,7 +13,7 @@ module.exports = {
 
   'Adds a Download button for every track in the charts list': function (browser) {
     browser
-      .waitForElementVisible('chartTracks__item:first-of-type')
+      .waitForElementVisible('.chartTracks__item:first-of-type')
       .elements('css selector', '.chartsMain .chartTracks__item', function (results) {
         browser.globals.numChartTracksInitial = results.value.length;
       })
