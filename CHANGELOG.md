@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v1.3.2] - 2018-10-16
+### Added
+- Added functionality of removing the text 'Free Download' or variations thereof at the end of a song title.
+
+### Changed
+- Increased frequency of adding download buttons to a page.
+
 ## [v1.3.1] - 2018-10-08
 ### Added
 - Added high resolution cover art (if available) in downloaded metadata.
@@ -48,7 +55,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/xtangle/ZoundCloud/compare/v1.3.2...HEAD
+[v1.3.2]: https://github.com/xtangle/ZoundCloud/compare/v1.3.1...v1.3.2
 [v1.3.1]: https://github.com/xtangle/ZoundCloud/compare/v1.3.0...v1.3.1
 [v1.3.0]: https://github.com/xtangle/ZoundCloud/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/xtangle/ZoundCloud/compare/v1.1.0...v1.2.0

@@ -39,7 +39,10 @@ All tracks will be downloaded to the default Downloads folder:
 If a file with the same name exists, it will not be overwritten.
 
 Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
-case it is replaced by a dash (-) symbol).
+case it is replaced by a dash (-) symbol). 
+
+Most song titles with the text 'Free Download' at the end (or variations such as ' - [Free Download])' will be removed
+in the downloaded file name.
 
 ## Installation
 
@@ -69,4 +72,3 @@ To build, make sure Node.js (version >= 7.6) and yarn is installed.
 
 * Make download options configurable through a menu interface.
 * Some visual indicator to track current download status and previous downloads.
-* Protractor tests to cover integration.
