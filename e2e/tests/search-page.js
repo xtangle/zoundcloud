@@ -92,7 +92,7 @@ module.exports = {
     const trackPath = path.join(browser.globals.downloadDir, '07 Lil Baby & Marlo- Time After Time Ft. Tk Kravitz [Prod. By Quay Global].mp3');
     browser
       .setValue('input[type="search"]', ['07 Lil Baby & Marlo- Time After Time Ft. Tk Kravitz [Prod. By Quay Global]', browser.Keys.ENTER])
-      .pause(500) // wait for search to initiate
+      .pause(1000) // wait for search to initiate
       .waitForElementVisible('.searchResultGroupHeading')
       .click('.searchList__item button.zc-button-download')
       .assert.fileDownloaded(trackPath)
@@ -147,7 +147,7 @@ module.exports = {
     const track2Path = path.join(playlistDir, 'Lil Peep & XXXTENTACION - Falling Down.mp3');
     browser
       .setValue('input[type="search"]', ['xtangle Zqc9JceJT11d27T3ukAM', browser.Keys.ENTER])
-      .pause(500) // wait for search to initiate
+      .pause(1000) // wait for search to initiate
       .waitForElementVisible('.searchResultGroupHeading')
       .click('.searchList__item button.zc-button-download')
       .assert.fileDownloaded(track1Path)
