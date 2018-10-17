@@ -41,8 +41,8 @@ If a file with the same name exists, it will not be overwritten.
 Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
 case it is replaced by a dash (-) symbol). 
 
-Most song titles with the text 'Free Download' at the end (or variations such as ' - [Free Download])' will be removed
-in the downloaded file name.
+Most song titles with the text 'Free Download' at the end (or variations thereof such as ' - [Free Download])' should be 
+automatically removed in the downloaded file's name.
 
 ## Installation
 
