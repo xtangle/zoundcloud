@@ -110,7 +110,7 @@ module.exports = {
       .elements('css selector', '.searchList__item', function (results) {
         browser.globals.numAlbums = results.value.length;
       })
-      .elements('css selector', '.searchList__item .sc-button-share + button.zc-button-download', function (results) {
+      .elements('css selector', '.searchList__item :not(.zc-button-download) + button.zc-button-download', function (results) {
         browser.globals.numZcBtns = results.value.length;
       })
       .perform(function () {
@@ -130,7 +130,7 @@ module.exports = {
       .elements('css selector', '.searchList__item', function (results) {
         browser.globals.numPlaylists = results.value.length;
       })
-      .elements('css selector', '.searchList__item .sc-button-share + button.zc-button-download', function (results) {
+      .elements('css selector', '.searchList__item :not(.zc-button-download) + button.zc-button-download', function (results) {
         browser.globals.numZcBtns = results.value.length;
       })
       .perform(function () {
