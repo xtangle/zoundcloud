@@ -37,7 +37,7 @@
   },
   "pre-commit": "precommit",
   "dependencies": {
-    "@types/chrome": "^0.0.74",
+    "@types/chrome": "^0.0.75",
     "@types/jquery": "^3.3.22",
     "@types/node": "^10.12.0",
     "@types/verror": "^1.10.3",

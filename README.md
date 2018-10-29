@@ -10,7 +10,7 @@
 [![Dependencies Status](https://img.shields.io/david/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud)
 [![DevDependencies Status](https://img.shields.io/david/dev/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud?type=dev)
 [![Known Vulnerabilities](https://snyk.io/test/github/xtangle/ZoundCloud/badge.svg?targetFile=package.json)](https://snyk.io/test/github/xtangle/ZoundCloud?targetFile=package.json)
-[![CodeFactor](https://www.codefactor.io/repository/github/xtangle/zoundcloud/badge)](https://www.codefactor.io/repository/github/xtangle/zoundcloud)
+[![CodeFactor](https://www.codefactor.io/repository/github/xtangle/zoundcloud/badge)](https://www.codefactor.io/repository/github/xtangle/zoundcloud) [![Greenkeeper badge](https://badges.greenkeeper.io/xtangle/ZoundCloud.svg)](https://greenkeeper.io/)
 
 ## Description
 
