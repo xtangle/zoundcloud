@@ -6,13 +6,13 @@ const trackItemSelector = '.listenDetails .trackList__item:last-of-type';
 module.exports = {
   '@tags': ['playlist-page'],
 
-  before: function (browser) {
+  before(browser) {
     browser
       .url('https://soundcloud.com/xtangle/sets/test-playlist')
       .dismissCookiePolicyNotification();
   },
 
-  after: function (browser) {
+  after(browser) {
     browser.end();
   },
 
@@ -34,7 +34,8 @@ module.exports = {
     const track3Path = path.join(playlistDir, 'Ryuusei.mp3');
     // track 4: uses the stream_url method, has a long track title with weird characters
     // with some that are unsuitable for filenames, has cover art
-    const track4Path = path.join(playlistDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
+    const track4Path = path.join(playlistDir,
+      'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019.mp3');
 
     browser
       .click(zcBtnSelector)
@@ -50,20 +51,23 @@ module.exports = {
 
   'Adds a Download button for every item in the track list': function (browser) {
     browser
-      .elements('css selector', '.listenDetails .trackList__item .sc-button-share + button.zc-button-download', function (result) {
+      .elements('css selector', '.listenDetails .trackList__item'
+        + ' .sc-button-share + button.zc-button-download', (result) => {
         browser.assert.strictEqual(result.value.length, 4,
           'Should add a download button for every track item');
       })
       .assert.hidden(`${trackItemSelector} button.zc-button-download`, 'Download button is hidden on a track item')
       .moveToElement(trackItemSelector, 100, 20)
-      .assert.visible(`${trackItemSelector} button.zc-button-download`, 'Download button is visible when hovering over a track item');
+      .assert.visible(`${trackItemSelector} button.zc-button-download`,
+        'Download button is visible when hovering over a track item');
   },
 
   'Downloads the track when a Download button in the track list is clicked': function (browser) {
-    const trackPath = path.join(browser.globals.downloadDir, 'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019' + '.mp3');
+    const trackPath = path.join(browser.globals.downloadDir,
+      'مهرجان _ رب الكون ميزنا بميزه _ حمو بيكا - علي قدوره - نور التوت - توزيع فيجو الدخلاوي 2019.mp3');
     browser
       .click(`${trackItemSelector} button.zc-button-download`)
       .assert.fileDownloaded(trackPath)
       .verify.fileHasSize(trackPath, 5551832); // not sure where the extra byte comes from
-  }
+  },
 };

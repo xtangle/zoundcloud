@@ -1,46 +1,53 @@
-module.exports = function (config) {
+const tsconfig = require('./tsconfig');
+
+const reportDestinationConfig = {
+  directory: 'coverage',
+  subdirectory: 'HeadlessChrome',
+};
+
+module.exports = (config) => {
   config.set({
     basePath: '',
     frameworks: ['mocha', 'karma-typescript'],
     files: [
       'src/ts/**/*.ts',
-      'test/ts/**/*.ts'
+      'test/ts/**/*.ts',
     ],
     exclude: [
       'src/ts/background.ts',
-      'src/ts/content.ts'
+      'src/ts/content.ts',
     ],
     preprocessors: {
       'src/ts/**/*.ts': ['karma-typescript'],
-      'test/ts/**/*.ts': ['karma-typescript']
+      'test/ts/**/*.ts': ['karma-typescript'],
     },
     client: {
       captureConsole: false,
       mocha: {
-        opts: 'mocha.opts'
-      }
+        opts: 'mocha.opts',
+      },
     },
     reporters: ['mocha'],
     karmaTypescriptConfig: {
       bundlerOptions: {
-        entrypoints: /\.spec\.ts$/
+        entrypoints: /\.spec\.ts$/,
       },
-      compilerOptions: require('./tsconfig').compilerOptions,
+      compilerOptions: tsconfig.compilerOptions,
       coverageOptions: {
         threshold: {
           global: {
             statements: 95,
             branches: 95,
             functions: 95,
-            lines: 95
-          }
-        }
+            lines: 95,
+          },
+        },
       },
       reports: {
-        'html': reportDestinationConfig,
-        'lcovonly': reportDestinationConfig,
-        'text': ''
-      }
+        html: reportDestinationConfig,
+        lcovonly: reportDestinationConfig,
+        text: '',
+      },
     },
     port: 9876,
     colors: true,
@@ -48,11 +55,6 @@ module.exports = function (config) {
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     singleRun: true,
-    concurrency: Infinity
+    concurrency: Infinity,
   });
-};
-
-const reportDestinationConfig = {
-  'directory': 'coverage',
-  'subdirectory': 'HeadlessChrome'
 };

@@ -9,7 +9,8 @@
  *
  * @method fileDownloaded
  * @param {string} filepath The path of the expected file to be downloaded.
- * @param {string} [msg] Optional log message to display in the output. If missing, one is displayed by default.
+ * @param {string} [msg] Optional log message to display in the output.
+ *        If missing, one is displayed by default.
  * @api assertions
  */
 
@@ -18,6 +19,20 @@ const util = require('util');
 
 const POLL_INTERVAL_IN_MS = 1000;
 const TIMEOUT_IN_MS = 15000;
+
+function pollStats(startTime, filepath, callback) {
+  if (Date.now() - startTime > TIMEOUT_IN_MS) {
+    callback(null);
+  } else {
+    fs.stat(filepath, function (err, stats) {
+      if (err) {
+        setTimeout(pollStats.bind(this, startTime, filepath, callback), POLL_INTERVAL_IN_MS);
+      } else {
+        callback(stats);
+      }
+    });
+  }
+}
 
 exports.assertion = function (filepath, msg) {
   const DEFAULT_MSG = `Testing if file was downloaded to '${filepath}'.`;
@@ -44,17 +59,3 @@ exports.assertion = function (filepath, msg) {
     return this;
   };
 };
-
-function pollStats(startTime, filepath, callback) {
-  if (Date.now() - startTime > TIMEOUT_IN_MS) {
-    callback(null);
-  } else {
-    fs.stat(filepath, function (err, stats) {
-      if (err) {
-        setTimeout(pollStats.bind(this, startTime, filepath, callback), POLL_INTERVAL_IN_MS);
-      } else {
-        callback(stats);
-      }
-    });
-  }
-}

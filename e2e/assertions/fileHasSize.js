@@ -10,7 +10,8 @@
  * @method fileDownloaded
  * @param {string} filepath The path of the file to check.
  * @param {int} size The size to check in bytes.
- * @param {string} [msg] Optional log message to display in the output. If missing, one is displayed by default.
+ * @param {string} [msg] Optional log message to display in the output.
+ *        If missing, one is displayed by default.
  * @api assertions
  */
 
@@ -46,7 +47,7 @@ exports.assertion = function (filepath, size, msg) {
   };
 
   this.command = function (callback) {
-    fs.stat(filepath, function (err, stats) {
+    fs.stat(filepath, (err, stats) => {
       callback(stats);
     });
     return this;

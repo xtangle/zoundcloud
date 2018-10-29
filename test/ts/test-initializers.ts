@@ -23,7 +23,7 @@ export function useSinonChrome() {
     sinonChrome.reset();
   });
 
-  after('delete stubbed chrome object from global scope', () => {
+  after('removes stubbed chrome object from global scope', () => {
     delete (global as any).chrome;
   });
 
