@@ -12,7 +12,7 @@ module.exports = {
   custom_assertions_path: path.join(e2ePath, 'assertions'),
   globals_path: path.join(e2ePath, 'globals.js'),
   test_workers: {
-    enabled: true,
+    enabled: false,
     workers: 'auto',
   },
   selenium: {
@@ -24,7 +24,7 @@ module.exports = {
       selenium_port: 9515,
       selenium_host: '0.0.0.0',
       default_path_prefix: '',
-      detailed_output: false,
+      detailed_output: true,
       request_timeout_options: {
         timeout: 20000,
       },

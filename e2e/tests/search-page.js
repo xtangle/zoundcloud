@@ -95,15 +95,14 @@ module.exports = {
   },
 
   'Downloads the track when the Download button in the list is clicked': (browser) => {
-    const trackPath = path.join(browser.globals.downloadDir,
-      '07 Lil Baby & Marlo- Time After Time Ft. Tk Kravitz [Prod. By Quay Global].mp3');
+    const trackTitle = '07 Lil Baby & Marlo- Time After Time Ft. Tk Kravitz [Prod. By Quay Global]';
+    const trackPath = path.join(browser.globals.downloadDir, `${trackTitle}.mp3`);
     browser
-      .setValue('input[type="search"]', [
-        '07 Lil Baby & Marlo- Time After Time Ft. Tk Kravitz [Prod. By Quay Global]',
-        browser.Keys.ENTER,
-      ])
-      .pause(1000) // wait for search to initiate
-      .waitForElementVisible('.searchResultGroupHeading')
+      .clearValue('input[type="search"]')
+      .setValue('input[type="search"]', [trackTitle, browser.Keys.ENTER])
+      .useXpath()
+      .waitForElementVisible(`//*[contains(@class,'searchList__item')]//span[contains(text(),'${trackTitle}')]`)
+      .useCss()
       .click('.searchList__item button.zc-button-download')
       .assert.fileDownloaded(trackPath)
       .verify.fileHasSize(trackPath, 3360581)
