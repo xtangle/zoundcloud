@@ -24,7 +24,7 @@
     "ci": "run-s lint test:coverage coveralls build build:prod e2e:ci",
     "coveralls": "cat coverage/HeadlessChrome/lcovonly | coveralls",
     "e2e": "nightwatch",
-    "e2e:ci": "xvfb-run nightwatch --retries 2",
+    "e2e:ci": "xvfb-run 'nightwatch --retries 2'",
     "lint": "run-p lint:js lint:ts",
     "lint:js": "eslint .",
     "lint:ts": "tslint -p .",
