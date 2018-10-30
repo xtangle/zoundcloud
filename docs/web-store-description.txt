@@ -3,17 +3,19 @@ Extension that adds download buttons to SoundCloud pages.
 This extension will add download buttons to track pages, playlists,
 track lists, and user pages (to download all of a user's tracks).
 
-Track will be downloaded its uploaded format if available. For mp3 files, 
+Track will be downloaded its uploaded format if available. For mp3 files,
 metadata information and cover art is automatically added (in ID3v2.3 format).
 
 All tracks will be downloaded to the default Downloads folder:
 
 * Tracks are downloaded with the name `track_title`.
 * Playlists are downloaded to a folder with the name `user_name - playlist_name`.
-* User tracks are downloaded to a folder wih the name `user_name`.
+* User tracks are downloaded to a folder with the name `user_name`.
 
 Any special characters in the name will be replaced by an underscore (unless it's a tilda, in which case it is replaced by a dash (-) symbol). Files with the same name will not be overwritten.
 
-Source code is available on GitHub: https://github.com/xtangle/ZoundCloud
+Most song titles with the text 'Free Download' at the end (or variations thereof such as ' - [Free Download])' should be automatically removed in the downloaded file's name.
+
+Source code is available on GitHub: https://github.com/xtangle/zoundcloud
 
 Report any bugs or feature suggestions to: jackyxu07@gmail.com

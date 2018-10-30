@@ -1,21 +1,21 @@
 <a href="https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij">
-  <img src="https://github.com/xtangle/ZoundCloud/blob/master/src/resources/icon128.png" width="96" height="96">
+  <img src="https://github.com/xtangle/zoundcloud/blob/master/src/resources/icon128.png" width="96" height="96">
 </a>
 
 # ZoundCloud Downloader
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/bhnpokjikdldjiimbmoakkfekcnpkkij.svg)](https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij)
-[![Build Status](https://img.shields.io/travis/xtangle/ZoundCloud.svg)](https://travis-ci.org/xtangle/ZoundCloud)
-[![Coverage Status](https://img.shields.io/coveralls/github/xtangle/ZoundCloud.svg)](https://coveralls.io/github/xtangle/ZoundCloud?branch=master)
-[![Known Vulnerabilities](https://snyk.io/test/github/xtangle/ZoundCloud/badge.svg?targetFile=package.json)](https://snyk.io/test/github/xtangle/ZoundCloud?targetFile=package.json)
-[![Greenkeeper badge](https://badges.greenkeeper.io/xtangle/ZoundCloud.svg)](https://greenkeeper.io/)
+[![Build Status](https://img.shields.io/travis/xtangle/zoundcloud.svg)](https://travis-ci.org/xtangle/zoundcloud)
+[![Coverage Status](https://img.shields.io/coveralls/github/xtangle/zoundcloud.svg)](https://coveralls.io/github/xtangle/zoundcloud?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/xtangle/zoundcloud/badge.svg?targetFile=package.json)](https://snyk.io/test/github/xtangle/zoundcloud?targetFile=package.json)
+[![Greenkeeper badge](https://badges.greenkeeper.io/xtangle/zoundcloud.svg)](https://greenkeeper.io/)
 [![CodeFactor](https://www.codefactor.io/repository/github/xtangle/zoundcloud/badge)](https://www.codefactor.io/repository/github/xtangle/zoundcloud)
 
 ## Description
 
 A Google Chrome extension that adds download buttons to SoundCloud web pages. 
 
-<img src="https://github.com/xtangle/ZoundCloud/blob/master/docs/img1.png" width="800">
+<img src="https://github.com/xtangle/zoundcloud/blob/master/docs/img1.png" width="800">
 
 This extension will add download buttons to:
 
@@ -51,7 +51,7 @@ automatically removed in the downloaded file's name.
 
 ### From Archive
 
-- Go to the [Releases](https://github.com/xtangle/ZoundCloud/releases) page and download the `zoundcloud-<version-number>.zip` file of the release you wish to install.
+- Go to the [Releases](https://github.com/xtangle/zoundcloud/releases) page and download the `zoundcloud-<version-number>.zip` file of the release you wish to install.
 - Extract the downloaded zip file to a folder anywhere.
 - Open Google Chrome and navigate to `chrome://extensions`.
 - Click `Load Unpacked` and choose the folder where the contents were extracted to in the first step. 

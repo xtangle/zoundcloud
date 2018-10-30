@@ -5,13 +5,13 @@
   "private": true,
   "author": "xtangle <jackyxu07@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/xtangle/ZoundCloud#readme",
+  "homepage": "https://github.com/xtangle/zoundcloud#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xtangle/ZoundCloud.git"
+    "url": "git+https://github.com/xtangle/zoundcloud.git"
   },
   "bugs": {
-    "url": "https://github.com/xtangle/ZoundCloud/issues"
+    "url": "https://github.com/xtangle/zoundcloud/issues"
   },
   "main": "index.js",
   "engines": {
