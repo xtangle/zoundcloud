@@ -14,7 +14,7 @@ import {catchError, flatMap, map, timeout} from 'rxjs/operators';
 export const ID3MetadataService = {
   addID3V2Metadata$(metadata: ITrackMetadata, downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
     return XhrService.getArrayBuffer$(downloadInfo.downloadOptions.url).pipe(
-      timeout(300000),
+      timeout(1800000),
       flatMap(writeMetadata$.bind(null, metadata)),
       map(ID3WriterService.getURL),
       map((url: string) => ({
@@ -63,7 +63,7 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
     return of(writer);
   }
   return XhrService.getArrayBuffer$(url).pipe(
-    timeout(20000),
+    timeout(60000),
     map((arrayBuffer: ArrayBuffer) =>
       ID3WriterService.setFrame(writer, 'APIC', {
         data: arrayBuffer,

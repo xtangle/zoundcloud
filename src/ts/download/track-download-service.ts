@@ -15,7 +15,7 @@ export const TrackDownloadService = {
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Downloading track', downloadInfo)),
       flatMap(MetadataAdapter.addMetadata$),
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Added metadata', downloadInfo)),
-      timeout(300000)
+      timeout(1800000)
     ).subscribe(
       downloadTrack.bind(null, downloadMetadata$),
       onError.bind(null, downloadMetadata$, trackInfo)

@@ -72,21 +72,21 @@ describe('user download service', () => {
       expect(rx.complete).to.have.been.called;
     });
 
-    it('should not emit error if fetching track list info takes less than 30 seconds', () => {
+    it('should not emit error if fetching track list info takes less than 1 minute', () => {
       stubGetTrackInfoList$.withArgs(expectedTrackListInfoUrl)
-        .returns(timer(29999).pipe(mapTo([trackOneInfo, trackTwoInfo])));
+        .returns(timer(59999).pipe(mapTo([trackOneInfo, trackTwoInfo])));
       rx.subscribeTo(fixture.download$(userInfo));
-      clock.tick(30000);
+      clock.tick(60000);
 
       expect(rx.error).to.not.have.been.called;
       expect(rx.next).to.have.been.calledOnce;
     });
 
-    it('should emit error if fetching track list info takes 30 seconds or more', () => {
+    it('should emit error if fetching track list info takes 1 minute or more', () => {
       stubGetTrackInfoList$.withArgs(expectedTrackListInfoUrl)
-        .returns(timer(30000).pipe(mapTo([trackOneInfo, trackTwoInfo])));
+        .returns(timer(60000).pipe(mapTo([trackOneInfo, trackTwoInfo])));
       rx.subscribeTo(fixture.download$(userInfo));
-      clock.tick(30001);
+      clock.tick(60001);
 
       expect(rx.error).to.have.been.called;
       expect(rx.next).to.not.have.been.called;

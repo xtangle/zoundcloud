@@ -18,7 +18,7 @@ const fs = require('fs');
 const util = require('util');
 
 const POLL_INTERVAL_IN_MS = 1000;
-const TIMEOUT_IN_MS = 15000;
+const TIMEOUT_IN_MS = 30000;
 
 function pollStats(startTime, filepath, callback) {
   if (Date.now() - startTime > TIMEOUT_IN_MS) {

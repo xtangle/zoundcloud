@@ -31,7 +31,7 @@ function withUpdatedCoverArtUrl$(metadata: ITrackMetadata): Observable<ITrackMet
   }
   const highResUrl = getCoverArtUrlForResolution(origUrl, 500);
   return XhrService.ping$(highResUrl).pipe(
-    timeout(5000),
+    timeout(10000),
     map((status: number) => (status === 200) ? highResUrl : origUrl),
     map((url: string) => ({...metadata, cover_url: url})),
     catchError(() => of(metadata) as Observable<ITrackMetadata>),

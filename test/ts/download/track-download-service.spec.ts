@@ -102,26 +102,26 @@ describe(`track download service`, () => {
       expect(rx.error).to.have.been.calledOnce.calledWithMatch(matchesError('some error message'));
     });
 
-    it('should download if fetching download info or metadata takes less than 5 minutes', () => {
+    it('should download if fetching download info or metadata takes less than 30 minutes', () => {
       stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation)
-        .returns(timer(100000).pipe(mapTo(inputDownloadInfo)));
+        .returns(timer(900000).pipe(mapTo(inputDownloadInfo)));
       stubAddMetadata$.withArgs(inputDownloadInfo)
-        .returns(timer(199999).pipe(mapTo(downloadInfo)));
+        .returns(timer(899999).pipe(mapTo(downloadInfo)));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
-      clock.tick(300000);
+      clock.tick(1800000);
 
       expect(sinonChrome.downloads.download).to.have.been.called;
       expect(rx.next).to.have.been.calledOnce;
       expect(rx.complete).to.have.been.called;
     });
 
-    it('should not download and emit error if fetching download method takes 5 minutes or more', () => {
+    it('should not download and emit error if fetching download method takes 30 minutes or more', () => {
       stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation)
-        .returns(timer(100000).pipe(mapTo(inputDownloadInfo)));
+        .returns(timer(900000).pipe(mapTo(inputDownloadInfo)));
       stubAddMetadata$.withArgs(inputDownloadInfo)
-        .returns(timer(200000).pipe(mapTo(downloadInfo)));
+        .returns(timer(900000).pipe(mapTo(downloadInfo)));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
-      clock.tick(300001);
+      clock.tick(1800000);
 
       expect(sinonChrome.downloads.download).to.not.have.been.called;
       expect(rx.next).to.not.have.been.called;

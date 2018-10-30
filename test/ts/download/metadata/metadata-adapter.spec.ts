@@ -75,11 +75,11 @@ describe('metadata adapter', () => {
     });
 
     it('should not update cover art url if pinging for high resolution url takes 10 seconds or more', () => {
-      stubPing$.withArgs(expectedHighResUrl).returns(timer(5000).pipe(mapTo(200)));
+      stubPing$.withArgs(expectedHighResUrl).returns(timer(10000).pipe(mapTo(200)));
       const expectedMetadata = {...metadata};
 
       rx.subscribeTo(fixture.addMetadata$(inputDlInfo));
-      clock.tick(5001);
+      clock.tick(10001);
       expect(stubAddIDV2Metadata).to.have.been.calledOnceWithExactly(expectedMetadata, inputDlInfo);
     });
   });

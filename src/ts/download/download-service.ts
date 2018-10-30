@@ -12,7 +12,7 @@ export const DownloadService = {
   download$(resourceInfoUrl: string): Observable<IDownloadResult> {
     const downloadResult$: AsyncSubject<IDownloadResult> = new AsyncSubject();
     ResourceInfoService.getResourceInfo$(resourceInfoUrl)
-      .pipe(timeout(30000))
+      .pipe(timeout(60000))
       .subscribe(
         doDownload.bind(null, downloadResult$, resourceInfoUrl),
         onError.bind(null, downloadResult$, resourceInfoUrl)

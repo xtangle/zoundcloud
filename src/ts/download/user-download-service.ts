@@ -13,7 +13,7 @@ export const UserDownloadService = {
     const trackListInfoUrl = `${userInfo.permalink_url}/tracks`;
 
     ResourceInfoService.getTrackInfoList$(trackListInfoUrl).pipe(
-      timeout(30000),
+      timeout(60000),
       map((tracks: ITrackInfo[]) => tracks.map(
         (trackInfo: ITrackInfo) => TrackDownloadService.download(trackInfo, downloadLocation)
       )),

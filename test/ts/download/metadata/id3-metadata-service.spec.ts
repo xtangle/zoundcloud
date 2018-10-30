@@ -98,20 +98,20 @@ describe('id3 metadata service', () => {
       expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
     });
 
-    it('should add metadata if fetching the song data takes less 5 minutes', () => {
+    it('should add metadata if fetching the song data takes less 30 minutes', () => {
       stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url)
-        .returns(timer(299999).pipe(mapTo(songData)));
+        .returns(timer(1799999).pipe(mapTo(songData)));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      clock.tick(300000);
+      clock.tick(1800000);
 
       verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
     });
 
-    it('should not add metadata if fetching the song data takes 5 minutes or more', () => {
+    it('should not add metadata if fetching the song data takes 30 minutes or more', () => {
       stubGetArrayBuffer$.withArgs(downloadInfo.downloadOptions.url)
-        .returns(timer(300000).pipe(mapTo(songData)));
+        .returns(timer(1800000).pipe(mapTo(songData)));
       rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-      clock.tick(300001);
+      clock.tick(1800001);
 
       verifyDownloadOptionsEmittedWithUrl(downloadInfo.downloadOptions.url);
     });
@@ -153,20 +153,20 @@ describe('id3 metadata service', () => {
         verifyDownloadOptionsEmittedWithUrl(metadataAddedURL);
       });
 
-      it('should add cover art metadata if fetching cover art data takes less than 20 seconds', () => {
+      it('should add cover art metadata if fetching cover art data takes less than 1 minute', () => {
         stubGetArrayBuffer$.withArgs(metadata.cover_url)
-          .returns(timer(19999).pipe(mapTo(coverArtData)));
+          .returns(timer(59999).pipe(mapTo(coverArtData)));
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-        clock.tick(20000);
+        clock.tick(60000);
 
         expect(stubSetFrame).to.have.been.calledWith(writer, 'APIC', expectedFrame);
       });
 
-      it('should not add cover art metadata if fetching cover art data takes 20 seconds or more', () => {
+      it('should not add cover art metadata if fetching cover art data takes 1 minute or more', () => {
         stubGetArrayBuffer$.withArgs(metadata.cover_url)
-          .returns(timer(20000).pipe(mapTo(coverArtData)));
+          .returns(timer(60000).pipe(mapTo(coverArtData)));
         rx.subscribeTo(fixture.addID3V2Metadata$(metadata, downloadInfo));
-        clock.tick(20001);
+        clock.tick(60001);
 
         expect(stubSetFrame).to.not.have.been.calledWith(writer, 'APIC', match.any);
       });
