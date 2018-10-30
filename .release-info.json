@@ -1,5 +1,6 @@
 {
   "user": "xtangle",
   "remote": "https://github.com/xtangle/ZoundCloud.git",
-  "pre_release": "scripts/pre-release.js"
+  "pre_release": "scripts/pre-release.js",
+  "assets": "tmp/zoundcloud-*.zip"
 }
