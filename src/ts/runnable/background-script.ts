@@ -23,6 +23,7 @@ export class BackgroundScript implements IRunnable {
         chrome.tabs.insertCSS(tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(tabId, {file: 'vendor.js'});
         chrome.tabs.executeScript(tabId, {file: 'content.js'});
+        chrome.pageAction.show(tabId);
       });
 
     ExtensionMessenger.onMessage$(RequestContentPageReloadMessage.TYPE)

@@ -50,12 +50,14 @@ describe('background script', () => {
       expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
       expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(123, {file: 'vendor.js'});
       expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(123, {file: 'content.js'});
+      expect(sinonChrome.pageAction.show).to.have.been.calledWithExactly(123);
     });
 
     it('should not run when not visiting a SoundCloud page', () => {
       fixture.run();
       expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
       expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
+      expect(sinonChrome.pageAction.show).to.not.have.been.called;
     });
 
     it('should not run after the onSuspend event has emitted', () => {
@@ -67,6 +69,7 @@ describe('background script', () => {
 
       expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
       expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
+      expect(sinonChrome.pageAction.show).to.not.have.been.called;
     });
   });
 

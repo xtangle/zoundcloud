@@ -21,5 +21,6 @@
       "background.js"
     ],
     "persistent": false
-  }
+  },
+  "page_action": {}
 }
