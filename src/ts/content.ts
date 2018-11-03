@@ -1,3 +1,3 @@
-import {ContentScript} from '@src/runnable/content-script';
+import {ContentScript} from 'src/ts/content/content-script';
 
 new ContentScript().run();

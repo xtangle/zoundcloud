@@ -1,7 +1,7 @@
-import {IPlaylistDownloadResult} from '@src/download/download-result';
-import {IPlaylistInfo, ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {FilenameService} from '@src/util/filename-service';
+import {IPlaylistDownloadResult} from 'src/ts/download/download-result';
+import {IPlaylistInfo, ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {FilenameService} from 'src/ts/util/filename-service';
 
 export const PlaylistDownloadService = {
   download(playlistInfo: IPlaylistInfo): IPlaylistDownloadResult {

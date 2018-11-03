@@ -1,11 +1,11 @@
-import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
-import {ITrackInfo} from '@src/download/resource/resource-info';
-import {TrackDownloadMethod} from '@src/download/track-download-method';
-import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
-import {XhrService} from '@src/util/xhr-service';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError} from 'rxjs';
 import {match, restore, SinonMatcher, SinonStub, stub} from 'sinon';
+import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from 'src/ts/constants';
+import {ITrackInfo} from 'src/ts/download/resource/resource-info';
+import {TrackDownloadMethod} from 'src/ts/download/track-download-method';
+import {TrackDownloadMethodService} from 'src/ts/download/track-download-method-service';
+import {XhrService} from 'src/ts/util/xhr-service';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

@@ -1,11 +1,11 @@
-import {ITrackDownloadMetadata, ITrackDownloadResult} from '@src/download/download-result';
-import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
-import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
-import {logger} from '@src/util/logger';
 import {AsyncSubject} from 'rxjs';
 import {flatMap, tap, timeout} from 'rxjs/operators';
+import {ITrackDownloadMetadata, ITrackDownloadResult} from 'src/ts/download/download-result';
+import {MetadataAdapter} from 'src/ts/download/metadata/metadata-adapter';
+import {ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
+import {logger} from 'src/ts/util/logger';
 import * as VError from 'verror';
 
 export const TrackDownloadService = {

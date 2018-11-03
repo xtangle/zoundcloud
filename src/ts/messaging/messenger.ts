@@ -1,7 +1,7 @@
-import {Message, MessageType} from '@src/messaging/message';
-import {MessageResponse} from '@src/messaging/message-response';
 import {Observable, Subject} from 'rxjs';
 import {first} from 'rxjs/operators';
+import {Message, MessageType} from 'src/ts/messaging/message';
+import {MessageResponse} from 'src/ts/messaging/message-response';
 import MessageSender = chrome.runtime.MessageSender;
 
 export interface IMessageHandlerArgs<T extends Message = Message, U extends MessageResponse = undefined> {

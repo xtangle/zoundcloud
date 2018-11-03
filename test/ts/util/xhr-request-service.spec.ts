@@ -1,7 +1,7 @@
-import {XhrService} from '@src/util/xhr-service';
-import {matchesError} from '@test/sinon-matchers';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {restore, server, SinonFakeXMLHttpRequest, useFakeServer} from 'sinon';
+import {XhrService} from 'src/ts/util/xhr-service';
+import {matchesError} from 'test/ts/sinon-matchers';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

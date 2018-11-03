@@ -1,12 +1,12 @@
-import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_SMALL_CLASS} from '@src/constants';
-import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
-import {ListItemInjectionService} from '@src/page/injection/list-item-injection-service';
-import {matchesElements} from '@test/sinon-matchers';
-import {configureChai} from '@test/test-initializers';
 import * as $ from 'jquery';
 import {EMPTY, of, Subject} from 'rxjs';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_SMALL_CLASS} from 'src/ts/constants';
+import {DownloadButtonFactory} from 'src/ts/content/injection/download-button-factory';
+import {InjectionSignalFactory} from 'src/ts/content/injection/injection-signal-factory';
+import {ListItemInjectionService} from 'src/ts/content/injection/list-item-injection-service';
+import {matchesElements} from 'test/ts/sinon-matchers';
+import {configureChai} from 'test/ts/test-initializers';
 
 const forEach = require('mocha-each');
 const expect = configureChai();

@@ -6,10 +6,6 @@
     "sourceMap": true,
     "rootDir": ".",
     "baseUrl": ".",
-    "paths": {
-      "@src/*": ["src/ts/*"],
-      "@test/*": ["test/ts/*"]
-    },
     "outDir": "dist"
   }
 }

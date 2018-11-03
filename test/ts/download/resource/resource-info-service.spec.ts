@@ -1,10 +1,10 @@
-import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IPlaylistInfo, IResourceInfo, ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ResourceInfoService} from '@src/download/resource/resource-info-service';
-import {XhrService} from '@src/util/xhr-service';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
+import {CLIENT_ID, SC_API_URL} from 'src/ts/constants';
+import {IPlaylistInfo, IResourceInfo, ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {ResourceInfoService} from 'src/ts/download/resource/resource-info-service';
+import {XhrService} from 'src/ts/util/xhr-service';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

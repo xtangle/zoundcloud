@@ -1,9 +1,9 @@
-import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import * as $ from 'jquery';
 import {fromEvent, Observable} from 'rxjs';
 import {takeUntil, throttleTime} from 'rxjs/operators';
+import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from 'src/ts/constants';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {RequestDownloadMessage} from 'src/ts/messaging/page/request-download.message';
 
 export const DownloadButtonFactory = {
   create(onUnload$: Observable<any>, resourceInfoUrl: string): JQuery<HTMLElement> {

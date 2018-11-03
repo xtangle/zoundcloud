@@ -1,9 +1,9 @@
-import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from '@src/constants';
-import {ITrackInfo} from '@src/download/resource/resource-info';
-import {ITrackDownloadMethodInfo, TrackDownloadMethod} from '@src/download/track-download-method';
-import {XhrService} from '@src/util/xhr-service';
 import {combineLatest, Observable, of} from 'rxjs';
 import {flatMap, map} from 'rxjs/operators';
+import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from 'src/ts/constants';
+import {ITrackInfo} from 'src/ts/download/resource/resource-info';
+import {ITrackDownloadMethodInfo, TrackDownloadMethod} from 'src/ts/download/track-download-method';
+import {XhrService} from 'src/ts/util/xhr-service';
 
 export interface IScI1ApiTrackDownloadInfo {
   http_mp3_128_url?: string;

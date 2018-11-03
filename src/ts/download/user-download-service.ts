@@ -1,10 +1,10 @@
-import {ITrackDownloadResult, IUserDownloadResult} from '@src/download/download-result';
-import {ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ResourceInfoService} from '@src/download/resource/resource-info-service';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {FilenameService} from '@src/util/filename-service';
 import {AsyncSubject, Observable} from 'rxjs';
 import {map, timeout} from 'rxjs/operators';
+import {ITrackDownloadResult, IUserDownloadResult} from 'src/ts/download/download-result';
+import {ITrackInfo, IUserInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {ResourceInfoService} from 'src/ts/download/resource/resource-info-service';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {FilenameService} from 'src/ts/util/filename-service';
 
 export const UserDownloadService = {
   download$(userInfo: IUserInfo): Observable<IUserDownloadResult> {

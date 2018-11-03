@@ -1,8 +1,8 @@
-import {SC_URL_HOST} from '@src/constants';
-import {ScPageObservables} from '@src/util/sc-page-observables';
-import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
-import {noop} from '@test/test-utils';
 import {clock, match, restore, SinonMatcher, SinonStub, spy, stub, useFakeTimers} from 'sinon';
+import {ScPageObservables} from 'src/ts/background/sc-page-observables';
+import {SC_URL_HOST} from 'src/ts/constants';
+import {configureChai, useRxTesting, useSinonChrome} from 'test/ts/test-initializers';
+import {noop} from 'test/ts/test-utils';
 import Tab = chrome.tabs.Tab;
 import WebNavigationUrlCallbackDetails = chrome.webNavigation.WebNavigationUrlCallbackDetails;
 

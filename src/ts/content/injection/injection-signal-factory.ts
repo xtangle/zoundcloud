@@ -1,10 +1,10 @@
-import {ZC_DL_BUTTON_CLASS} from '@src/constants';
-import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {elementExist$, elementExistOrAdded$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
 import {interval, merge, Observable} from 'rxjs';
 import {filter, map, switchMapTo, take} from 'rxjs/operators';
+import {ZC_DL_BUTTON_CLASS} from 'src/ts/constants';
+import {ReloadContentPageMessage} from 'src/ts/messaging/extension/reload-content-page.message';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {elementExist$, elementExistOrAdded$} from 'src/ts/util/dom-observer';
 
 export const InjectionSignalFactory = {
   create$(selector: string): Observable<JQuery<HTMLElement>> {

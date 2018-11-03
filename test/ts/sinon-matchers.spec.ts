@@ -1,7 +1,7 @@
-import {matchesCause, matchesElements, matchesError} from '@test/sinon-matchers';
-import {configureChai} from '@test/test-initializers';
 import * as $ from 'jquery';
 import {SinonSpy, spy} from 'sinon';
+import {matchesCause, matchesElements, matchesError} from 'test/ts/sinon-matchers';
+import {configureChai} from 'test/ts/test-initializers';
 import * as VError from 'verror';
 
 const expect = configureChai();

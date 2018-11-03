@@ -1,12 +1,12 @@
-import {ITrackDownloadResult} from '@src/download/download-result';
-import {ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ResourceInfoService} from '@src/download/resource/resource-info-service';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {UserDownloadService} from '@src/download/user-download-service';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, match, restore, SinonStub, stub, useFakeTimers} from 'sinon';
+import {ITrackDownloadResult} from 'src/ts/download/download-result';
+import {ITrackInfo, IUserInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {ResourceInfoService} from 'src/ts/download/resource/resource-info-service';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {UserDownloadService} from 'src/ts/download/user-download-service';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

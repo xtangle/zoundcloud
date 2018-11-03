@@ -1,13 +1,13 @@
-import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
-import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {matchesCause, matchesError} from '@test/sinon-matchers';
-import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, match, restore, SinonSpy, SinonStub, spy, stub, useFakeTimers} from 'sinon';
+import {MetadataAdapter} from 'src/ts/download/metadata/metadata-adapter';
+import {ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {matchesCause, matchesError} from 'test/ts/sinon-matchers';
+import {configureChai, useRxTesting, useSinonChrome} from 'test/ts/test-initializers';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const expect = configureChai();

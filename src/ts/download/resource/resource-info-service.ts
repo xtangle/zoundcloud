@@ -1,7 +1,7 @@
-import {CLIENT_ID, SC_API_URL} from '@src/constants';
-import {IResourceInfo, ITrackInfo} from '@src/download/resource/resource-info';
-import {XhrService} from '@src/util/xhr-service';
 import {Observable} from 'rxjs';
+import {CLIENT_ID, SC_API_URL} from 'src/ts/constants';
+import {IResourceInfo, ITrackInfo} from 'src/ts/download/resource/resource-info';
+import {XhrService} from 'src/ts/util/xhr-service';
 
 /**
  * Fetches the resource metadata information from SoundCloud when given the url

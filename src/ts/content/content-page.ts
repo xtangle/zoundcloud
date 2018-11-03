@@ -1,7 +1,7 @@
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
-import {InjectionService} from '@src/page/injection/injection-service';
 import {AsyncSubject, Observable} from 'rxjs';
+import {InjectionService} from 'src/ts/content/injection/injection-service';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {LogToConsoleMessage} from 'src/ts/messaging/page/log-to-console.message';
 
 export class ContentPage {
 

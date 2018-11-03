@@ -1,7 +1,7 @@
-import {SC_URL_HOST} from '@src/constants';
-import {concatFilter} from '@src/util/rxjs-operators';
 import {bindCallback, fromEventPattern, merge, Observable} from 'rxjs';
 import {debounceTime, map} from 'rxjs/operators';
+import {SC_URL_HOST} from 'src/ts/constants';
+import {concatFilter} from 'src/ts/util/rxjs-operators';
 import Tab = chrome.tabs.Tab;
 import WebNavigationFramedCallbackDetails = chrome.webNavigation.WebNavigationFramedCallbackDetails;
 import WebNavigationTransitionCallbackDetails = chrome.webNavigation.WebNavigationTransitionCallbackDetails;

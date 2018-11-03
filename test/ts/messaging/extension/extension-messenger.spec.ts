@@ -1,10 +1,10 @@
-import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
-import {Message} from '@src/messaging/message';
-import {MessageResponse} from '@src/messaging/message-response';
-import {DummyMessage} from '@test/messaging/dummy-message';
-import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
-import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {match} from 'sinon';
+import {ExtensionMessenger} from 'src/ts/messaging/extension/extension-messenger';
+import {Message} from 'src/ts/messaging/message';
+import {MessageResponse} from 'src/ts/messaging/message-response';
+import {DummyMessage} from 'test/ts/messaging/dummy-message';
+import {DummyMessageResponse} from 'test/ts/messaging/dummy-message-response';
+import {configureChai, useRxTesting, useSinonChrome} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

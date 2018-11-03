@@ -1,8 +1,8 @@
-import {Bootstrapper} from '@src/page/bootstrapper';
-import {ContentPage} from '@src/page/content-page';
-import {ContentScript} from '@src/runnable/content-script';
-import {configureChai} from '@test/test-initializers';
 import {restore, SinonStub, stub} from 'sinon';
+import {Bootstrapper} from 'src/ts/content/bootstrapper';
+import {ContentPage} from 'src/ts/content/content-page';
+import {ContentScript} from 'src/ts/content/content-script';
+import {configureChai} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

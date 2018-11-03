@@ -1,11 +1,17 @@
-import {IDownloadResult} from '@src/download/download-result';
-import {PlaylistDownloadService} from '@src/download/playlist-download-service';
-import {IPlaylistInfo, IResourceInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ResourceInfoService} from '@src/download/resource/resource-info-service';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {UserDownloadService} from '@src/download/user-download-service';
 import {AsyncSubject, Observable, Subject} from 'rxjs';
 import {timeout} from 'rxjs/operators';
+import {IDownloadResult} from 'src/ts/download/download-result';
+import {PlaylistDownloadService} from 'src/ts/download/playlist-download-service';
+import {
+  IPlaylistInfo,
+  IResourceInfo,
+  ITrackInfo,
+  IUserInfo,
+  ResourceType
+} from 'src/ts/download/resource/resource-info';
+import {ResourceInfoService} from 'src/ts/download/resource/resource-info-service';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {UserDownloadService} from 'src/ts/download/user-download-service';
 import * as VError from 'verror';
 
 export const DownloadService = {

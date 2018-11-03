@@ -1,13 +1,13 @@
-import {ID3MetadataService} from '@src/download/metadata/id3-metadata-service';
-import {MetadataAdapter} from '@src/download/metadata/metadata-adapter';
-import {ITrackMetadata} from '@src/download/metadata/track-metadata';
-import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {XhrService} from '@src/util/xhr-service';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {EMPTY, of, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
+import {ID3MetadataService} from 'src/ts/download/metadata/id3-metadata-service';
+import {MetadataAdapter} from 'src/ts/download/metadata/metadata-adapter';
+import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
+import {TrackMetadataFactory} from 'src/ts/download/metadata/track-metadata-factory';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {XhrService} from 'src/ts/util/xhr-service';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

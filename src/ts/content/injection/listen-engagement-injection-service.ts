@@ -1,10 +1,10 @@
-import {ZC_DL_BUTTON_MEDIUM_CLASS} from '@src/constants';
-import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {addToButtonGroup} from '@src/page/injection/injection-commons';
-import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
-import {UrlService} from '@src/util/url-service';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {ZC_DL_BUTTON_MEDIUM_CLASS} from 'src/ts/constants';
+import {DownloadButtonFactory} from 'src/ts/content/injection/download-button-factory';
+import {addToButtonGroup} from 'src/ts/content/injection/injection-commons';
+import {InjectionSignalFactory} from 'src/ts/content/injection/injection-signal-factory';
+import {UrlService} from 'src/ts/util/url-service';
 
 export const ListenEngagementInjectionService = {
   injectDownloadButtons(onUnload$: Observable<any>) {

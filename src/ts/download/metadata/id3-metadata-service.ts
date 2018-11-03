@@ -1,10 +1,10 @@
-import {ID3WriterService, IID3Writer} from '@src/download/metadata/id3-writer-service';
-import {ITrackMetadata} from '@src/download/metadata/track-metadata';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {logger} from '@src/util/logger';
-import {XhrService} from '@src/util/xhr-service';
 import {Observable, of} from 'rxjs';
 import {catchError, flatMap, map, timeout} from 'rxjs/operators';
+import {ID3WriterService, IID3Writer} from 'src/ts/download/metadata/id3-writer-service';
+import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {logger} from 'src/ts/util/logger';
+import {XhrService} from 'src/ts/util/xhr-service';
 
 /**
  * Adds ID3 v2.4 tags and returns downloadInfo with url in downloadOptions set to the updated URL.

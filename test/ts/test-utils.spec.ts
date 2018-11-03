@@ -1,6 +1,6 @@
-import {configureChai} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
 import {SinonSpy, spy} from 'sinon';
+import {configureChai} from 'test/ts/test-initializers';
+import {tick} from 'test/ts/test-utils';
 
 const expect = configureChai();
 

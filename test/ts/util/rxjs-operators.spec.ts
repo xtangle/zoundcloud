@@ -1,8 +1,8 @@
-import {concatFilter} from '@src/util/rxjs-operators';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of} from 'rxjs';
 import {delay} from 'rxjs/operators';
 import {clock, useFakeTimers} from 'sinon';
+import {concatFilter} from 'src/ts/util/rxjs-operators';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

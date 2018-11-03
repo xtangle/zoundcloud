@@ -1,10 +1,10 @@
-import {ID3MetadataService} from '@src/download/metadata/id3-metadata-service';
-import {ITrackMetadata} from '@src/download/metadata/track-metadata';
-import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {XhrService} from '@src/util/xhr-service';
 import {Observable, of} from 'rxjs';
 import {catchError, flatMap, map, timeout} from 'rxjs/operators';
+import {ID3MetadataService} from 'src/ts/download/metadata/id3-metadata-service';
+import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
+import {TrackMetadataFactory} from 'src/ts/download/metadata/track-metadata-factory';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {XhrService} from 'src/ts/util/xhr-service';
 
 export const MetadataAdapter = {
   addMetadata$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {

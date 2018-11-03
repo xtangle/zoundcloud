@@ -1,6 +1,6 @@
-import {addToButtonGroup} from '@src/page/injection/injection-commons';
-import {configureChai} from '@test/test-initializers';
 import * as $ from 'jquery';
+import {addToButtonGroup} from 'src/ts/content/injection/injection-commons';
+import {configureChai} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

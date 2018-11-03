@@ -1,6 +1,6 @@
-import {logger} from '@src/util/logger';
-import {configureChai} from '@test/test-initializers';
 import {clock, match, restore, SinonStub, stub, useFakeTimers} from 'sinon';
+import {logger} from 'src/ts/util/logger';
+import {configureChai} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

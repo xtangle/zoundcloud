@@ -1,11 +1,11 @@
-import {Message, MessageType} from '@src/messaging/message';
-import {MessageResponse} from '@src/messaging/message-response';
-import {BaseMessenger, IMessenger} from '@src/messaging/messenger';
-import {DummyMessage} from '@test/messaging/dummy-message';
-import {DummyMessageResponse} from '@test/messaging/dummy-message-response';
-import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {match, SinonSpy, spy} from 'sinon';
+import {Message, MessageType} from 'src/ts/messaging/message';
+import {MessageResponse} from 'src/ts/messaging/message-response';
+import {BaseMessenger, IMessenger} from 'src/ts/messaging/messenger';
+import {DummyMessage} from 'test/ts/messaging/dummy-message';
+import {DummyMessageResponse} from 'test/ts/messaging/dummy-message-response';
+import {configureChai, useRxTesting, useSinonChrome} from 'test/ts/test-initializers';
 import MessageSender = chrome.runtime.MessageSender;
 
 const expect = configureChai();

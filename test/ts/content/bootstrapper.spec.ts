@@ -1,12 +1,12 @@
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {Bootstrapper, TAG_ID} from '@src/page/bootstrapper';
-import {ContentPage} from '@src/page/content-page';
-import {configureChai} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {Subject} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
+import {Bootstrapper, TAG_ID} from 'src/ts/content/bootstrapper';
+import {ContentPage} from 'src/ts/content/content-page';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {RequestContentPageReloadMessage} from 'src/ts/messaging/page/request-content-page-reload.message';
+import {configureChai} from 'test/ts/test-initializers';
+import {tick} from 'test/ts/test-utils';
 
 const expect = configureChai();
 

@@ -1,10 +1,10 @@
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
-import {ContentPage} from '@src/page/content-page';
-import {InjectionService} from '@src/page/injection/injection-service';
-import {configureChai, useRxTesting} from '@test/test-initializers';
-import {noop} from '@test/test-utils';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {ContentPage} from 'src/ts/content/content-page';
+import {InjectionService} from 'src/ts/content/injection/injection-service';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {LogToConsoleMessage} from 'src/ts/messaging/page/log-to-console.message';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
+import {noop} from 'test/ts/test-utils';
 
 const expect = configureChai();
 

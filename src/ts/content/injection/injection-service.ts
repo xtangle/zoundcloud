@@ -1,7 +1,7 @@
-import {ListItemInjectionService} from '@src/page/injection/list-item-injection-service';
-import {ListenEngagementInjectionService} from '@src/page/injection/listen-engagement-injection-service';
-import {UserInfoBarInjectionService} from '@src/page/injection/user-info-bar-injection-service';
 import {Observable} from 'rxjs';
+import {ListItemInjectionService} from 'src/ts/content/injection/list-item-injection-service';
+import {ListenEngagementInjectionService} from 'src/ts/content/injection/listen-engagement-injection-service';
+import {UserInfoBarInjectionService} from 'src/ts/content/injection/user-info-bar-injection-service';
 
 export const InjectionService = {
   injectDownloadButtons(onUnload$: Observable<any>) {

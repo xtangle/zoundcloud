@@ -1,10 +1,10 @@
-import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from '@src/constants';
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
-import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {configureChai} from '@test/test-initializers';
 import {Subject} from 'rxjs';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
+import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_ICON_CLASS} from 'src/ts/constants';
+import {DownloadButtonFactory} from 'src/ts/content/injection/download-button-factory';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {RequestDownloadMessage} from 'src/ts/messaging/page/request-download.message';
+import {configureChai} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

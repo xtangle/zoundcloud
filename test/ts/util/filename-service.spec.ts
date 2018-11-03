@@ -1,5 +1,5 @@
-import {FilenameService} from '@src/util/filename-service';
 import {expect} from 'chai';
+import {FilenameService} from 'src/ts/util/filename-service';
 
 describe('filename service', () => {
   const fixture = FilenameService;

@@ -1,8 +1,8 @@
-import {elementAdded$, elementExist$, elementExistOrAdded$, elementRemoved$} from '@src/util/dom-observer';
-import {configureChai, useRxTesting} from '@test/test-initializers';
-import {tick} from '@test/test-utils';
 import * as $ from 'jquery';
 import {Observable} from 'rxjs';
+import {elementAdded$, elementExist$, elementExistOrAdded$, elementRemoved$} from 'src/ts/util/dom-observer';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
+import {tick} from 'test/ts/test-utils';
 
 const expect = configureChai();
 

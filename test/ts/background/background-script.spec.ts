@@ -1,16 +1,16 @@
-import {DownloadService} from '@src/download/download-service';
-import {ExtensionMessenger} from '@src/messaging/extension/extension-messenger';
-import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
-import {IMessageHandlerArgs} from '@src/messaging/messenger';
-import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
-import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
-import {BackgroundScript} from '@src/runnable/background-script';
-import {logger} from '@src/util/logger';
-import {ScPageObservables} from '@src/util/sc-page-observables';
-import {configureChai, useSinonChrome} from '@test/test-initializers';
 import {EMPTY, of, Subject} from 'rxjs';
 import {restore, SinonStub, stub} from 'sinon';
+import {BackgroundScript} from 'src/ts/background/background-script';
+import {ScPageObservables} from 'src/ts/background/sc-page-observables';
+import {DownloadService} from 'src/ts/download/download-service';
+import {ExtensionMessenger} from 'src/ts/messaging/extension/extension-messenger';
+import {ReloadContentPageMessage} from 'src/ts/messaging/extension/reload-content-page.message';
+import {IMessageHandlerArgs} from 'src/ts/messaging/messenger';
+import {LogToConsoleMessage} from 'src/ts/messaging/page/log-to-console.message';
+import {RequestContentPageReloadMessage} from 'src/ts/messaging/page/request-content-page-reload.message';
+import {RequestDownloadMessage} from 'src/ts/messaging/page/request-download.message';
+import {logger} from 'src/ts/util/logger';
+import {configureChai, useSinonChrome} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

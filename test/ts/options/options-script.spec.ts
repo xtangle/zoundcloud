@@ -1,8 +1,8 @@
-import {defaultOptions, IOptions} from '@src/options/option';
-import {OptionsScript} from '@src/runnable/options-script';
-import {configureChai, useSinonChrome} from '@test/test-initializers';
 import * as $ from 'jquery';
 import {clock, restore, useFakeTimers} from 'sinon';
+import {defaultOptions, IOptions} from 'src/ts/options/option';
+import {OptionsScript} from 'src/ts/options/options-script';
+import {configureChai, useSinonChrome} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 const HTML_KEY = '__html__';
@@ -89,11 +89,11 @@ describe('options script', () => {
 
   function testConfirmMsgWhenBtnIsClicked(button: JQuery<HTMLElement>) {
     const confirmMsg = $('#confirm-msg');
-    expect(confirmMsg.is(':hidden')).to.be.true;
+    expect(confirmMsg).to.be.$hidden;
     button.trigger('click');
-    expect(confirmMsg.is(':hidden')).to.be.false;
+    expect(confirmMsg).to.be.$visible;
     clock.tick(1500); // 1s + 400ms fade out animation + 100ms room for error
-    expect(confirmMsg.is(':hidden')).to.be.true;
+    expect(confirmMsg).to.be.$hidden;
   }
 
   function setHTMLState(options: IOptions) {
@@ -104,9 +104,9 @@ describe('options script', () => {
   }
 
   function verifyHTMLState(options: IOptions) {
-    expect($('#add-metadata-option').prop('checked')).to.be.equal(options.addMetadata);
-    expect($('#always-mp3-option').prop('checked')).to.be.equal(options.alwaysDownloadMp3);
-    expect($('#clean-title-option').prop('checked')).to.be.equal(options.cleanTrackTitle);
-    expect($('#overwrite-option').prop('checked')).to.be.equal(options.overwriteExistingFiles);
+    expect($('#add-metadata-option')).to.have.$prop('checked', options.addMetadata);
+    expect($('#always-mp3-option')).to.have.$prop('checked', options.alwaysDownloadMp3);
+    expect($('#clean-title-option')).to.have.$prop('checked', options.cleanTrackTitle);
+    expect($('#overwrite-option')).to.have.$prop('checked', options.overwriteExistingFiles);
   }
 });

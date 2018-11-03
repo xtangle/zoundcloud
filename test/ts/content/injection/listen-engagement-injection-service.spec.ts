@@ -1,45 +1,47 @@
-import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_MEDIUM_CLASS} from '@src/constants';
-import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
-import {UserInfoBarInjectionService} from '@src/page/injection/user-info-bar-injection-service';
-import {UrlService} from '@src/util/url-service';
-import {matchesElements} from '@test/sinon-matchers';
-import {configureChai} from '@test/test-initializers';
 import * as $ from 'jquery';
 import {EMPTY, of, Subject} from 'rxjs';
 import {restore, SinonSpy, SinonStub, spy, stub} from 'sinon';
+import {ZC_DL_BUTTON_CLASS, ZC_DL_BUTTON_MEDIUM_CLASS} from 'src/ts/constants';
+import {DownloadButtonFactory} from 'src/ts/content/injection/download-button-factory';
+import {InjectionSignalFactory} from 'src/ts/content/injection/injection-signal-factory';
+import {ListenEngagementInjectionService} from 'src/ts/content/injection/listen-engagement-injection-service';
+import {UrlService} from 'src/ts/util/url-service';
+import {matchesElements} from 'test/ts/sinon-matchers';
+import {configureChai} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 
-describe('user info bar injection service', () => {
-  const fixture = UserInfoBarInjectionService;
-  const currentUrl = 'https://soundcloud.com/some-user/tracks?some-query=123';
+describe('listen engagement injection service', () => {
+  const fixture = ListenEngagementInjectionService;
+  const currentUrl = 'current-url-of-page';
   let onUnload$: Subject<any>;
 
   let stubCreateInjectionSignal$: SinonStub;
   let stubGetCurrentUrl: SinonStub;
   let spyCreateDownloadButton: SinonSpy;
 
-  let userInfoBar: JQuery<HTMLElement>;
+  let listenEngagement: JQuery<HTMLElement>;
   let buttonGroup: JQuery<HTMLElement>;
 
   beforeEach(() => {
     onUnload$ = new Subject();
     document.body.innerHTML = `
       <body>
-        <div id="userInfoBarTestId" class="userInfoBar">
-          <div class="userInfoBar__tabs"></div>
-          <div class="userInfoBar__buttons">
-            <div id="buttonGroupTestId" class="sc-button-group"></div>
+        <div id="listenEngagementTestId" class="listenEngagement sc-clearfix">
+          <div class="listenEngagement__footer sc-clearfix">
+            <div class="soundActions sc-button-toolbar soundActions__medium">
+              <div id="buttonGroupTestId" class="sc-button-group sc-button-group-medium">
+              </div>
+            </div>
           </div>
         </div>
       </body>
     `;
-    userInfoBar = $('#userInfoBarTestId');
+    listenEngagement = $('#listenEngagementTestId');
     buttonGroup = $('#buttonGroupTestId');
 
     stubCreateInjectionSignal$ = stub(InjectionSignalFactory, 'create$');
-    stubCreateInjectionSignal$.returns(of(userInfoBar));
+    stubCreateInjectionSignal$.returns(of(listenEngagement));
 
     stubGetCurrentUrl = stub(UrlService, 'getCurrentUrl');
     stubGetCurrentUrl.returns(currentUrl);
@@ -69,16 +71,15 @@ describe('user info bar injection service', () => {
       expect(getDownloadButton().length).to.be.equal(0);
     });
 
-    it('should create an injection signal with a selector that matches the user info bar element', () => {
+    it('should create an injection signal with a selector that matches the listen engagement element', () => {
       fixture.injectDownloadButtons(onUnload$);
       expect(stubCreateInjectionSignal$).to.have.been.calledOnce
-        .calledWithMatch(matchesElements(userInfoBar));
+        .calledWithMatch(matchesElements(listenEngagement));
     });
 
     it('should create the download button with the correct parameters', () => {
-      const expectedUrl = 'https://soundcloud.com/some-user';
       fixture.injectDownloadButtons(onUnload$);
-      expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(onUnload$, expectedUrl);
+      expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(onUnload$, currentUrl);
     });
 
     it('should add classes to the download button to indicate a medium-sized button', () => {

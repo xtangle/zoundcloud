@@ -1,11 +1,11 @@
-import {ITrackInfo} from '@src/download/resource/resource-info';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {ITrackDownloadMethodInfo} from '@src/download/track-download-method';
-import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
-import {FilenameService} from '@src/util/filename-service';
 import * as path from 'path';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {ITrackInfo} from 'src/ts/download/resource/resource-info';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {ITrackDownloadMethodInfo} from 'src/ts/download/track-download-method';
+import {TrackDownloadMethodService} from 'src/ts/download/track-download-method-service';
+import {FilenameService} from 'src/ts/util/filename-service';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export const TrackDownloadInfoFactory = {

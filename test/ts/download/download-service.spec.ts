@@ -1,16 +1,15 @@
-import {IPlaylistDownloadResult, ITrackDownloadResult, IUserDownloadResult} from '@src/download/download-result';
-import {DownloadService} from '@src/download/download-service';
-import {PlaylistDownloadService} from '@src/download/playlist-download-service';
-import {IResourceInfo, ResourceType} from '@src/download/resource/resource-info';
-import {ResourceInfoService} from '@src/download/resource/resource-info-service';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {UserDownloadService} from '@src/download/user-download-service';
-import {matchesError} from '@test/sinon-matchers';
-import {matchesCause} from '@test/sinon-matchers';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import {of, throwError, timer} from 'rxjs';
 import {mapTo} from 'rxjs/operators';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
+import {IPlaylistDownloadResult, ITrackDownloadResult, IUserDownloadResult} from 'src/ts/download/download-result';
+import {DownloadService} from 'src/ts/download/download-service';
+import {PlaylistDownloadService} from 'src/ts/download/playlist-download-service';
+import {IResourceInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {ResourceInfoService} from 'src/ts/download/resource/resource-info-service';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {UserDownloadService} from 'src/ts/download/user-download-service';
+import {matchesCause, matchesError} from 'test/ts/sinon-matchers';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

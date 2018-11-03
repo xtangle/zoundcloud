@@ -1,9 +1,9 @@
-import {ITrackDownloadResult} from '@src/download/download-result';
-import {PlaylistDownloadService} from '@src/download/playlist-download-service';
-import {IPlaylistInfo, ITrackInfo, IUserInfo, ResourceType} from '@src/download/resource/resource-info';
-import {TrackDownloadService} from '@src/download/track-download-service';
-import {configureChai} from '@test/test-initializers';
 import {match, restore, SinonStub, stub} from 'sinon';
+import {ITrackDownloadResult} from 'src/ts/download/download-result';
+import {PlaylistDownloadService} from 'src/ts/download/playlist-download-service';
+import {IPlaylistInfo, ITrackInfo, IUserInfo, ResourceType} from 'src/ts/download/resource/resource-info';
+import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {configureChai} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

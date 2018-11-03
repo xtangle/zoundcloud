@@ -1,14 +1,14 @@
-import {ZC_DL_BUTTON_CLASS} from '@src/constants';
-import {ReloadContentPageMessage} from '@src/messaging/extension/reload-content-page.message';
-import {Message} from '@src/messaging/message';
-import {MessageResponse} from '@src/messaging/message-response';
-import {IMessageHandlerArgs} from '@src/messaging/messenger';
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import * as $ from 'jquery';
 import {Subject} from 'rxjs';
 import {clock, restore, SinonStub, stub, useFakeTimers} from 'sinon';
+import {ZC_DL_BUTTON_CLASS} from 'src/ts/constants';
+import {InjectionSignalFactory} from 'src/ts/content/injection/injection-signal-factory';
+import {ReloadContentPageMessage} from 'src/ts/messaging/extension/reload-content-page.message';
+import {Message} from 'src/ts/messaging/message';
+import {MessageResponse} from 'src/ts/messaging/message-response';
+import {IMessageHandlerArgs} from 'src/ts/messaging/messenger';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
 const expect = configureChai();
 

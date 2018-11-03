@@ -1,9 +1,9 @@
-import {ZC_DL_BUTTON_SMALL_CLASS} from '@src/constants';
-import {DownloadButtonFactory} from '@src/page/injection/download-button-factory';
-import {addToButtonGroup} from '@src/page/injection/injection-commons';
-import {InjectionSignalFactory} from '@src/page/injection/injection-signal-factory';
 import {Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
+import {ZC_DL_BUTTON_SMALL_CLASS} from 'src/ts/constants';
+import {DownloadButtonFactory} from 'src/ts/content/injection/download-button-factory';
+import {addToButtonGroup} from 'src/ts/content/injection/injection-commons';
+import {InjectionSignalFactory} from 'src/ts/content/injection/injection-signal-factory';
 
 export const ListItemInjectionService = {
   injectDownloadButtons(onUnload$: Observable<any>) {

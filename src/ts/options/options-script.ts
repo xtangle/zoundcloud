@@ -1,6 +1,6 @@
-import {defaultOptions, IOptions} from '@src/options/option';
-import {IRunnable} from '@src/runnable/runnable';
 import * as $ from 'jquery';
+import {defaultOptions, IOptions} from 'src/ts/options/option';
+import {IRunnable} from 'src/ts/util/runnable';
 
 export class OptionsScript implements IRunnable {
   public run(): void {

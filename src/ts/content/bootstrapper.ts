@@ -1,9 +1,9 @@
-import {ContentPageMessenger} from '@src/messaging/page/content-page-messenger';
-import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
-import {ContentPage} from '@src/page/content-page';
-import {elementAdded$, elementRemoved$} from '@src/util/dom-observer';
 import * as $ from 'jquery';
-import {first, take, takeUntil} from 'rxjs/operators';
+import {take, takeUntil} from 'rxjs/operators';
+import {ContentPage} from 'src/ts/content/content-page';
+import {ContentPageMessenger} from 'src/ts/messaging/page/content-page-messenger';
+import {RequestContentPageReloadMessage} from 'src/ts/messaging/page/request-content-page-reload.message';
+import {elementAdded$, elementRemoved$} from 'src/ts/util/dom-observer';
 
 export const TAG_ID = 'zc-content-page';
 

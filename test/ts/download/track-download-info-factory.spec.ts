@@ -1,12 +1,12 @@
-import {ITrackInfo} from '@src/download/resource/resource-info';
-import {ITrackDownloadInfo} from '@src/download/track-download-info';
-import {TrackDownloadInfoFactory} from '@src/download/track-download-info-factory';
-import {ITrackDownloadMethodInfo, TrackDownloadMethod} from '@src/download/track-download-method';
-import {TrackDownloadMethodService} from '@src/download/track-download-method-service';
-import {configureChai, useRxTesting} from '@test/test-initializers';
 import * as path from 'path';
 import {of} from 'rxjs';
 import {match, restore, SinonStub, stub} from 'sinon';
+import {ITrackInfo} from 'src/ts/download/resource/resource-info';
+import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
+import {ITrackDownloadMethodInfo, TrackDownloadMethod} from 'src/ts/download/track-download-method';
+import {TrackDownloadMethodService} from 'src/ts/download/track-download-method-service';
+import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const forEach = require('mocha-each');

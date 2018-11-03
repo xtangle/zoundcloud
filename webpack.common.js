@@ -25,9 +25,10 @@ module.exports = {
     ],
   },
   resolve: {
-    alias: {
-      '@src': path.join(__dirname, 'src/ts'),
-    },
+    modules: [
+      __dirname,
+      'node_modules',
+    ],
     extensions: ['.ts', '.tsx', '.js'],
   },
   plugins: [

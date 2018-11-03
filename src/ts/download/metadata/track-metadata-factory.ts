@@ -1,5 +1,5 @@
-import {ITrackMetadata} from '@src/download/metadata/track-metadata';
-import {ITrackInfo} from '@src/download/resource/resource-info';
+import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
+import {ITrackInfo} from 'src/ts/download/resource/resource-info';
 
 export const TrackMetadataFactory = {
   create(trackInfo: ITrackInfo): ITrackMetadata {

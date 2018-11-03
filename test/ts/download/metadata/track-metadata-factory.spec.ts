@@ -1,6 +1,6 @@
-import {TrackMetadataFactory} from '@src/download/metadata/track-metadata-factory';
-import {ITrackInfo, ResourceType} from '@src/download/resource/resource-info';
 import {expect} from 'chai';
+import {TrackMetadataFactory} from 'src/ts/download/metadata/track-metadata-factory';
+import {ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
 
 describe('track metadata factory', () => {
   const fixture = TrackMetadataFactory;
