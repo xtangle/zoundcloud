@@ -7,6 +7,7 @@
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "permissions": [
     "downloads",
+    "storage",
     "tabs",
     "webNavigation",
     "*://soundcloud.com/*",
@@ -21,6 +22,10 @@
       "background.js"
     ],
     "persistent": false
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
   },
   "page_action": {}
 }

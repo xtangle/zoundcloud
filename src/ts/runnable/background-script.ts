@@ -6,8 +6,8 @@ import {LogToConsoleMessage} from '@src/messaging/page/log-to-console.message';
 import {RequestContentPageReloadMessage} from '@src/messaging/page/request-content-page-reload.message';
 import {RequestDownloadMessage} from '@src/messaging/page/request-download.message';
 import {IRunnable} from '@src/runnable/runnable';
-import {ScPageObservables} from '@src/runnable/sc-page-observables';
 import {logger} from '@src/util/logger';
+import {ScPageObservables} from '@src/util/sc-page-observables';
 import {fromEventPattern, Observable} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
@@ -23,7 +23,9 @@ export class BackgroundScript implements IRunnable {
         chrome.tabs.insertCSS(tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(tabId, {file: 'vendor.js'});
         chrome.tabs.executeScript(tabId, {file: 'content.js'});
+
         chrome.pageAction.show(tabId);
+        chrome.pageAction.onClicked.addListener(() => chrome.runtime.openOptionsPage());
       });
 
     ExtensionMessenger.onMessage$(RequestContentPageReloadMessage.TYPE)

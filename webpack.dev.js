@@ -24,15 +24,4 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'eval-source-map',
   plugins: getPlugins(),
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
-          chunks: 'initial',
-        },
-      },
-    },
-  },
 });

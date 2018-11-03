@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     background: path.join(__dirname, 'src/ts/background.ts'),
     content: path.join(__dirname, 'src/ts/content.ts'),
+    options: path.join(__dirname, 'src/ts/options.ts'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -35,7 +36,18 @@ module.exports = {
     // copy assets
     new CopyWebpackPlugin([{
       context: 'src/resources',
-      from: '*.*',
+      from: '**/*.*',
     }]),
   ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'initial',
+        },
+      },
+    },
+  },
 };

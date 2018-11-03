@@ -11,15 +11,17 @@ module.exports = (config) => {
     frameworks: ['mocha', 'karma-typescript'],
     files: [
       'src/ts/**/*.ts',
+      'src/resources/*.html',
       'test/ts/**/*.ts',
     ],
     exclude: [
       'src/ts/background.ts',
       'src/ts/content.ts',
+      'src/ts/options.ts',
     ],
     preprocessors: {
-      'src/ts/**/*.ts': ['karma-typescript'],
-      'test/ts/**/*.ts': ['karma-typescript'],
+      '**/*.ts': ['karma-typescript'],
+      '**/*.html': ['html2js'],
     },
     client: {
       captureConsole: false,
@@ -48,6 +50,9 @@ module.exports = (config) => {
         lcovonly: reportDestinationConfig,
         text: '',
       },
+    },
+    html2JsPreprocessor: {
+      stripPrefix: 'src/resources/',
     },
     port: 9876,
     colors: true,

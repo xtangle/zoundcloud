@@ -1,5 +1,5 @@
 import {SC_URL_HOST} from '@src/constants';
-import {ScPageObservables} from '@src/runnable/sc-page-observables';
+import {ScPageObservables} from '@src/util/sc-page-observables';
 import {configureChai, useRxTesting, useSinonChrome} from '@test/test-initializers';
 import {noop} from '@test/test-utils';
 import {clock, match, restore, SinonMatcher, SinonStub, spy, stub, useFakeTimers} from 'sinon';

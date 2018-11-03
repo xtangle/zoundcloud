@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ZoundCloud Options</title>
+  <style type="text/css">
+    body {
+      margin: 1em 1.5em 1.5em;
+    }
+    .option {
+      font-size: 12px;
+      padding-bottom: 0.5em;
+    }
+    .option label,input[type=checkbox] {
+      cursor: pointer;
+    }
+    .option input[type=checkbox] {
+      transform: scale(1.25);
+      vertical-align: middle;
+      margin-right: 0.5em;
+    }
+    .control > * {
+      margin-top: 1em;
+    }
+    .control button {
+      cursor: pointer;
+      width: 6em;
+      height: 1.75em;
+      margin-right: 1em;
+    }
+    #confirm-msg {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="option">
+    <label>
+      <input type="checkbox" id="add-metadata-option">
+      Add Metadata to mp3 files.
+    </label>
+  </div>
+  <div class="option">
+    <label>
+      <input type="checkbox" id="always-mp3-option">
+      Always download tracks in .mp3 format.
+    </label>
+  </div>
+  <div class="option">
+    <label>
+      <input type="checkbox" id="clean-title-option">
+      Remove the text 'Free Download' from track titles.
+    </label>
+  </div>
+  <div class="option">
+    <label>
+      <input type="checkbox" id="overwrite-option">
+      Overwrite existing files with the same name.
+    </label>
+  </div>
+  <div class="control">
+    <button id="save-btn">Save</button>
+    <button id="reset-btn">Reset</button>
+    <span id="confirm-msg" hidden>Settings saved.</span>
+  </div>
+  <script type="text/javascript" src="vendor.js"></script>
+  <script type="text/javascript" src="options.js"></script>
+</body>
+</html>
