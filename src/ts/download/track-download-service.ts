@@ -1,5 +1,5 @@
-import {AsyncSubject, of} from 'rxjs';
-import {flatMap, tap, timeout, withLatestFrom} from 'rxjs/operators';
+import {AsyncSubject, Observable, of} from 'rxjs';
+import {flatMap, tap, timeout} from 'rxjs/operators';
 import {ITrackDownloadMetadata, ITrackDownloadResult} from 'src/ts/download/download-result';
 import {MetadataAdapter} from 'src/ts/download/metadata/metadata-adapter';
 import {ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
@@ -15,14 +15,12 @@ export const TrackDownloadService = {
     const downloadMetadata$: AsyncSubject<ITrackDownloadMetadata> = new AsyncSubject();
     TrackDownloadInfoFactory.create$(trackInfo, downloadLocation).pipe(
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Downloading track', downloadInfo)),
-      withLatestFrom(OptionsObservables.getOptions$()),
-      flatMap(([downloadInfo, options]: [ITrackDownloadInfo, IOptions]) =>
-        options.addMetadata ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo)
-      ),
+      flatMap(addMetadataIfEnabled$),
       timeout(1800000)
     ).subscribe(
       downloadTrack.bind(null, downloadMetadata$),
-      onError.bind(null, downloadMetadata$, trackInfo)
+      onError.bind(null, downloadMetadata$, trackInfo),
+      () => logger.debug('Track download info stream completed', trackInfo)
     );
     return {
       kind: ResourceType.Track,
@@ -31,6 +29,14 @@ export const TrackDownloadService = {
     };
   }
 };
+
+function addMetadataIfEnabled$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
+  return OptionsObservables.getOptions$().pipe(
+    flatMap((options: IOptions) =>
+      options.addMetadata ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo)
+    )
+  );
+}
 
 function downloadTrack(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, downloadInfo: ITrackDownloadInfo) {
   chrome.downloads.download(downloadInfo.downloadOptions, (downloadId: number) => {
@@ -49,5 +55,6 @@ function downloadTrack(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, 
 
 function onError(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, trackInfo: ITrackInfo, e: Error) {
   const err = new VError(e, `Cannot download track: ${trackInfo.title}`);
+  logger.error(err);
   downloadMetadata$.error(err);
 }

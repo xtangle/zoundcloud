@@ -132,19 +132,19 @@ describe('download service', () => {
     });
 
     context('fetching resource info', () => {
-      it('should download if fetching resource info takes less than 1 minute', () => {
-        stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(timer(59999).pipe(mapTo(resourceInfo)));
+      it('should download if fetching resource info takes less than 30 seconds', () => {
+        stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(timer(29999).pipe(mapTo(resourceInfo)));
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
-        clock.tick(60000);
+        clock.tick(30000);
 
         expect(stubTrackDownload).to.have.been.called;
         expect(rx.next).to.have.been.called;
       });
 
-      it('should emit error if fetching resource info takes 1 minute or more', () => {
-        stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(timer(60000).pipe(mapTo(resourceInfo)));
+      it('should emit error if fetching resource info takes 30 seconds or more', () => {
+        stubGetResourceInfo$.withArgs(resourceInfoUrl).returns(timer(30000).pipe(mapTo(resourceInfo)));
         rx.subscribeTo(fixture.download$(resourceInfoUrl));
-        clock.tick(60001);
+        clock.tick(30001);
 
         expect(stubTrackDownload).to.not.have.been.called;
         expect(rx.next).to.not.have.been.called;

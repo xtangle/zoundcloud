@@ -1,5 +1,5 @@
 import {combineLatest, Observable, of} from 'rxjs';
-import {flatMap, map, withLatestFrom} from 'rxjs/operators';
+import {flatMap, map} from 'rxjs/operators';
 import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from 'src/ts/constants';
 import {ITrackInfo} from 'src/ts/download/resource/resource-info';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from 'src/ts/download/track-download-method';
@@ -13,9 +13,12 @@ export interface IScI1ApiTrackDownloadInfo {
 
 export const TrackDownloadMethodService = {
   getDownloadMethodInfo$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethodInfo> {
-    return combineLatest(canUseDownloadUrlMethod$(trackInfo), canUseStreamUrlMethod$(trackInfo)).pipe(
-      withLatestFrom(OptionsObservables.getOptions$()),
-      flatMap(([[canUseDownloadUrlMethod, canUseStreamUrlMethod], options]: [[boolean, boolean], IOptions]) => {
+    return combineLatest(
+      canUseDownloadUrlMethod$(trackInfo),
+      canUseStreamUrlMethod$(trackInfo),
+      OptionsObservables.getOptions$()
+    ).pipe(
+      flatMap(([canUseDownloadUrlMethod, canUseStreamUrlMethod, options]) => {
         if (canUseDownloadUrlMethod && shouldUseDownloadUrlMethod(trackInfo, options)) {
           return useDownloadUrlMethod$(trackInfo);
         } else if (canUseStreamUrlMethod) {

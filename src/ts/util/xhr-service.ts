@@ -1,5 +1,4 @@
-import {AsyncSubject, Observable, of} from 'rxjs';
-import {catchError, timeout} from 'rxjs/operators';
+import {AsyncSubject, Observable} from 'rxjs';
 
 export const XhrService = {
   ping$(url: string): Observable<number> {
@@ -33,7 +32,7 @@ function getResponse$<T>(responseType: XMLHttpRequestResponseType, url: string):
   return response$;
 }
 
-function pingUrl$(url: string, timeoutInMs = 5000): Observable<number> {
+function pingUrl$(url: string): Observable<number> {
   const status$: AsyncSubject<number> = new AsyncSubject<number>();
   const xhr = new XMLHttpRequest();
   xhr.open('HEAD', url, true);
@@ -49,8 +48,5 @@ function pingUrl$(url: string, timeoutInMs = 5000): Observable<number> {
     status$.complete();
   };
   xhr.send();
-  return status$.pipe(
-    timeout(timeoutInMs),
-    catchError(() => of(503))
-  );
+  return status$;
 }

@@ -78,6 +78,10 @@ describe('track download info factory', () => {
       '| free dl',
     ];
 
+    beforeEach(() => {
+      stubGetDownloadMethodInfo$.returns(of(downloadMethodInfo));
+    });
+
     // In test setup, clean track title option is enabled
     forEach(titleSuffixes)
       .it(`should remove '%s' from the end of the song title`, (suffix: string) => {
@@ -91,8 +95,6 @@ describe('track download info factory', () => {
 
     it('should not clean the track info when clean track title option is disabled', () => {
       stubGetOptions$.returns(of({...options, cleanTrackTitle: false}));
-      stubGetDownloadMethodInfo$.returns(of(downloadMethodInfo));
-
       const titleWithSuffix = trackInfo.title + titleSuffixes[0];
       const newTrackInfo = {...trackInfo, title: titleWithSuffix};
       rx.subscribeTo(fixture.create$(newTrackInfo, downloadLocation));

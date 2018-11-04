@@ -1,6 +1,6 @@
 import * as path from 'path';
-import {Observable} from 'rxjs';
-import {flatMap, map, tap} from 'rxjs/operators';
+import {combineLatest, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {ITrackInfo} from 'src/ts/download/resource/resource-info';
 import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
 import {ITrackDownloadMethodInfo} from 'src/ts/download/track-download-method';
@@ -12,14 +12,13 @@ import DownloadOptions = chrome.downloads.DownloadOptions;
 
 export const TrackDownloadInfoFactory = {
   create$(trackInfo: ITrackInfo, downloadLocation: string): Observable<ITrackDownloadInfo> {
-    return OptionsObservables.getOptions$().pipe(
-      flatMap((options: IOptions) => {
+    return combineLatest(
+      TrackDownloadMethodService.getDownloadMethodInfo$(trackInfo),
+      OptionsObservables.getOptions$()
+    ).pipe(
+      map(([downloadMethodInfo, options]) => {
         trackInfo = options.cleanTrackTitle ? cleanTrackTitle(trackInfo) : trackInfo;
-        return TrackDownloadMethodService.getDownloadMethodInfo$(trackInfo).pipe(
-          map((downloadMethodInfo: ITrackDownloadMethodInfo) =>
-            toDownloadInfo(trackInfo, downloadMethodInfo, downloadLocation, options)
-          )
-        );
+        return toDownloadInfo(trackInfo, downloadMethodInfo, downloadLocation, options);
       })
     );
   }
@@ -32,7 +31,7 @@ function toDownloadInfo(trackInfo: ITrackInfo,
   const filePath = getFilePath(downloadLocation, trackInfo.title, downloadMethodInfo.format);
   return {
     downloadMethod: downloadMethodInfo.downloadMethod,
-    downloadOptions: getDownloadOptions(options, filePath, downloadMethodInfo.url),
+    downloadOptions: getDownloadOptions(filePath, downloadMethodInfo.url, options),
     originalUrl: downloadMethodInfo.url,
     trackInfo
   };
@@ -52,7 +51,7 @@ function getFilePath(downloadLocation: string, trackTitle: string, fileExtension
   return path.join(location, filename);
 }
 
-function getDownloadOptions(options: IOptions, filePath: string, url: string): DownloadOptions {
+function getDownloadOptions(filePath: string, url: string, options: IOptions): DownloadOptions {
   return {
     conflictAction: options.overwriteExistingFiles ? 'overwrite' : 'uniquify',
     filename: filePath,
