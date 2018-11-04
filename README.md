@@ -25,7 +25,7 @@ This extension will add download buttons to:
 * Tracks that are contained in scrollable lists.
 
 When a download is initiated, it attempts to download a track in its uploaded format (i.e. highest quality) and will only
-resort to the streamable 128kb mp3 version if no better quality is available.
+resort to the streamable 128 kbps mp3 version if no better quality is available.
 
 Metadata information and cover art is automatically added to files in .mp3 format (in ID3v2.3).
 

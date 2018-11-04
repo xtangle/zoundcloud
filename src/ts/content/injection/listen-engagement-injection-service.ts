@@ -12,7 +12,7 @@ export const ListenEngagementInjectionService = {
     InjectionSignalFactory.create$(selector)
       .pipe(takeUntil(onUnload$))
       .subscribe(addToListenEngagement.bind(null, onUnload$));
-  }
+  },
 };
 
 function createDownloadButton(onUnload$: Observable<any>): JQuery<HTMLElement> {

@@ -16,7 +16,7 @@ export const TrackDownloadMethodService = {
     return combineLatest(
       canUseDownloadUrlMethod$(trackInfo),
       canUseStreamUrlMethod$(trackInfo),
-      OptionsObservables.getOptions$()
+      OptionsObservables.getOptions$(),
     ).pipe(
       flatMap(([canUseDownloadUrlMethod, canUseStreamUrlMethod, options]) => {
         if (canUseDownloadUrlMethod && shouldUseDownloadUrlMethod(trackInfo, options)) {
@@ -26,9 +26,9 @@ export const TrackDownloadMethodService = {
         } else {
           return useI1ApiMethod$(trackInfo);
         }
-      })
+      }),
     );
-  }
+  },
 };
 
 function canUseDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<boolean> {
@@ -51,7 +51,7 @@ function useDownloadUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownload
   return of({
     downloadMethod: TrackDownloadMethod.DownloadUrlMethod,
     format: trackInfo.original_format,
-    url: getDownloadUrl(trackInfo)
+    url: getDownloadUrl(trackInfo),
   });
 }
 
@@ -71,7 +71,7 @@ function useStreamUrlMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMe
   return of({
     downloadMethod: TrackDownloadMethod.StreamUrlMethod,
     format: 'mp3',
-    url: getStreamUrl(trackInfo)
+    url: getStreamUrl(trackInfo),
   });
 }
 
@@ -83,11 +83,11 @@ function useI1ApiMethod$(trackInfo: ITrackInfo): Observable<ITrackDownloadMethod
         return {
           downloadMethod: TrackDownloadMethod.I1ApiMethod,
           format: 'mp3',
-          url: downloadInfo.http_mp3_128_url
+          url: downloadInfo.http_mp3_128_url,
         };
       } else {
         throw new Error(`No download URL found in i1 api endpoint response: ${dlInfoEndpoint}`);
       }
-    })
+    }),
   );
 }

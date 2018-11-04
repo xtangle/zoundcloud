@@ -5,19 +5,31 @@
   <title>ZoundCloud Options</title>
   <style type="text/css">
     body {
-      margin: 1em 1.5em 1.5em;
+      margin: 0 1.5em 1.5em;
+    }
+    .top-links {
+      text-align: right;
+      margin-bottom: 0.5em;
     }
     .option {
       font-size: 12px;
       padding-bottom: 0.5em;
     }
-    .option label,input[type=checkbox] {
-      cursor: pointer;
+    .option label {
+      font-weight: 500;
     }
     .option input[type=checkbox] {
       transform: scale(1.25);
       vertical-align: middle;
-      margin-right: 0.5em;
+    }
+    .option label,input[type=checkbox],summary {
+      cursor: pointer;
+    }
+    .option details,textarea {
+      margin: 0.5em 0 0.5em 2em;
+    }
+    .option summary {
+      width: fit-content;
     }
     .control > * {
       margin-top: 1em;
@@ -34,34 +46,85 @@
   </style>
 </head>
 <body>
+  <div class="top-links">
+    <a target="_blank" href="https://github.com/xtangle/zoundcloud/">Website</a> |
+    <a target="_blank" href="https://github.com/xtangle/zoundcloud/issues/new">Send feedback</a>
+  </div>
   <div class="option">
-    <label>
-      <input type="checkbox" id="add-metadata-option">
+    <input type="checkbox" id="add-metadata-option">
+    <label for="add-metadata-option">
       Add Metadata to mp3 files.
     </label>
+    <details>
+      <summary>Expand for details.</summary>
+      <p>
+        This option adds ID3v2 metadata tags to all tracks downloaded that have the .mp3 extension.
+        Metadata data is fetched from SoundCloud's API.
+      </p>
+      <p>
+        The added metadata includes: cover art, title, album artist, genres, duration, release year,
+        bpm, artist url, audio source url, and description.
+      </p>
+      <p>
+        Note that if this option is enabled, the entire song needs to be downloaded to memory first.
+        This might cause a song to not appear to be downloading at first, but in most cases
+        it is actually downloading in the background.
+      </p>
+    </details>
   </div>
   <div class="option">
-    <label>
-      <input type="checkbox" id="always-mp3-option">
+    <input type="checkbox" id="always-mp3-option">
+    <label for="always-mp3-option">
       Always download tracks in .mp3 format.
     </label>
+    <details>
+      <summary>Expand for details.</summary>
+      <p>
+        Enabling this option will cause all tracks downloaded to be in mp3 format.
+        Most of the time, this will be the 128 kbps bit rate streamable version you hear
+        during a normal browsing session on SoundCloud.
+      </p>
+      <p>
+        If this option is disabled, the original uploaded format of a track (often of higher quality)
+        will take precedence when downloading. However, metadata will not be added to non-mp3 formats.
+      </p>
+    </details>
   </div>
   <div class="option">
-    <label>
-      <input type="checkbox" id="clean-title-option">
-      Remove text containing 'Free Download' from track titles.
+    <input type="checkbox" id="clean-title-option">
+    <label for="clean-title-option">
+      Remove text from track titles matching the pattern:
     </label>
+    <textarea id="clean-title-pattern" cols="40" rows="5" wrap="soft"></textarea>
+    <details>
+      <summary>Expand for details.</summary>
+      <p>
+        Before metadata is added and the file name is established, if the track title contains
+        a substring matching the provided regular expression pattern, the matching part will be removed.
+        One exception is that if the regex matches the entire track title, then it will not be removed.
+      </p>
+      <p>
+        The default setting attempts to remove strings containing 'Free Download' or
+        'Download Link' suffixes appended to the end of many track titles.
+      </p>
+      <p>
+        When entering a custom regular expression, make sure it conforms to Javascript's
+        <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp">RegExp</a> format.
+        The provided regex string will be passed into a RegExp constructor with
+        the global flag turned off and the case insensitive flag turned on.
+      </p>
+    </details>
   </div>
   <div class="option">
-    <label>
-      <input type="checkbox" id="overwrite-option">
+    <input type="checkbox" id="overwrite-option">
+    <label for="overwrite-option">
       Overwrite existing files with the same file name.
     </label>
   </div>
   <div class="control">
     <button id="save-btn">Save</button>
-    <button id="reset-btn">Reset</button>
-    <span id="confirm-msg" hidden>Settings saved.</span>
+    <button id="defaults-btn">Defaults</button>
+    <span id="confirm-msg" hidden>Options saved.</span>
   </div>
   <script type="text/javascript" src="vendor.js"></script>
   <script type="text/javascript" src="options.js"></script>

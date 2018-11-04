@@ -11,19 +11,19 @@ export const MetadataAdapter = {
   addMetadata$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
     const fileExtension = downloadInfo.downloadOptions.filename.split('.').pop();
     const metadata$ = of(TrackMetadataFactory.create(downloadInfo.trackInfo)).pipe(
-      flatMap(withUpdatedCoverArtUrl$)
+      flatMap(withUpdatedCoverArtUrl$),
     );
 
     switch (fileExtension) {
       case 'mp3':
         return metadata$.pipe(
           flatMap((metadata: ITrackMetadata) => ID3MetadataService.addID3V2Metadata$(metadata, downloadInfo)),
-          tap((info: ITrackDownloadInfo) => logger.debug('Added mp3 metadata', info))
+          tap((info: ITrackDownloadInfo) => logger.debug('Added mp3 metadata', info)),
         );
       default:
         return of(downloadInfo);
     }
-  }
+  },
 };
 
 function withUpdatedCoverArtUrl$(metadata: ITrackMetadata): Observable<ITrackMetadata> {

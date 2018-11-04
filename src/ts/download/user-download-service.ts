@@ -15,16 +15,16 @@ export const UserDownloadService = {
     ResourceInfoService.getTrackInfoList$(trackListInfoUrl).pipe(
       timeout(60000),
       map((tracks: ITrackInfo[]) => tracks.map(
-        (trackInfo: ITrackInfo) => TrackDownloadService.download(trackInfo, downloadLocation)
+        (trackInfo: ITrackInfo) => TrackDownloadService.download(trackInfo, downloadLocation),
       )),
       map((tracks: ITrackDownloadResult[]) => ({
         kind: ResourceType.User,
         tracks,
-        userInfo
-      }))
+        userInfo,
+      })),
     ).subscribe(downloadResult$);
     return downloadResult$.asObservable();
-  }
+  },
 };
 
 function getDownloadLocation(userInfo: IUserInfo): string {

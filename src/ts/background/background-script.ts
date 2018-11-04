@@ -33,7 +33,7 @@ export class BackgroundScript implements IRunnable {
     ExtensionMessenger.onMessage$(RequestContentPageReloadMessage.TYPE)
       .pipe(takeUntil(this.onSuspend$))
       .subscribe((args: IMessageHandlerArgs<RequestContentPageReloadMessage>) =>
-        ExtensionMessenger.sendToContentPage$(args.sender.tab.id, new ReloadContentPageMessage())
+        ExtensionMessenger.sendToContentPage$(args.sender.tab.id, new ReloadContentPageMessage()),
       );
 
     ExtensionMessenger.onMessage$(RequestDownloadMessage.TYPE)
@@ -46,7 +46,7 @@ export class BackgroundScript implements IRunnable {
     ExtensionMessenger.onMessage$(LogToConsoleMessage.TYPE)
       .pipe(takeUntil(this.onSuspend$))
       .subscribe((args: IMessageHandlerArgs<LogToConsoleMessage>) =>
-        logger.log(`${args.message.message} (tabId: ${args.sender.tab.id})`, ...args.message.optionalParams)
+        logger.log(`${args.message.message} (tabId: ${args.sender.tab.id})`, ...args.message.optionalParams),
       );
 
     logger.log('Loaded background script');

@@ -10,7 +10,7 @@ export const DownloadButtonFactory = {
     const dlButton = createDlButton();
     addDlButtonBehavior(dlButton, onUnload$, resourceInfoUrl);
     return dlButton;
-  }
+  },
 };
 
 function createDlButton(): JQuery<HTMLElement> {

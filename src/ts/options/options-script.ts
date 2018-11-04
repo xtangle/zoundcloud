@@ -1,12 +1,14 @@
 import * as $ from 'jquery';
-import {defaultOptions, IOptions} from 'src/ts/options/option';
+import {defaultOptions} from 'src/ts/options/default-options';
+import {IOptions} from 'src/ts/options/option';
 import {IRunnable} from 'src/ts/util/runnable';
 
 export class OptionsScript implements IRunnable {
   public run(): void {
     restoreOptions();
     $('#save-btn').on('click', saveOptions);
-    $('#reset-btn').on('click', resetToDefaults);
+    $('#defaults-btn').on('click', setToDefaults);
+    $('#clean-title-option').on('click', (event: any) => syncCleanTitlePatternInput(event.target.checked));
   }
 }
 
@@ -19,15 +21,20 @@ function saveOptions() {
   $('#confirm-msg').show().delay(1000).fadeOut();
 }
 
-function resetToDefaults() {
+function setToDefaults() {
   setOptions(defaultOptions);
-  saveOptions();
+}
+
+function syncCleanTitlePatternInput(enabled: boolean) {
+  $('#clean-title-pattern').prop('disabled', !enabled);
 }
 
 function setOptions(options: IOptions) {
   $('#add-metadata-option').prop('checked', options.addMetadata);
   $('#always-mp3-option').prop('checked', options.alwaysDownloadMp3);
-  $('#clean-title-option').prop('checked', options.cleanTrackTitle);
+  $('#clean-title-option').prop('checked', options.cleanTrackTitle.enabled);
+  $('#clean-title-pattern').val(options.cleanTrackTitle.pattern);
+  syncCleanTitlePatternInput(options.cleanTrackTitle.enabled);
   $('#overwrite-option').prop('checked', options.overwriteExistingFiles);
 }
 
@@ -35,7 +42,10 @@ function getOptions(): IOptions {
   return {
     addMetadata: $('#add-metadata-option').prop('checked'),
     alwaysDownloadMp3: $('#always-mp3-option').prop('checked'),
-    cleanTrackTitle: $('#clean-title-option').prop('checked'),
-    overwriteExistingFiles: $('#overwrite-option').prop('checked')
+    cleanTrackTitle: {
+      enabled: $('#clean-title-option').prop('checked'),
+      pattern: $('#clean-title-pattern').val().toString(),
+    },
+    overwriteExistingFiles: $('#overwrite-option').prop('checked'),
   };
 }

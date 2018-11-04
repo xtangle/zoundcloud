@@ -85,7 +85,7 @@ describe('list item injection service', () => {
       const downloadButtons = getDownloadButtons();
       $.each(downloadButtons, (_, button) =>
         expect($(button)).to.have.$class('sc-button-small')
-          .and.to.have.$class(ZC_DL_BUTTON_SMALL_CLASS)
+          .and.to.have.$class(ZC_DL_BUTTON_SMALL_CLASS),
       );
     });
 
@@ -100,7 +100,7 @@ describe('list item injection service', () => {
           fixture.injectDownloadButtons(onUnload$);
 
           expect(spyCreateDownloadButton).to.have.been.calledOnceWithExactly(onUnload$, expectedUrl);
-        }
+        },
       );
 
       // noinspection TypeScriptValidateJSTypes
@@ -115,7 +115,7 @@ describe('list item injection service', () => {
 
           expect(downloadButton.length).to.be.equal(1);
           expect($.contains(buttonGroup[0], downloadButton[0])).to.be.true;
-        }
+        },
       );
     });
   });

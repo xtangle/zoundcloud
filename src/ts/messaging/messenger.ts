@@ -31,7 +31,7 @@ export abstract class BaseMessenger implements IMessenger {
             response$.pipe(first()).subscribe(sendResponse);
             return true;
           }
-        }
+        },
       );
 
     } else {
@@ -40,7 +40,7 @@ export abstract class BaseMessenger implements IMessenger {
           if (message.type === messageType) {
             handlerArgs$.next({message, sender});
           }
-        }
+        },
       );
     }
 

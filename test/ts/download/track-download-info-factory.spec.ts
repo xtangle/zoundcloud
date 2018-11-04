@@ -6,6 +6,8 @@ import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
 import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from 'src/ts/download/track-download-method';
 import {TrackDownloadMethodService} from 'src/ts/download/track-download-method-service';
+import {defaultOptions} from 'src/ts/options/default-options';
+import {IOptions} from 'src/ts/options/option';
 import {OptionsObservables} from 'src/ts/options/options-observables';
 import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
@@ -21,14 +23,19 @@ describe('track download info factory', () => {
   const downloadMethodInfo: ITrackDownloadMethodInfo = {
     downloadMethod: TrackDownloadMethod.DownloadUrlMethod,
     format: 'wav',
-    url: 'download-url'
+    url: 'download-url',
   };
 
+  let options: IOptions;
   let stubGetOptions$: SinonStub;
   let stubGetDownloadMethodInfo$: SinonStub;
-  const options = {cleanTrackTitle: true, overwriteExistingFiles: false};
 
   beforeEach(() => {
+    options = {
+      cleanTrackTitle: {...defaultOptions.cleanTrackTitle},
+      overwriteExistingFiles: false,
+    } as IOptions;
+
     stubGetOptions$ = stub(OptionsObservables, 'getOptions$');
     stubGetOptions$.returns(of(options));
 
@@ -64,44 +71,70 @@ describe('track download info factory', () => {
       .calledWithMatch(match.has('trackInfo', trackInfo));
   });
 
-  context('cleaning the track info', () => {
-    const titleSuffixes = [
-      ' - FREE DOWNLOAD [link in description]',
-      '|[FREE Download]',
-      '*** FREE DOWNLOAD ***',
-      ' // FREE_DL - Link In Description!!! //',
-      '_Free_Download',
-      '  (Free Download)',
-      ' [Buy = Free Download]',
-      '*BUY=FREE DOWNLOAD*',
-      ' BUY= Free Download',
-      '| free dl',
+  context('cleaning the track info with the default pattern', () => {
+    const trackTitles = [
+      'Alok & Sevenn - BYOB [ FREE DOWNLOAD ]',
+      'Calvin Harris - Live At EDC Las Vegas 2014 FREE DOWNLOAD',
+      'Analog Trip @ EDM Underground Sessions Vol021 Protonradio 10-1-2017 | Free Download: goo.gl/pgD3gr',
+      'Strip That Down - Liam Payne ("Deep House" Lucas Levi Remix)*BUY = FREE DOWNLOAD*',
+      'Alan Walker - Faded (Osias Trap Remix) [BUY = FREE DOWNLOAD]',
+      'Bob Marley - Is This Love (Soke Remix) **FREE DOWNLOAD**',
+      'Hip Hop Beats Instrumental - Hard Work |Free Download| (Standard Lease $24.95) (Instant Delivery)',
+      'Tracy Chapman - Fast Car (Bauke Top Remix) (Buy=Free DL)',
+      `Taylor Swift & Zayn Malik - I Don't Wanna Live Forever (Toob's Moombahbaas Refix) (buy = free DL!)`,
+      'All That Swag (Prod By. YaBoyJDub) *Wack Rap Tuesday* ["BUY" IS FREE DL!]',
+      `Jennifer Lopez - Ain't Your Mama (DEEJAYDANNY BOOTLEG)HIT BUY FOR FREE DOWNLOAD !`,
+      'Dj Taj ~ Latch (Remix) {DOWNLOAD LINK IN DESCRIPTION}',
+      'Dilbar Dilbar ― DJ Farrukh Squashup ― Download Link : hearthis.at/2167189/',
+      'Snatch Ma Crops (full download link in description box)',
+      // negative cases
+      '[FREE_DL] Yuto.com City Light Remix SHIMPEI ×JIVA Nel MONDO',
+      '[Buy link = FREE DL!!!] Tororoudon - Hot Cocoa',
+    ];
+
+    const expectedTitles = [
+      'Alok & Sevenn - BYOB',
+      'Calvin Harris - Live At EDC Las Vegas 2014',
+      'Analog Trip @ EDM Underground Sessions Vol021 Protonradio 10-1-2017',
+      'Strip That Down - Liam Payne ("Deep House" Lucas Levi Remix)',
+      'Alan Walker - Faded (Osias Trap Remix)',
+      'Bob Marley - Is This Love (Soke Remix)',
+      'Hip Hop Beats Instrumental - Hard Work',
+      'Tracy Chapman - Fast Car (Bauke Top Remix)',
+      `Taylor Swift & Zayn Malik - I Don't Wanna Live Forever (Toob's Moombahbaas Refix)`,
+      'All That Swag (Prod By. YaBoyJDub) *Wack Rap Tuesday',
+      'Jennifer Lopez - Ain\'t Your Mama (DEEJAYDANNY BOOTLEG)',
+      'Dj Taj ~ Latch (Remix)',
+      'Dilbar Dilbar ― DJ Farrukh Squashup',
+      'Snatch Ma Crops',
+      // negative cases
+      '[FREE_DL] Yuto.com City Light Remix SHIMPEI ×JIVA Nel MONDO',
+      '[Buy link = FREE DL!!!] Tororoudon - Hot Cocoa',
     ];
 
     beforeEach(() => {
       stubGetDownloadMethodInfo$.returns(of(downloadMethodInfo));
     });
 
-    // In test setup, clean track title option is enabled
-    forEach(titleSuffixes)
-      .it(`should remove '%s' from the end of the song title`, (suffix: string) => {
-        const newTrackInfo = {...trackInfo, title: `${trackInfo.title}${suffix}`};
+    // In test setup, clean track titles option is enabled
+    forEach(trackTitles.map((t, i) => [t, expectedTitles[i]]))
+      .it(`should clean track title for '%s'`, (trackTitle: string, expected: string) => {
+        const newTrackInfo = {...trackInfo, title: trackTitle};
         rx.subscribeTo(fixture.create$(newTrackInfo, downloadLocation));
         const actual: ITrackDownloadInfo = rx.next.firstCall.args[0];
 
-        expect(actual.trackInfo.title).to.be.equal(trackInfo.title);
-        expect(actual.downloadOptions.filename).not.to.contain(suffix);
+        expect(actual.trackInfo.title).to.be.equal(expected);
+        // expect(actual.downloadOptions.filename).to.contain(expected);
       });
 
-    it('should not clean the track info when clean track title option is disabled', () => {
-      stubGetOptions$.returns(of({...options, cleanTrackTitle: false}));
-      const titleWithSuffix = trackInfo.title + titleSuffixes[0];
-      const newTrackInfo = {...trackInfo, title: titleWithSuffix};
+    it('should not clean the track title when clean track title option is disabled', () => {
+      stubGetOptions$.returns(of({cleanTrackTitle: {enabled: false}}));
+      const newTrackInfo = {...trackInfo, title: trackTitles[0]};
       rx.subscribeTo(fixture.create$(newTrackInfo, downloadLocation));
       const actual: ITrackDownloadInfo = rx.next.firstCall.args[0];
 
-      expect(actual.trackInfo.title).to.be.equal(titleWithSuffix);
-      expect(actual.downloadOptions.filename).to.contain(titleSuffixes[0]);
+      expect(actual.trackInfo.title).to.be.equal(trackTitles[0]);
+      // expect(actual.downloadOptions.filename).to.contain(trackTitles[0]);
     });
   });
 

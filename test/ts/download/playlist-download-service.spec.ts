@@ -18,8 +18,8 @@ describe('playlist download service', () => {
     title: 'some*playlist?with>special\\characters',
     tracks: [trackOneInfo, trackTwoInfo],
     user: {
-      username: 'some<username|with?special/characters'
-    } as IUserInfo
+      username: 'some<username|with?special/characters',
+    } as IUserInfo,
   };
   const trackOneDlResult = {trackInfo: trackOneInfo} as ITrackDownloadResult;
   const trackTwoDlResult = {trackInfo: trackTwoInfo} as ITrackDownloadResult;
@@ -60,7 +60,7 @@ describe('playlist download service', () => {
       expect(actual).to.be.deep.equal({
         kind: ResourceType.Playlist,
         playlistInfo,
-        tracks: [trackOneDlResult, trackTwoDlResult]
+        tracks: [trackOneDlResult, trackTwoDlResult],
       });
     });
   });

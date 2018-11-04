@@ -40,7 +40,7 @@ describe('track download method service', () => {
       trackInfo = {
         download_url: 'some-download-url',
         downloadable: true,
-        original_format: 'wav'
+        original_format: 'wav',
       } as ITrackInfo;
     });
 
@@ -107,7 +107,7 @@ describe('track download method service', () => {
     beforeEach(() => {
       trackInfo = {
         downloadable: false,
-        stream_url: 'some-stream-url'
+        stream_url: 'some-stream-url',
       } as ITrackInfo;
     });
 
@@ -163,7 +163,7 @@ describe('track download method service', () => {
     beforeEach(() => {
       trackInfo = {
         downloadable: false,
-        id: 123
+        id: 123,
       } as ITrackInfo;
 
       stubGetJSON$.withArgs(expectedScI1ApiEndpoint()).returns(of({http_mp3_128_url: expectedDlUrl}));

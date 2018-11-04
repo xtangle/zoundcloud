@@ -21,22 +21,22 @@ export const ID3MetadataService = {
         ...downloadInfo,
         downloadOptions: {
           ...downloadInfo.downloadOptions,
-          url
-        }
+          url,
+        },
       } as any)),
       catchError((err: Error) => {
         logger.error(`Unable to fetch metadata for track ${downloadInfo.trackInfo.title}`, err);
         return of(downloadInfo);
-      })
+      }),
     );
-  }
+  },
 };
 
 function writeMetadata$(metadata: ITrackMetadata, arrayBuffer: ArrayBuffer): Observable<IID3Writer> {
   return of(ID3WriterService.createWriter(arrayBuffer)).pipe(
     map(withTextualMetadata.bind(null, metadata)),
     flatMap(withCoverArt$.bind(null, metadata)),
-    map(ID3WriterService.addTag)
+    map(ID3WriterService.addTag),
   );
 }
 
@@ -52,7 +52,7 @@ function withTextualMetadata(metadata: ITrackMetadata, writer: IID3Writer): IID3
   ID3WriterService.setFrame(writer, 'WOAS', metadata.audio_source_url);
   ID3WriterService.setFrame(writer, 'COMM', {
     description: 'Soundcloud description',
-    text: metadata.description || ''
+    text: metadata.description || '',
   });
   return writer;
 }
@@ -69,12 +69,12 @@ function withCoverArt$(metadata: ITrackMetadata, writer: IID3Writer): Observable
         data: arrayBuffer,
         description: `Soundcloud artwork. Source: ${url}`,
         type: 3,
-        useUnicodeEncoding: false
-      })
+        useUnicodeEncoding: false,
+      }),
     ),
     catchError((err: Error) => {
       logger.error(`Unable to fetch cover art for track ${metadata.title}`, err);
       return of(writer);
-    })
+    }),
   );
 }

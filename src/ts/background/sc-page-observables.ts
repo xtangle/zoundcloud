@@ -10,8 +10,8 @@ const initialNavigationToScPage$: Observable<number> =
   fromEventPattern<number>((handler: (tabId: number) => void) =>
     chrome.webNavigation.onDOMContentLoaded.addListener(
       (details: WebNavigationFramedCallbackDetails) => handler(details.tabId),
-      {url: [{hostEquals: SC_URL_HOST}]}
-    )
+      {url: [{hostEquals: SC_URL_HOST}]},
+    ),
   );
 
 /**
@@ -22,18 +22,18 @@ const navigateBetweenScPages$: Observable<number> =
   fromEventPattern<number>((handler: (tabId: number) => void) =>
     chrome.webNavigation.onHistoryStateUpdated.addListener(
       (details: WebNavigationTransitionCallbackDetails) => handler(details.tabId),
-      {url: [{hostEquals: SC_URL_HOST}]}
-    )
+      {url: [{hostEquals: SC_URL_HOST}]},
+    ),
   ).pipe(debounceTime(20));
 
 const tabExists$: (tabId: number) => Observable<boolean> =
   (tabId: number) => bindCallback(chrome.tabs.get)(tabId).pipe(
-    map((tab: Tab) => !chrome.runtime.lastError && tab !== undefined)
+    map((tab: Tab) => !chrome.runtime.lastError && tab !== undefined),
   );
 
 export const ScPageObservables = {
   goToSoundCloudPage$(): Observable<number> {
     return merge(initialNavigationToScPage$, navigateBetweenScPages$)
       .pipe(concatFilter(tabExists$));
-  }
+  },
 };

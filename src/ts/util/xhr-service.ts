@@ -9,7 +9,7 @@ export const XhrService = {
   },
   getJSON$<T>(url: string): Observable<T> {
     return getResponse$<T>('json', url);
-  }
+  },
 };
 
 function getResponse$<T>(responseType: XMLHttpRequestResponseType, url: string): Observable<T> {

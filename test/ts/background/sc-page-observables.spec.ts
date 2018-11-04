@@ -32,7 +32,7 @@ describe('sc page visited observables', () => {
   const invalidScUrls = [
     'https://not.soundcloud.com/',
     'https://soundcloud.org/',
-    'https://soundcloud.com.abc/'
+    'https://soundcloud.com.abc/',
   ];
 
   let stubOnCompleted: SinonStub;

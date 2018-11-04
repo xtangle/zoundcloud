@@ -16,7 +16,7 @@ describe('id3 metadata service', () => {
   const fixture = ID3MetadataService;
   const downloadInfo = {
     downloadOptions: {url: 'download-options-url'},
-    trackInfo: {title: 'track-title'}
+    trackInfo: {title: 'track-title'},
   } as ITrackDownloadInfo;
   const writer = {foo: 'bar'} as IID3Writer;
   const metadataAddedURL = 'url-with-metadata-added';
@@ -75,7 +75,7 @@ describe('id3 metadata service', () => {
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'WOAS', metadata.audio_source_url);
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'COMM', {
         description: 'Soundcloud description',
-        text: metadata.description
+        text: metadata.description,
       });
       expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
     });
@@ -86,7 +86,7 @@ describe('id3 metadata service', () => {
 
       expect(stubSetFrame).to.have.been.calledWithExactly(writer, 'COMM', {
         description: 'Soundcloud description',
-        text: ''
+        text: '',
       });
       expect(stubAddTag).to.have.been.calledWith(writer).calledAfter(stubSetFrame);
     });
@@ -134,7 +134,7 @@ describe('id3 metadata service', () => {
           data: coverArtData,
           description: `Soundcloud artwork. Source: ${metadata.cover_url}`,
           type: 3,
-          useUnicodeEncoding: false
+          useUnicodeEncoding: false,
         };
         stubGetArrayBuffer$.withArgs(metadata.cover_url).returns(of(coverArtData));
       });
@@ -186,8 +186,8 @@ describe('id3 metadata service', () => {
       ...downloadInfo,
       downloadOptions: {
         ...downloadInfo.downloadOptions,
-        url
-      }
+        url,
+      },
     };
     expect(rx.next).to.have.been.calledOnceWithExactly(expectedDownloadInfo);
     expect(rx.error).to.not.have.been.called;
@@ -208,7 +208,7 @@ describe('id3 metadata service', () => {
       release_month: 4,
       release_year: 2008,
       title: 'some-title',
-      ...overrides
+      ...overrides,
     };
   }
 });

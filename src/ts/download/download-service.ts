@@ -7,7 +7,7 @@ import {
   IResourceInfo,
   ITrackInfo,
   IUserInfo,
-  ResourceType
+  ResourceType,
 } from 'src/ts/download/resource/resource-info';
 import {ResourceInfoService} from 'src/ts/download/resource/resource-info-service';
 import {TrackDownloadService} from 'src/ts/download/track-download-service';
@@ -21,10 +21,10 @@ export const DownloadService = {
       .pipe(timeout(30000))
       .subscribe(
         doDownload.bind(null, downloadResult$, resourceInfoUrl),
-        onError.bind(null, downloadResult$, resourceInfoUrl)
+        onError.bind(null, downloadResult$, resourceInfoUrl),
       );
     return downloadResult$.asObservable();
-  }
+  },
 };
 
 function doDownload(downloadResult$: AsyncSubject<IDownloadResult>,

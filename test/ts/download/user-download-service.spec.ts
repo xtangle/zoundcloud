@@ -19,7 +19,7 @@ describe('user download service', () => {
   const userInfo: IUserInfo = {
     kind: ResourceType.User,
     permalink_url: 'permalinkUrl',
-    username: 'some?username/with*special<characters'
+    username: 'some?username/with*special<characters',
   };
   const expectedTrackListInfoUrl = `${userInfo.permalink_url}/tracks`;
   const trackOneDlResult = {trackInfo: trackOneInfo} as ITrackDownloadResult;
@@ -67,7 +67,7 @@ describe('user download service', () => {
       expect(rx.next).to.have.been.calledOnceWithExactly({
         kind: ResourceType.User,
         tracks: [trackOneDlResult, trackTwoDlResult],
-        userInfo
+        userInfo,
       });
       expect(rx.complete).to.have.been.called;
     });

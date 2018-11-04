@@ -8,5 +8,5 @@
 export const UrlService = {
   getCurrentUrl(): string {
     return document.location.href;
-  }
+  },
 };

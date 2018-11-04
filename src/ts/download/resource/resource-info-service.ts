@@ -12,7 +12,7 @@ export const ResourceInfoService = {
   },
   getTrackInfoList$(url: string): Observable<ITrackInfo[]> {
     return getResource$<ITrackInfo[]>(url);
-  }
+  },
 };
 
 function getResource$<T>(url: string): Observable<T> {

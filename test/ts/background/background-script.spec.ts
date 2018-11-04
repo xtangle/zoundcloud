@@ -98,8 +98,8 @@ describe('background script', () => {
     it('should send a reload message when a request reload content page message is received', () => {
       const handlerArgs = {
         sender: {
-          tab: {id: 123}
-        }
+          tab: {id: 123},
+        },
       } as IMessageHandlerArgs<RequestContentPageReloadMessage>;
       stubOnMessage$.withArgs(RequestContentPageReloadMessage.TYPE).returns(of(handlerArgs));
       fixture.run();
@@ -128,8 +128,8 @@ describe('background script', () => {
     it('should download when a request download message is received', () => {
       const handlerArgs = {
         message: {
-          resourceInfoUrl: 'some-url'
-        }
+          resourceInfoUrl: 'some-url',
+        },
       } as IMessageHandlerArgs<RequestDownloadMessage>;
       stubOnMessage$.withArgs(RequestDownloadMessage.TYPE).returns(of(handlerArgs));
       fixture.run();
@@ -158,11 +158,11 @@ describe('background script', () => {
       const handlerArgs = {
         message: {
           message: 'some-message',
-          optionalParams: [1, 2]
+          optionalParams: [1, 2],
         },
         sender: {
-          tab: {id: 123}
-        }
+          tab: {id: 123},
+        },
       } as IMessageHandlerArgs<LogToConsoleMessage>;
       stubOnMessage$.withArgs(LogToConsoleMessage.TYPE).returns(of(handlerArgs));
       fixture.run();

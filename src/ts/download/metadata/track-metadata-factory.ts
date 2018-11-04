@@ -16,7 +16,7 @@ export const TrackMetadataFactory = {
       release_day: trackInfo.release_day,
       release_month: trackInfo.release_month,
       release_year: trackInfo.release_year,
-      title: (titleParts.length > 1) ? titleParts.slice(1).join(' - ') : trackInfo.title
+      title: (titleParts.length > 1) ? titleParts.slice(1).join(' - ') : trackInfo.title,
     };
-  }
+  },
 };

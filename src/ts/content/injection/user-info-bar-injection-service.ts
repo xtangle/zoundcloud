@@ -14,7 +14,7 @@ export const UserInfoBarInjectionService = {
     InjectionSignalFactory.create$(selector)
       .pipe(takeUntil(onUnload$))
       .subscribe(addToUserInfoBar.bind(null, onUnload$));
-  }
+  },
 };
 
 function createDownloadButton(onUnload$: Observable<any>): JQuery<HTMLElement> {

@@ -22,11 +22,11 @@ describe(`track download service`, () => {
   const downloadLocation = 'download-location';
   const downloadInfo = {
     downloadOptions: {url: 'original-url'} as DownloadOptions,
-    trackInfo
+    trackInfo,
   } as ITrackDownloadInfo;
   const downloadInfoWithMetadata = {
     downloadOptions: {url: 'updated-options-url'} as DownloadOptions,
-    trackInfo
+    trackInfo,
   } as ITrackDownloadInfo;
 
   let stubGetOptions$: SinonStub;

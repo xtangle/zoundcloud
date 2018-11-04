@@ -31,7 +31,7 @@ export const Bootstrapper = {
         .subscribe(() => contentPage.unload());
       addIdTagToDOM(idTag);
     }
-  }
+  },
 };
 
 function idTagIsInDOM(): boolean {

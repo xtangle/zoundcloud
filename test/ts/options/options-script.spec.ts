@@ -1,6 +1,7 @@
 import * as $ from 'jquery';
-import {clock, restore, useFakeTimers} from 'sinon';
-import {defaultOptions, IOptions} from 'src/ts/options/option';
+import {clock, match, restore, useFakeTimers} from 'sinon';
+import {defaultOptions} from 'src/ts/options/default-options';
+import {IOptions} from 'src/ts/options/option';
 import {OptionsScript} from 'src/ts/options/options-script';
 import {configureChai, useSinonChrome} from 'test/ts/test-initializers';
 
@@ -13,18 +14,21 @@ describe('options script', () => {
   let fixture: OptionsScript;
 
   // values should differ from default options
-  const mockOptions: IOptions = {
+  const mockOptions: IOptions = Object.freeze({
     addMetadata: false,
     alwaysDownloadMp3: true,
-    cleanTrackTitle: false,
-    overwriteExistingFiles: true
-  };
+    cleanTrackTitle: {
+      enabled: false,
+      pattern: 'abcdefg',
+    },
+    overwriteExistingFiles: true,
+  });
 
   beforeEach(() => {
     useFakeTimers();
 
     document.body.innerHTML = optionsHTML;
-    sinonChrome.storage.sync.get.yields(defaultOptions);
+    sinonChrome.storage.sync.get.withArgs(defaultOptions, match.any).yields(defaultOptions);
     fixture = new OptionsScript();
   });
 
@@ -35,22 +39,35 @@ describe('options script', () => {
   context('when script is run', () => {
     it('should restore to the default options if there were no saved options', () => {
       fixture.run();
-      verifyHTMLState({
-        addMetadata: true,
-        alwaysDownloadMp3: true,
-        cleanTrackTitle: true,
-        overwriteExistingFiles: false
-      });
+      verifyHTMLState(defaultOptions);
     });
 
     it('should restore options from Chrome storage if there were saved options', () => {
-      sinonChrome.storage.sync.get.yields(mockOptions);
+      sinonChrome.storage.sync.get.withArgs(defaultOptions, match.any).yields(mockOptions);
       fixture.run();
       verifyHTMLState(mockOptions);
     });
   });
 
-  context('when save button is clicked', () => {
+  context('when the clean title option checkbox is clicked', () => {
+    beforeEach(() => {
+      fixture.run();
+    });
+
+    it('should enable the clean title pattern input when checkbox is checked', () => {
+      setHTMLState({...mockOptions, cleanTrackTitle: {enabled: false, pattern: ''}});
+      $('#clean-title-option').trigger('click');
+      expect($('#clean-title-pattern')).to.have.$prop('disabled', false);
+    });
+
+    it('should disable the clean title pattern input when checkbox is unchecked', () => {
+      setHTMLState({...mockOptions, cleanTrackTitle: {enabled: true, pattern: ''}});
+      $('#clean-title-option').trigger('click');
+      expect($('#clean-title-pattern')).to.have.$prop('disabled', true);
+    });
+  });
+
+  context('when the save button is clicked', () => {
     beforeEach(() => {
       fixture.run();
     });
@@ -66,24 +83,15 @@ describe('options script', () => {
     });
   });
 
-  context('when reset button is clicked', () => {
+  context('when the reset button is clicked', () => {
     beforeEach(() => {
       fixture.run();
       setHTMLState(mockOptions);
     });
 
-    it('should save default options to Chrome storage', () => {
-      $('#reset-btn').trigger('click');
-      expect(sinonChrome.storage.sync.set).to.have.been.calledOnceWithExactly(defaultOptions);
-    });
-
     it('should set options on the page to reflect the default options', () => {
-      $('#reset-btn').trigger('click');
+      $('#defaults-btn').trigger('click');
       verifyHTMLState(defaultOptions);
-    });
-
-    it('should show the confirmation message', () => {
-      testConfirmMsgWhenBtnIsClicked($('#reset-btn'));
     });
   });
 
@@ -99,14 +107,18 @@ describe('options script', () => {
   function setHTMLState(options: IOptions) {
     $('#add-metadata-option').prop('checked', options.addMetadata);
     $('#always-mp3-option').prop('checked', options.alwaysDownloadMp3);
-    $('#clean-title-option').prop('checked', options.cleanTrackTitle);
+    $('#clean-title-option').prop('checked', options.cleanTrackTitle.enabled);
+    const cleanTitlePattern = $('#clean-title-pattern');
+    cleanTitlePattern.val(options.cleanTrackTitle.pattern);
+    cleanTitlePattern.prop('disabled', !options.cleanTrackTitle.enabled);
     $('#overwrite-option').prop('checked', options.overwriteExistingFiles);
   }
 
   function verifyHTMLState(options: IOptions) {
     expect($('#add-metadata-option')).to.have.$prop('checked', options.addMetadata);
     expect($('#always-mp3-option')).to.have.$prop('checked', options.alwaysDownloadMp3);
-    expect($('#clean-title-option')).to.have.$prop('checked', options.cleanTrackTitle);
+    expect($('#clean-title-option')).to.have.$prop('checked', options.cleanTrackTitle.enabled);
+    expect($('#clean-title-pattern')).to.have.$val(options.cleanTrackTitle.pattern);
     expect($('#overwrite-option')).to.have.$prop('checked', options.overwriteExistingFiles);
   }
 });

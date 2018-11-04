@@ -9,14 +9,14 @@ export const PlaylistDownloadService = {
     const downloadLocation = getDownloadLocation(playlistInfo);
     logger.debug(`Downloading playlist to '${downloadLocation}'`, playlistInfo);
     const tracks = playlistInfo.tracks.map(
-      (trackInfo: ITrackInfo) => TrackDownloadService.download(trackInfo, downloadLocation)
+      (trackInfo: ITrackInfo) => TrackDownloadService.download(trackInfo, downloadLocation),
     );
     return {
       kind: ResourceType.Playlist,
       playlistInfo,
-      tracks
+      tracks,
     };
-  }
+  },
 };
 
 function getDownloadLocation(playlistInfo: IPlaylistInfo): string {

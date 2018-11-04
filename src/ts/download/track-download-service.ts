@@ -16,25 +16,25 @@ export const TrackDownloadService = {
     TrackDownloadInfoFactory.create$(trackInfo, downloadLocation).pipe(
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Downloading track', downloadInfo)),
       flatMap(addMetadataIfEnabled$),
-      timeout(1800000)
+      timeout(1800000),
     ).subscribe(
       downloadTrack.bind(null, downloadMetadata$),
       onError.bind(null, downloadMetadata$, trackInfo),
-      () => logger.debug('Track download info stream completed', trackInfo)
+      () => logger.debug('Track download info stream completed', trackInfo),
     );
     return {
       kind: ResourceType.Track,
       metadata$: downloadMetadata$.asObservable(),
-      trackInfo
+      trackInfo,
     };
-  }
+  },
 };
 
 function addMetadataIfEnabled$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
   return OptionsObservables.getOptions$().pipe(
     flatMap((options: IOptions) =>
-      options.addMetadata ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo)
-    )
+      options.addMetadata ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo),
+    ),
   );
 }
 
@@ -43,7 +43,7 @@ function downloadTrack(downloadMetadata$: AsyncSubject<ITrackDownloadMetadata>, 
     if (downloadId !== undefined) {
       downloadMetadata$.next({
         downloadId,
-        downloadInfo
+        downloadInfo,
       });
       downloadMetadata$.complete();
     } else {

@@ -48,7 +48,7 @@ export function useRxTesting(): IRxTestingWrapper {
     next: sandbox.spy(),
     subscribeTo<T>(observable: Observable<T>) {
       subscription = observable.subscribe(this);
-    }
+    },
   };
 
   afterEach('reset callbacks and unsubscribe', () => {

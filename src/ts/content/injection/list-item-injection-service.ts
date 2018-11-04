@@ -11,7 +11,7 @@ export const ListItemInjectionService = {
     InjectionSignalFactory.create$(selector)
       .pipe(takeUntil(onUnload$))
       .subscribe(addToListItem.bind(null, onUnload$));
-  }
+  },
 };
 
 function createDownloadButton(onUnload$: Observable<any>, downloadInfoUrl: string): JQuery<HTMLElement> {

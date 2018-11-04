@@ -14,14 +14,14 @@ export const TrackDownloadInfoFactory = {
   create$(trackInfo: ITrackInfo, downloadLocation: string): Observable<ITrackDownloadInfo> {
     return combineLatest(
       TrackDownloadMethodService.getDownloadMethodInfo$(trackInfo),
-      OptionsObservables.getOptions$()
+      OptionsObservables.getOptions$(),
     ).pipe(
       map(([downloadMethodInfo, options]) => {
-        trackInfo = options.cleanTrackTitle ? cleanTrackTitle(trackInfo) : trackInfo;
+        trackInfo = cleanTrackTitleIfEnabled(trackInfo, options);
         return toDownloadInfo(trackInfo, downloadMethodInfo, downloadLocation, options);
-      })
+      }),
     );
-  }
+  },
 };
 
 function toDownloadInfo(trackInfo: ITrackInfo,
@@ -33,15 +33,20 @@ function toDownloadInfo(trackInfo: ITrackInfo,
     downloadMethod: downloadMethodInfo.downloadMethod,
     downloadOptions: getDownloadOptions(filePath, downloadMethodInfo.url, options),
     originalUrl: downloadMethodInfo.url,
-    trackInfo
+    trackInfo,
   };
 }
 
-function cleanTrackTitle(trackInfo: ITrackInfo): ITrackInfo {
-  const freeDlRegex = /[-_|/*!\s]*[\[(\s]*(buy\s?=\s?)?free[\s_]?(download|dl).*$/i;
+function cleanTrackTitleIfEnabled(trackInfo: ITrackInfo, options: IOptions): ITrackInfo {
+  if (!options.cleanTrackTitle.enabled) {
+    return trackInfo;
+  }
+  const regex = new RegExp(options.cleanTrackTitle.pattern, 'i');
+  const cleanedTitle = trackInfo.title.replace(regex, '').trim();
   return {
     ...trackInfo,
-    title: trackInfo.title.replace(freeDlRegex, '')
+    // Don't use cleaned title if the pattern matched the entire title
+    title: cleanedTitle === '' ? trackInfo.title : cleanedTitle,
   };
 }
 
@@ -56,6 +61,6 @@ function getDownloadOptions(filePath: string, url: string, options: IOptions): D
     conflictAction: options.overwriteExistingFiles ? 'overwrite' : 'uniquify',
     filename: filePath,
     saveAs: false,
-    url
+    url,
   };
 }

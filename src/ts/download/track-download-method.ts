@@ -1,7 +1,7 @@
 export enum TrackDownloadMethod {
   DownloadUrlMethod,
   StreamUrlMethod,
-  I1ApiMethod
+  I1ApiMethod,
 }
 
 export interface ITrackDownloadMethodInfo {

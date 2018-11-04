@@ -16,7 +16,7 @@ export function elementRemoved$(elem: Node): Observable<any> {
       observeAllNodes(mutationObserver);
       return mutationObserver;
     },
-    () => mutationObserver.disconnect()
+    () => mutationObserver.disconnect(),
   );
 }
 
@@ -37,7 +37,7 @@ export function elementAdded$(test: (node: Node) => boolean): Observable<Node> {
       observeAllNodes(mutationObserver);
       return mutationObserver;
     },
-    () => mutationObserver.disconnect()
+    () => mutationObserver.disconnect(),
   );
 }
 
@@ -54,13 +54,13 @@ export function elementExist$(selector: string): Observable<Node> {
 export function elementExistOrAdded$(selector: string): Observable<Node> {
   return merge(
     elementExist$(selector),
-    elementAdded$((node: Node) => $(node).is(selector))
+    elementAdded$((node: Node) => $(node).is(selector)),
   );
 }
 
 function observeAllNodes(mutationObserver: MutationObserver) {
   mutationObserver.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 }

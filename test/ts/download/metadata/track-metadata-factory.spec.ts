@@ -9,12 +9,12 @@ describe('track metadata factory', () => {
     it('should parse the artist and title from the track title ' +
       'and convert all other fields correctly', () => {
       const trackInfo = createTrackInfo({
-        title: 'a track-artist - a song-title - separated by a dash and spaces'
+        title: 'a track-artist - a song-title - separated by a dash and spaces',
       });
       const actual = fixture.create(trackInfo);
       const expected = createExpectedMetadata({
         albumArtist: 'a track-artist',
-        title: 'a song-title - separated by a dash and spaces'
+        title: 'a song-title - separated by a dash and spaces',
       });
       expect(actual).to.deep.include(expected);
     });
@@ -50,9 +50,9 @@ describe('track metadata factory', () => {
       user: {
         kind: ResourceType.User,
         permalink_url: 'user-permalink-url',
-        username: 'user-username'
+        username: 'user-username',
       },
-      ...overrides
+      ...overrides,
     };
   }
 
@@ -71,7 +71,7 @@ describe('track metadata factory', () => {
       release_month: trackInfo.release_month,
       release_year: trackInfo.release_year,
       title: trackInfo.title,
-      ...overrides
+      ...overrides,
     };
   }
 });

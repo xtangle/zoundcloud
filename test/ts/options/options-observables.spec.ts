@@ -1,5 +1,5 @@
 import {match, restore} from 'sinon';
-import {defaultOptions} from 'src/ts/options/option';
+import {defaultOptions} from 'src/ts/options/default-options';
 import {OptionsObservables} from 'src/ts/options/options-observables';
 import {configureChai, useRxTesting, useSinonChrome} from 'test/ts/test-initializers';
 

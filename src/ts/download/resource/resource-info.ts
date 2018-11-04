@@ -1,7 +1,7 @@
 export enum ResourceType {
   Track = 'track',
   Playlist = 'playlist',
-  User = 'user'
+  User = 'user',
 }
 
 export interface IResourceInfo {

@@ -8,5 +8,5 @@ export const InjectionService = {
     ListenEngagementInjectionService.injectDownloadButtons(onUnload$);
     ListItemInjectionService.injectDownloadButtons(onUnload$);
     UserInfoBarInjectionService.injectDownloadButtons(onUnload$);
-  }
+  },
 };
