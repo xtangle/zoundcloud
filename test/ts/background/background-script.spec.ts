@@ -50,7 +50,6 @@ describe('background script', () => {
       expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
       expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(123, {file: 'vendor.js'});
       expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(123, {file: 'content.js'});
-      expect(sinonChrome.pageAction.show).to.have.been.calledWithExactly(123);
     });
 
     it('should not run when not visiting a SoundCloud page', () => {
@@ -70,6 +69,28 @@ describe('background script', () => {
       expect(sinonChrome.tabs.insertCSS).to.not.have.been.called;
       expect(sinonChrome.tabs.executeScript).to.not.have.been.called;
       expect(sinonChrome.pageAction.show).to.not.have.been.called;
+    });
+  });
+
+  context('page actions', () => {
+    beforeEach(() => {
+      stubScPageVisited$.returns(of(123));
+    });
+
+    it('should show page action and add on click listener to load options page when run', () => {
+      fixture.run();
+
+      expect(sinonChrome.pageAction.show).to.have.been.calledWithExactly(123);
+      sinonChrome.pageAction.onClicked.trigger();
+      expect(sinonChrome.runtime.openOptionsPage).to.have.been.calledOnce;
+    });
+
+    it('show register the on click listener to load options page only once', () => {
+      fixture.run();
+      fixture.run();
+
+      sinonChrome.pageAction.onClicked.trigger();
+      expect(sinonChrome.runtime.openOptionsPage).to.have.been.calledOnce;
     });
   });
 

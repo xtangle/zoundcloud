@@ -4,6 +4,7 @@ import {CLIENT_ID, I1_CLIENT_ID, SC_I1_API_URL} from 'src/ts/constants';
 import {ITrackInfo} from 'src/ts/download/resource/resource-info';
 import {TrackDownloadMethod} from 'src/ts/download/track-download-method';
 import {TrackDownloadMethodService} from 'src/ts/download/track-download-method-service';
+import {OptionsObservables} from 'src/ts/options/options-observables';
 import {XhrService} from 'src/ts/util/xhr-service';
 import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
@@ -13,10 +14,14 @@ describe('track download method service', () => {
   const rx = useRxTesting();
 
   const fixture = TrackDownloadMethodService;
+  let stubGetOptions$: SinonStub;
   let stubPing$: SinonStub;
   let stubGetJSON$: SinonStub;
 
   beforeEach(() => {
+    stubGetOptions$ = stub(OptionsObservables, 'getOptions$');
+    stubGetOptions$.returns(of({alwaysDownloadMp3: false}));
+
     stubPing$ = stub(XhrService, 'ping$');
     stubPing$.returns(of(200));
 
@@ -39,10 +44,29 @@ describe('track download method service', () => {
       } as ITrackInfo;
     });
 
-    it('should use the download url method if track is downloadable and has a working download url', () => {
-      rx.subscribeTo(fixture.getDownloadMethodInfo$(trackInfo));
-      expect(rx.next).to.have.been.calledOnce.calledWithMatch(usedDownloadUrlMethod());
-      expect(rx.complete).to.have.been.called;
+    context('when the track is downloadable and has a working download url', () => {
+      it('should use the download url method if always download mp3 option is disabled', () => {
+        // In test setup, always download mp3 option is disabled
+        rx.subscribeTo(fixture.getDownloadMethodInfo$(trackInfo));
+        expect(rx.next).to.have.been.calledOnce.calledWithMatch(usedDownloadUrlMethod());
+        expect(rx.complete).to.have.been.called;
+      });
+
+      it('should not use the download url method if always download mp3 option is enabled'
+        + ' and original format is not mp3', () => {
+        // In test setup, original format is set to wav (not mp3)
+        stubGetOptions$.returns(of({alwaysDownloadMp3: true}));
+        rx.subscribeTo(fixture.getDownloadMethodInfo$(trackInfo));
+        expect(rx.next).to.not.have.been.calledWithMatch(usedDownloadUrlMethod());
+      });
+
+      it('should use the download url method if always download mp3 option is enabled'
+        + ' and original format is mp3', () => {
+        stubGetOptions$.returns(of({alwaysDownloadMp3: true}));
+        trackInfo = {...trackInfo, original_format: 'mp3'};
+        rx.subscribeTo(fixture.getDownloadMethodInfo$(trackInfo));
+        expect(rx.next).to.have.been.calledOnce.calledWithMatch(usedDownloadUrlMethod());
+      });
     });
 
     it('should not use the download url method if track is not downloadable', () => {

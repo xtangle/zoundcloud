@@ -11,8 +11,9 @@ import {RequestDownloadMessage} from 'src/ts/messaging/page/request-download.mes
 import {logger} from 'src/ts/util/logger';
 import {IRunnable} from 'src/ts/util/runnable';
 
-export class BackgroundScript implements IRunnable {
+const openOptionsPage = () => chrome.runtime.openOptionsPage();
 
+export class BackgroundScript implements IRunnable {
   private onSuspend$: Observable<any> = fromEventPattern<any>(
     (handler: () => void) => chrome.runtime.onSuspend.addListener(handler));
 
@@ -25,7 +26,8 @@ export class BackgroundScript implements IRunnable {
         chrome.tabs.executeScript(tabId, {file: 'content.js'});
 
         chrome.pageAction.show(tabId);
-        chrome.pageAction.onClicked.addListener(() => chrome.runtime.openOptionsPage());
+        chrome.pageAction.onClicked.removeListener(openOptionsPage);
+        chrome.pageAction.onClicked.addListener(openOptionsPage);
       });
 
     ExtensionMessenger.onMessage$(RequestContentPageReloadMessage.TYPE)

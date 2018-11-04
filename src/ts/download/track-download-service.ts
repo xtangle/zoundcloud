@@ -1,10 +1,12 @@
-import {AsyncSubject} from 'rxjs';
-import {flatMap, tap, timeout} from 'rxjs/operators';
+import {AsyncSubject, of} from 'rxjs';
+import {flatMap, tap, timeout, withLatestFrom} from 'rxjs/operators';
 import {ITrackDownloadMetadata, ITrackDownloadResult} from 'src/ts/download/download-result';
 import {MetadataAdapter} from 'src/ts/download/metadata/metadata-adapter';
 import {ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
 import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
 import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
+import {IOptions} from 'src/ts/options/option';
+import {OptionsObservables} from 'src/ts/options/options-observables';
 import {logger} from 'src/ts/util/logger';
 import * as VError from 'verror';
 
@@ -13,8 +15,10 @@ export const TrackDownloadService = {
     const downloadMetadata$: AsyncSubject<ITrackDownloadMetadata> = new AsyncSubject();
     TrackDownloadInfoFactory.create$(trackInfo, downloadLocation).pipe(
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Downloading track', downloadInfo)),
-      flatMap(MetadataAdapter.addMetadata$),
-      tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Added metadata', downloadInfo)),
+      withLatestFrom(OptionsObservables.getOptions$()),
+      flatMap(([downloadInfo, options]: [ITrackDownloadInfo, IOptions]) =>
+        options.addMetadata ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo)
+      ),
       timeout(1800000)
     ).subscribe(
       downloadTrack.bind(null, downloadMetadata$),

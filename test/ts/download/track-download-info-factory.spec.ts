@@ -6,8 +6,8 @@ import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
 import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
 import {ITrackDownloadMethodInfo, TrackDownloadMethod} from 'src/ts/download/track-download-method';
 import {TrackDownloadMethodService} from 'src/ts/download/track-download-method-service';
+import {OptionsObservables} from 'src/ts/options/options-observables';
 import {configureChai, useRxTesting} from 'test/ts/test-initializers';
-import DownloadOptions = chrome.downloads.DownloadOptions;
 
 const forEach = require('mocha-each');
 const expect = configureChai();
@@ -24,9 +24,14 @@ describe('track download info factory', () => {
     url: 'download-url'
   };
 
+  let stubGetOptions$: SinonStub;
   let stubGetDownloadMethodInfo$: SinonStub;
+  const options = {cleanTrackTitle: true, overwriteExistingFiles: false};
 
   beforeEach(() => {
+    stubGetOptions$ = stub(OptionsObservables, 'getOptions$');
+    stubGetOptions$.returns(of(options));
+
     stubGetDownloadMethodInfo$ = stub(TrackDownloadMethodService, 'getDownloadMethodInfo$');
     stubGetDownloadMethodInfo$.withArgs(trackInfo).returns(of(downloadMethodInfo));
   });
@@ -61,21 +66,19 @@ describe('track download info factory', () => {
 
   context('cleaning the track info', () => {
     const titleSuffixes = [
-      ' - FREE DOWNLOAD',
-      '|[FREE DOWNLOAD]',
-      '** FREE DOWNLOAD **',
-      ' // FREE DOWNLOAD!!! //',
-      ' * FREE DOWNLOAD !!!',
-      '_Free Download',
-      ' (Free Download)',
-      ' free download',
+      ' - FREE DOWNLOAD [link in description]',
+      '|[FREE Download]',
+      '*** FREE DOWNLOAD ***',
+      ' // FREE_DL - Link In Description!!! //',
+      '_Free_Download',
+      '  (Free Download)',
       ' [Buy = Free Download]',
       '*BUY=FREE DOWNLOAD*',
       ' BUY= Free Download',
       '| free dl',
-      ' FREE_DL'
     ];
 
+    // In test setup, clean track title option is enabled
     forEach(titleSuffixes)
       .it(`should remove '%s' from the end of the song title`, (suffix: string) => {
         const newTrackInfo = {...trackInfo, title: `${trackInfo.title}${suffix}`};
@@ -85,32 +88,56 @@ describe('track download info factory', () => {
         expect(actual.trackInfo.title).to.be.equal(trackInfo.title);
         expect(actual.downloadOptions.filename).not.to.contain(suffix);
       });
+
+    it('should not clean the track info when clean track title option is disabled', () => {
+      stubGetOptions$.returns(of({...options, cleanTrackTitle: false}));
+      stubGetDownloadMethodInfo$.returns(of(downloadMethodInfo));
+
+      const titleWithSuffix = trackInfo.title + titleSuffixes[0];
+      const newTrackInfo = {...trackInfo, title: titleWithSuffix};
+      rx.subscribeTo(fixture.create$(newTrackInfo, downloadLocation));
+      const actual: ITrackDownloadInfo = rx.next.firstCall.args[0];
+
+      expect(actual.trackInfo.title).to.be.equal(titleWithSuffix);
+      expect(actual.downloadOptions.filename).to.contain(titleSuffixes[0]);
+    });
   });
 
   context('the download options', () => {
-    let actual: DownloadOptions;
-
-    beforeEach(() => {
-      rx.subscribeTo(fixture.create$(trackInfo, downloadLocation));
-      actual = rx.next.firstCall.args[0].downloadOptions;
-    });
-
     it('should set the correct filepath with special characters removed', () => {
+      const actual = getDownloadOptions();
       const expectedPath = path.join('download_location_with_special_characters',
         'track_title_with_special_characters.wav');
       expect(actual.filename).to.be.equal(expectedPath);
     });
 
     it('should not ask the user where to download', () => {
+      const actual = getDownloadOptions();
       expect(actual.saveAs).to.be.false;
     });
 
-    it('should not overwrite an existing file with the same filename', () => {
+    it('should not overwrite an existing file with the same file name'
+      + ' if overwrite existing files option is disabled', () => {
+      // In test setup, overwrite existing files option is disabled
+      const actual = getDownloadOptions();
       expect(actual.conflictAction).to.be.equal('uniquify');
     });
 
+    it('should overwrite an existing file with the same file name'
+      + ' if overwrite existing files option is enabled', () => {
+      stubGetOptions$.returns(of({...options, overwriteExistingFiles: true}));
+      const actual = getDownloadOptions();
+      expect(actual.conflictAction).to.be.equal('overwrite');
+    });
+
     it('should use the correct download url', () => {
+      const actual = getDownloadOptions();
       expect(actual.url).to.be.equal(downloadMethodInfo.url);
     });
+
+    function getDownloadOptions() {
+      rx.subscribeTo(fixture.create$(trackInfo, downloadLocation));
+      return rx.next.firstCall.args[0].downloadOptions;
+    }
   });
 });

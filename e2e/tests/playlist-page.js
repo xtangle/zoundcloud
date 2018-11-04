@@ -24,10 +24,10 @@ module.exports = {
 
   'Downloads all tracks in the playlist when clicked': function (browser) {
     const playlistDir = path.join(browser.globals.downloadDir, 'xtangle - test playlist');
-    // track 1: uses the download_url method, does not have a .mp3 file extension,
-    // has cover art but won't get added as it's not an mp3 file,
-    // original track title has '__FREE DOWNLOAD__' as suffix which should be removed
-    const track1Path = path.join(playlistDir, 'Rather Be (Marimba Remix).m4a');
+    // track 1: uses the download_url method, does not have a .mp3 file extension
+    // (but should download in mp3 format anyways because of 'always download mp3' option enabled by default),
+    // has cover art, and original track title has '__FREE DOWNLOAD__' as a suffix which should be removed
+    const track1Path = path.join(playlistDir, 'Rather Be (Marimba Remix).mp3');
     // track 2: uses the stream_url method, does not have cover art
     const track2Path = path.join(playlistDir, '23. M2U - Blythe.mp3');
     // track 3: uses the a1_api method
@@ -40,7 +40,7 @@ module.exports = {
     browser
       .click(zcBtnSelector)
       .assert.fileDownloaded(track1Path)
-      .verify.fileHasSize(track1Path, 1392074)
+      .verify.fileHasSize(track1Path, 523662)
       .assert.fileDownloaded(track2Path)
       .verify.fileHasSize(track2Path, 2189492)
       .assert.fileDownloaded(track3Path)

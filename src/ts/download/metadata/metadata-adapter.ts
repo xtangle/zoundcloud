@@ -1,9 +1,10 @@
 import {Observable, of} from 'rxjs';
-import {catchError, flatMap, map, timeout} from 'rxjs/operators';
+import {catchError, flatMap, map, tap, timeout} from 'rxjs/operators';
 import {ID3MetadataService} from 'src/ts/download/metadata/id3-metadata-service';
 import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
 import {TrackMetadataFactory} from 'src/ts/download/metadata/track-metadata-factory';
 import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {logger} from 'src/ts/util/logger';
 import {XhrService} from 'src/ts/util/xhr-service';
 
 export const MetadataAdapter = {
@@ -16,7 +17,8 @@ export const MetadataAdapter = {
     switch (fileExtension) {
       case 'mp3':
         return metadata$.pipe(
-          flatMap((metadata: ITrackMetadata) => ID3MetadataService.addID3V2Metadata$(metadata, downloadInfo))
+          flatMap((metadata: ITrackMetadata) => ID3MetadataService.addID3V2Metadata$(metadata, downloadInfo)),
+          tap((info: ITrackDownloadInfo) => logger.debug('Added mp3 metadata', info))
         );
       default:
         return of(downloadInfo);

@@ -6,6 +6,7 @@ import {ITrackInfo, ResourceType} from 'src/ts/download/resource/resource-info';
 import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
 import {TrackDownloadInfoFactory} from 'src/ts/download/track-download-info-factory';
 import {TrackDownloadService} from 'src/ts/download/track-download-service';
+import {OptionsObservables} from 'src/ts/options/options-observables';
 import {matchesCause, matchesError} from 'test/ts/sinon-matchers';
 import {configureChai, useRxTesting, useSinonChrome} from 'test/ts/test-initializers';
 import DownloadOptions = chrome.downloads.DownloadOptions;
@@ -19,12 +20,16 @@ describe(`track download service`, () => {
   const fixture = TrackDownloadService;
   const trackInfo = {title: 'some-song'} as ITrackInfo;
   const downloadLocation = 'download-location';
-  const inputDownloadInfo = {trackInfo} as ITrackDownloadInfo;
   const downloadInfo = {
-    downloadOptions: {url: 'download-options-url'} as DownloadOptions,
+    downloadOptions: {url: 'original-url'} as DownloadOptions,
+    trackInfo
+  } as ITrackDownloadInfo;
+  const downloadInfoWithMetadata = {
+    downloadOptions: {url: 'updated-options-url'} as DownloadOptions,
     trackInfo
   } as ITrackDownloadInfo;
 
+  let stubGetOptions$: SinonStub;
   let stubCreateDownloadInfo$: SinonStub;
   let stubAddMetadata$: SinonStub;
   let stubRevokeObjectURL: SinonSpy;
@@ -32,11 +37,14 @@ describe(`track download service`, () => {
   beforeEach(() => {
     useFakeTimers();
 
+    stubGetOptions$ = stub(OptionsObservables, 'getOptions$');
+    stubGetOptions$.returns(of({addMetadata: true}));
+
     stubCreateDownloadInfo$ = stub(TrackDownloadInfoFactory, 'create$');
-    stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(inputDownloadInfo));
+    stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(downloadInfo));
 
     stubAddMetadata$ = stub(MetadataAdapter, 'addMetadata$');
-    stubAddMetadata$.withArgs(inputDownloadInfo).returns(of(downloadInfo));
+    stubAddMetadata$.withArgs(downloadInfo).returns(of(downloadInfoWithMetadata));
 
     stubRevokeObjectURL = spy(URL, 'revokeObjectURL');
     sinonChrome.downloads.download.yields(123);
@@ -47,9 +55,20 @@ describe(`track download service`, () => {
   });
 
   describe(`downloading a track`, () => {
-    it('should download the track using the download options', () => {
+    it('should download the track and add track metadata when add metadata option is enabled', () => {
+      // In test setup, add metadata option is enabled
       fixture.download(trackInfo, downloadLocation);
 
+      expect(stubAddMetadata$).to.have.been.calledOnceWithExactly(downloadInfo);
+      expect(sinonChrome.downloads.download).to.have.been.calledOnce
+        .calledWithExactly(downloadInfoWithMetadata.downloadOptions, match.any);
+    });
+
+    it('should download the track and not add track metadata when add metadata option is disabled', () => {
+      stubGetOptions$.returns(of({addMetadata: false}));
+      fixture.download(trackInfo, downloadLocation);
+
+      expect(stubAddMetadata$).not.to.have.been.called;
       expect(sinonChrome.downloads.download).to.have.been.calledOnce
         .calledWithExactly(downloadInfo.downloadOptions, match.any);
     });
@@ -58,12 +77,12 @@ describe(`track download service`, () => {
       fixture.download(trackInfo, downloadLocation);
 
       expect(stubRevokeObjectURL).to.have.been.calledOnce
-        .calledWithExactly(downloadInfo.downloadOptions.url)
+        .calledWithExactly(downloadInfoWithMetadata.downloadOptions.url)
         .calledAfter(sinonChrome.downloads.download);
     });
 
     it('should download with a default download location of empty (current directory)', () => {
-      stubCreateDownloadInfo$.withArgs(trackInfo, '').returns(of(inputDownloadInfo));
+      stubCreateDownloadInfo$.withArgs(trackInfo, '').returns(of(downloadInfo));
       fixture.download(trackInfo);
 
       expect(stubCreateDownloadInfo$).to.have.been.calledOnceWithExactly(trackInfo, '');
@@ -80,7 +99,8 @@ describe(`track download service`, () => {
     it('should return an item in download metadata if download started successfully', () => {
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
 
-      expect(rx.next).to.have.been.calledOnceWithExactly({downloadId: 123, downloadInfo});
+      expect(rx.next).to.have.been
+        .calledOnceWithExactly({downloadId: 123, downloadInfo: downloadInfoWithMetadata});
       expect(rx.complete).to.have.been.called;
     });
 
@@ -104,9 +124,9 @@ describe(`track download service`, () => {
 
     it('should download if fetching download info or metadata takes less than 30 minutes', () => {
       stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation)
-        .returns(timer(900000).pipe(mapTo(inputDownloadInfo)));
-      stubAddMetadata$.withArgs(inputDownloadInfo)
-        .returns(timer(899999).pipe(mapTo(downloadInfo)));
+        .returns(timer(900000).pipe(mapTo(downloadInfo)));
+      stubAddMetadata$.withArgs(downloadInfo)
+        .returns(timer(899999).pipe(mapTo(downloadInfoWithMetadata)));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
       clock.tick(1800000);
 
@@ -117,9 +137,9 @@ describe(`track download service`, () => {
 
     it('should not download and emit error if fetching download method takes 30 minutes or more', () => {
       stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation)
-        .returns(timer(900000).pipe(mapTo(inputDownloadInfo)));
-      stubAddMetadata$.withArgs(inputDownloadInfo)
         .returns(timer(900000).pipe(mapTo(downloadInfo)));
+      stubAddMetadata$.withArgs(downloadInfo)
+        .returns(timer(900000).pipe(mapTo(downloadInfoWithMetadata)));
       rx.subscribeTo(fixture.download(trackInfo, downloadLocation).metadata$);
       clock.tick(1800000);
 
