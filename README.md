@@ -20,28 +20,32 @@ A Google Chrome extension that adds download buttons to SoundCloud web pages.
 This extension will add download buttons to:
 
 * Individual track pages.
-* User pages (will download all of a user's tracks).
-* Playlist pages (will download the playlist).
+* User pages (downloads all of a user's tracks).
+* Playlist pages (downloads the entire playlist).
 * Tracks that are contained in scrollable lists.
 
-When a download is initiated, it attempts to download a track in its uploaded format (i.e. highest quality) and will only
-resort to the streamable 128 kbps mp3 version if no better quality is available.
+When a download is initiated, by default it will download the mp3 version
+of the song with metadata (including cover art) added. It can be configured from the options
+menu to not add metadata or prefer to download songs in its uploaded format if available.
 
-Metadata information and cover art is automatically added to files in .mp3 format (in ID3v2.3).
+Metadata information and cover art is automatically added to files in .mp3 format (as ID3v2 tags).
+The added metadata includes: cover art, title, album artist, genres, duration, release year, bpm, 
+artist url, audio source url, and description.
 
-All tracks will be downloaded to the default Downloads folder:
+All tracks will be downloaded to the user's default Downloads folder:
 
 * Tracks are downloaded with the name `track_title`.
 * Playlists are downloaded to a folder with the name `user_name - playlist_name`.
 * User tracks are downloaded to a folder with the name `user_name`.
 
-If a file with the same name exists, it will not be overwritten.
+If a file with the same name exists, it will not be overwritten. This can be changed from
+the options menu.
 
 Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
 case it is replaced by a dash (-) symbol). 
 
-Most song titles with the text 'Free Download' at the end (or variations thereof such as ' - [Free Download])' should be 
-automatically removed in the downloaded file's name.
+The extension will attempt to remove strings in track titles matching variations of
+'Free Download' or 'Download Link' as the suffix. The regex used for matching is configurable.
 
 ## Installation
 
@@ -59,15 +63,15 @@ automatically removed in the downloaded file's name.
 ### From Source
 
 The extension is created as a Node.js project and does not come pre-packaged. 
-To build, make sure Node.js (version >= 7.6) and yarn is installed.
+To build from source, make sure Node.js (version >= 7.6) and yarn is installed.
 
-- Clone the project to a local directory.
+- Clone the project from GitHub to a local directory.
 - In the project directory, run `yarn install`.
-- Run `yarn run build` or `yarn run build:prod`.
+- Run either `yarn run build` (for extra logging) or `yarn run build:prod` (for production build).
 - Open Google Chrome and navigate to `chrome://extensions`.
 - Click `Load Unpacked` and choose the `dist` folder in this project.
 
 ## Todo
 
-* Make download options configurable through a menu interface.
+* Make downloads cancellable.
 * Some visual indicator to track current download status and previous downloads.

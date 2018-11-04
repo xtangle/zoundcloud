@@ -1,21 +1,34 @@
-Extension that adds download buttons to SoundCloud pages.
+A Google Chrome extension that adds download buttons to SoundCloud web pages.
 
-This extension will add download buttons to track pages, playlists,
-track lists, and user pages (to download all of a user's tracks).
+This extension will add download buttons to:
 
-Track will be downloaded its uploaded format if available. For mp3 files,
-metadata information and cover art is automatically added (in ID3v2.3 format).
+* Individual track pages.
+* User pages (downloads all of a user's tracks).
+* Playlist pages (downloads the entire playlist).
+* Tracks that are contained in scrollable lists.
 
-All tracks will be downloaded to the default Downloads folder:
+When a download is initiated, by default it will download the mp3 version
+of the song with metadata (including cover art) added. It can be configured from the options
+menu to not add metadata or prefer to download songs in its uploaded format if available.
+
+Metadata information and cover art is automatically added to files in .mp3 format (as ID3v2 tags).
+The added metadata includes: cover art, title, album artist, genres, duration, release year, bpm,
+artist url, audio source url, and description.
+
+All tracks will be downloaded to the user's default Downloads folder:
 
 * Tracks are downloaded with the name `track_title`.
 * Playlists are downloaded to a folder with the name `user_name - playlist_name`.
 * User tracks are downloaded to a folder with the name `user_name`.
 
-Any special characters in the name will be replaced by an underscore (unless it's a tilda, in which case it is replaced by a dash (-) symbol). Files with the same name will not be overwritten.
+If a file with the same name exists, it will not be overwritten. This can be changed from
+the options menu.
 
-Most song titles with the text 'Free Download' at the end (or variations thereof such as ' - [Free Download])' should be automatically removed in the downloaded file's name.
+Special characters in the title will be replaced by an underscore (unless it's a tilda, in which
+case it is replaced by a dash (-) symbol).
+
+The extension will attempt to remove strings in track titles matching variations of
+'Free Download' or 'Download Link' as the suffix. The regex used for matching is configurable.
 
 Source code is available on GitHub: https://github.com/xtangle/zoundcloud
-
-Report any bugs or feature suggestions to: jackyxu07@gmail.com
+Report any bugs or feature suggestions to: https://github.com/xtangle/zoundcloud/issues
