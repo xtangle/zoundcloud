@@ -7,7 +7,8 @@ import {InjectionSignalFactory} from 'src/ts/content/injection/injection-signal-
 
 export const ListItemInjectionService = {
   injectDownloadButtons(onUnload$: Observable<any>) {
-    const selector = '.soundList__item, .searchList__item, .trackList__item, .chartTracks__item';
+    const selector = '.soundList__item, .searchList__item, .trackList__item, ' +
+      '.systemPlaylistTrackList__item, .chartTracks__item';
     InjectionSignalFactory.create$(selector)
       .pipe(takeUntil(onUnload$))
       .subscribe(addToListItem.bind(null, onUnload$));
