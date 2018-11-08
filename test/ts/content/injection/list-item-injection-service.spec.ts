@@ -27,8 +27,11 @@ describe('list item injection service', () => {
   const soundListItem = {name: 'sound list item', href: '/sound_list_item_href'} as IListItemTestObj;
   const searchListItem = {name: 'search list item', href: '/search_list_item_href'} as IListItemTestObj;
   const trackListItem = {name: 'track list item', href: '/track_list_item_href'} as IListItemTestObj;
+  const systemPlaylistTrackListItem =
+    {name: 'system playlist track list item', href: '/system_playlist_track_list_item_href'} as IListItemTestObj;
   const chartTracksItem = {name: 'chart tracks item', href: '/chart_tracks_item_href'} as IListItemTestObj;
-  const listItemTestObjs: IListItemTestObj[] = [soundListItem, searchListItem, trackListItem, chartTracksItem];
+  const listItemTestObjs: IListItemTestObj[] =
+    [soundListItem, searchListItem, trackListItem, systemPlaylistTrackListItem, chartTracksItem];
 
   beforeEach(() => {
     onUnload$ = new Subject();
@@ -37,12 +40,14 @@ describe('list item injection service', () => {
         ${getSoundListItemHTML(soundListItem.href)}
         ${getSearchListItemHTML(searchListItem.href)}
         ${getTrackListItemHTML(trackListItem.href)}
+        ${getSystemPlaylistTrackListItemHTML(systemPlaylistTrackListItem.href)}
         ${getChartTracksItemHTML(chartTracksItem.href)}
       </body>
     `;
     soundListItem.item = $('#soundListItemTestId');
     searchListItem.item = $('#searchListItemTestId');
     trackListItem.item = $('#trackListItemTestId');
+    systemPlaylistTrackListItem.item = $('#systemPlaylistTrackListItemTestId');
     chartTracksItem.item = $('#chartTracksItemTestId');
 
     stubCreateInjectionSignal$ = stub(InjectionSignalFactory, 'create$');
@@ -162,6 +167,19 @@ function getSearchListItemHTML(href: string): string {
 function getTrackListItemHTML(href: string): string {
   return `
     <li id="trackListItemTestId" class="trackList__item sc-border-light-bottom">
+      <div class="trackItem__content sc-truncate">
+        <a href="${href}" class="trackItem__trackTitle sc-link-dark sc-font-light"></a>
+      </div>
+      <div class="trackItem__additional">
+        ${getSoundActionsHTML()}
+      </div>
+    </li>
+  `;
+}
+
+function getSystemPlaylistTrackListItemHTML(href: string): string {
+  return `
+    <li id="systemPlaylistTrackListItemTestId" class="systemPlaylistTrackList__item sc-border-light-bottom">
       <div class="trackItem__content sc-truncate">
         <a href="${href}" class="trackItem__trackTitle sc-link-dark sc-font-light"></a>
       </div>
