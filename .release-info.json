@@ -2,7 +2,6 @@
   "dump_configs": ".tmp/configs.json",
   "github": {
     "remote": "https://github.com/xtangle/zoundcloud.git",
-    "token_ref": "GITHUB_TOKEN",
     "run_hooks": false,
     "assets": ".tmp/zoundcloud-*.zip"
   },
@@ -13,8 +12,7 @@
     "pre_release": {
       "command": [
         "yarn build:prod",
-        "rm -rf .tmp",
-        "mkdir .tmp",
+        "rm -f .tmp/*.zip",
         "zip -rj9 .tmp/zoundcloud-v${new_version}.zip dist"
       ]
     }

@@ -11,8 +11,6 @@ import {RequestDownloadMessage} from 'src/ts/messaging/page/request-download.mes
 import {logger} from 'src/ts/util/logger';
 import {IRunnable} from 'src/ts/util/runnable';
 
-const openOptionsPage = () => chrome.runtime.openOptionsPage();
-
 export class BackgroundScript implements IRunnable {
   private onSuspend$: Observable<any> = fromEventPattern<any>(
     (handler: () => void) => chrome.runtime.onSuspend.addListener(handler));
@@ -24,17 +22,14 @@ export class BackgroundScript implements IRunnable {
         chrome.tabs.insertCSS(tabId, {file: 'styles.css'});
         chrome.tabs.executeScript(tabId, {file: 'vendor.js'});
         chrome.tabs.executeScript(tabId, {file: 'content.js'});
-
         chrome.pageAction.show(tabId);
-        chrome.pageAction.onClicked.removeListener(openOptionsPage);
-        chrome.pageAction.onClicked.addListener(openOptionsPage);
       });
 
     ExtensionMessenger.onMessage$(RequestContentPageReloadMessage.TYPE)
       .pipe(takeUntil(this.onSuspend$))
-      .subscribe((args: IMessageHandlerArgs<RequestContentPageReloadMessage>) =>
-        ExtensionMessenger.sendToContentPage$(args.sender.tab.id, new ReloadContentPageMessage()),
-      );
+      .subscribe((args: IMessageHandlerArgs<RequestContentPageReloadMessage>) => {
+        ExtensionMessenger.sendToContentPage$(args.sender.tab.id, new ReloadContentPageMessage());
+      });
 
     ExtensionMessenger.onMessage$(RequestDownloadMessage.TYPE)
       .pipe(takeUntil(this.onSuspend$))
@@ -48,6 +43,8 @@ export class BackgroundScript implements IRunnable {
       .subscribe((args: IMessageHandlerArgs<LogToConsoleMessage>) =>
         logger.log(`${args.message.message} (tabId: ${args.sender.tab.id})`, ...args.message.optionalParams),
       );
+
+    chrome.pageAction.onClicked.addListener(() => chrome.runtime.openOptionsPage());
 
     logger.log('Loaded background script');
   }

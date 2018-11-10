@@ -41,7 +41,16 @@ describe('background script', () => {
     restore();
   });
 
-  context('when to run the content script', () => {
+  context('when the background script is run', () => {
+    it('should open the options page when the page action icon is clicked', () => {
+      fixture.run();
+      expect(sinonChrome.runtime.openOptionsPage).to.not.have.been.called;
+      sinonChrome.pageAction.onClicked.trigger();
+      expect(sinonChrome.runtime.openOptionsPage).to.have.been.calledOnce;
+    });
+  });
+
+  context('running the content script', () => {
     it('should run when visiting a SoundCloud page', () => {
       stubScPageVisited$.returns(of(123));
       fixture.run();
@@ -50,6 +59,7 @@ describe('background script', () => {
       expect(sinonChrome.tabs.executeScript).to.have.been.calledTwice;
       expect(sinonChrome.tabs.executeScript.firstCall).to.have.been.calledWithExactly(123, {file: 'vendor.js'});
       expect(sinonChrome.tabs.executeScript.secondCall).to.have.been.calledWithExactly(123, {file: 'content.js'});
+      expect(sinonChrome.pageAction.show).to.have.been.calledOnce;
     });
 
     it('should not run when not visiting a SoundCloud page', () => {
@@ -72,29 +82,7 @@ describe('background script', () => {
     });
   });
 
-  context('page actions', () => {
-    beforeEach(() => {
-      stubScPageVisited$.returns(of(123));
-    });
-
-    it('should show page action and add on click listener to load options page when run', () => {
-      fixture.run();
-
-      expect(sinonChrome.pageAction.show).to.have.been.calledWithExactly(123);
-      sinonChrome.pageAction.onClicked.trigger();
-      expect(sinonChrome.runtime.openOptionsPage).to.have.been.calledOnce;
-    });
-
-    it('show register the on click listener to load options page only once', () => {
-      fixture.run();
-      fixture.run();
-
-      sinonChrome.pageAction.onClicked.trigger();
-      expect(sinonChrome.runtime.openOptionsPage).to.have.been.calledOnce;
-    });
-  });
-
-  context('when to reload the content page', () => {
+  context('reloading the content page', () => {
     it('should send a reload message when a request reload content page message is received', () => {
       const handlerArgs = {
         sender: {
@@ -124,7 +112,7 @@ describe('background script', () => {
     });
   });
 
-  context('when to download', () => {
+  context('downloading', () => {
     it('should download when a request download message is received', () => {
       const handlerArgs = {
         message: {
@@ -153,7 +141,7 @@ describe('background script', () => {
     });
   });
 
-  context('when to log to the console', () => {
+  context('logging to the console', () => {
     it('should log to console when a log to console message is received', () => {
       const handlerArgs = {
         message: {

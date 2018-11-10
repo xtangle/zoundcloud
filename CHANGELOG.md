@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Fixed
 - Fixed download buttons not showing in playlists in the discover section of the website.
+- Fixed options page not opening when page action icon is clicked.
 
 ## [v1.4.0] - 2018-11-04
 ### Added
