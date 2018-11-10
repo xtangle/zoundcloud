@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Fixed
+
+### [v1.4.1] - 2018-11-10
+#### Fixed
 - Fixed download buttons not showing in playlists in the discover section of the website.
 - Fixed options page not opening when page action icon is clicked.
 
@@ -74,6 +76,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Travis CI integration.
 
 [Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.1...HEAD
+[v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
 [v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
 [v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
 [v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
