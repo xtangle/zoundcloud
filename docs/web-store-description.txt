@@ -1,5 +1,3 @@
-A Google Chrome extension that adds download buttons to SoundCloud web pages.
-
 This extension will add download buttons to:
 
 * Individual track pages.

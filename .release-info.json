@@ -1,6 +1,22 @@
 {
-  "user": "xtangle",
-  "remote": "https://github.com/xtangle/zoundcloud.git",
-  "pre_release": "scripts/pre-release.js",
-  "assets": "tmp/zoundcloud-*.zip"
+  "dump_configs": ".tmp/configs.json",
+  "github": {
+    "remote": "https://github.com/xtangle/zoundcloud.git",
+    "token_ref": "GITHUB_TOKEN",
+    "run_hooks": false,
+    "assets": ".tmp/zoundcloud-*.zip"
+  },
+  "hooks": {
+    "pre_commit": {
+      "command": "sed -i -r 's/(\"version\":)\\s*\"[^\"]*\"/\\1 \"${new_version}\"/' src/resources/manifest.json"
+    },
+    "pre_release": {
+      "command": [
+        "yarn build:prod",
+        "rm -rf .tmp",
+        "mkdir .tmp",
+        "zip -rj9 .tmp/zoundcloud-v${new_version}.zip dist"
+      ]
+    }
+  }
 }

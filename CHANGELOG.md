@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
-- Added download buttons to tracks in discover page playlists.
+### Fixed
+- Fixed download buttons not showing in playlists in the discover section of the website.
 
 ## [v1.4.0] - 2018-11-04
 ### Added
@@ -23,15 +23,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Changed default behavior to always download tracks in .mp3 format rather than the original uploaded format if available.
 - Changed the default track title matching pattern to capture more patterns (specifically patterns with the text 'Download Link').
 
-## [v1.3.2] - 2018-10-16
-### Added
+### [v1.3.2] - 2018-10-16
+#### Added
 - Added functionality of removing the text 'Free Download' or variations thereof at the end of a song title.
 
-### Changed
+#### Changed
 - Increased frequency of adding download buttons to a page.
 
-## [v1.3.1] - 2018-10-08
-### Added
+### [v1.3.1] - 2018-10-08
+#### Added
 - Added high resolution cover art (if available) in downloaded metadata.
 
 ## [v1.3.0] - 2018-06-24
@@ -64,15 +64,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Metadata information and cover art to files downloaded in .mp3 format.
 - Changelog.
 
-## v1.0.0 - 2018-05-06
-### Added
+# v1.0.0 - 2018-05-06
+## Added
 - Download button functionality to Soundcloud's individual track pages.
 - Webpack builds for development and production.
 - Hot-reloading of extension in Chrome browser.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.1...HEAD
+[v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
+[v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
+[v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/xtangle/zoundcloud/compare/v1.3.2...v1.4.0
 [v1.3.2]: https://github.com/xtangle/zoundcloud/compare/v1.3.1...v1.3.2
 [v1.3.1]: https://github.com/xtangle/zoundcloud/compare/v1.3.0...v1.3.1

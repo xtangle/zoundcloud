@@ -235,15 +235,17 @@
     "@webassemblyjs/wast-parser" "1.7.11"
     "@xtuc/long" "4.2.1"
 
-"@xtangle/release-tool@xtangle/release-tool#f6638cf":
-  version "0.0.1"
-  resolved "https://codeload.github.com/xtangle/release-tool/tar.gz/f6638cf8fbd59f1566dbabce27df3751a0838a39"
+"@xtangle/release-tool@xtangle/release-tool#8658d0a":
+  version "0.0.0"
+  resolved "https://codeload.github.com/xtangle/release-tool/tar.gz/8658d0ab1ce07363220fd83daa9e0230a20b177d"
   dependencies:
     mime-types "^2.1.21"
     readline-sync "^1.4.9"
+    request "^2.88.0"
     request-promise "^4.2.2"
     semver "^5.6.0"
     shelljs "^0.8.2"
+    yargs-parser "^11.0.0"
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -860,6 +862,10 @@ camelcase@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-4.1.0.tgz#d545635be1e33c542649c69173e5de6acfae34dd"
 
+camelcase@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.0.0.tgz#03295527d58bd3cd4aa75363f35b2e8d97be2f42"
+
 caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
@@ -1186,10 +1192,6 @@ core-js@^2.2.0:
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
 
-core-js@~2.3.0:
-  version "2.3.0"
-  resolved "http://registry.npmjs.org/core-js/-/core-js-2.3.0.tgz#fab83fbb0b2d8dc85fa636c4b9d34c75420c6d65"
-
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -1344,7 +1346,7 @@ debug@^3.1.0:
   dependencies:
     ms "^2.1.1"
 
-decamelize@^1.1.2:
+decamelize@^1.1.2, decamelize@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
 
@@ -1655,10 +1657,6 @@ es-to-primitive@^1.1.1:
     is-callable "^1.1.4"
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
-
-es6-promise@~3.0.2:
-  version "3.0.2"
-  resolved "http://registry.npmjs.org/es6-promise/-/es6-promise-3.0.2.tgz#010d5858423a5f118979665f46486a95c6ee2bb6"
 
 escape-html@~1.0.3:
   version "1.0.3"
@@ -2521,10 +2519,6 @@ ignore@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
 
-immediate@~3.0.5:
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
-
 import-local@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/import-local/-/import-local-2.0.0.tgz#55070be38a5993cf18ef6db7e961f5bee5c5a09d"
@@ -2922,16 +2916,6 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jszip@^3.1.5:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/jszip/-/jszip-3.1.5.tgz#e3c2a6c6d706ac6e603314036d43cd40beefdf37"
-  dependencies:
-    core-js "~2.3.0"
-    es6-promise "~3.0.2"
-    lie "~3.1.0"
-    pako "~1.0.2"
-    readable-stream "~2.0.6"
-
 just-extend@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-3.0.0.tgz#cee004031eaabf6406da03a7b84e4fe9d78ef288"
@@ -3092,12 +3076,6 @@ levn@^0.3.0, levn@~0.3.0:
   dependencies:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
-
-lie@~3.1.0:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/lie/-/lie-3.1.1.tgz#9a436b2cc7746ca59de7a41fa469b3efb76bd87e"
-  dependencies:
-    immediate "~3.0.5"
 
 load-json-file@^1.0.0:
   version "1.1.0"
@@ -4011,7 +3989,7 @@ pad@^2.0.0:
   dependencies:
     wcwidth "^1.0.1"
 
-pako@~1.0.2, pako@~1.0.5:
+pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
 
@@ -4430,7 +4408,7 @@ readable-stream@1.1.x, readable-stream@^1.1.7:
     isarray "0.0.1"
     string_decoder "~0.10.x"
 
-readable-stream@~2.0.0, readable-stream@~2.0.6:
+readable-stream@~2.0.0:
   version "2.0.6"
   resolved "http://registry.npmjs.org/readable-stream/-/readable-stream-2.0.6.tgz#8f90341e68a53ccc928788dacfcd11b36eb9b78e"
   dependencies:
@@ -4525,7 +4503,7 @@ request-promise@^4.2.2:
     stealthy-require "^1.1.0"
     tough-cookie ">=2.3.3"
 
-request@^2.85.0, request@^2.87.0:
+request@^2.85.0, request@^2.87.0, request@^2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   dependencies:
@@ -5758,6 +5736,13 @@ yargs-parser@^10.1.0:
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-10.1.0.tgz#7202265b89f7e9e9f2e5765e0fe735a905edbaa8"
   dependencies:
     camelcase "^4.1.0"
+
+yargs-parser@^11.0.0, yargs-parser@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-11.1.0.tgz#0b8104116367bf663089b24e5801438ab50396a3"
+  dependencies:
+    camelcase "^5.0.0"
+    decamelize "^1.2.0"
 
 yargs@^12.0.2:
   version "12.0.2"

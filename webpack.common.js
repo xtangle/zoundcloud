@@ -1,6 +1,25 @@
 const path = require('path');
+const parser = require('yargs-parser');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
+
+function getChromeReloaderPlugin() {
+  const plugins = [];
+  // only add plugin if the --watch flag is set
+  if (parser(process.argv).watch) {
+    plugins.push(
+      new ChromeExtensionReloader({
+        // The entries used for the content/background scripts; use entry names, not the file name or path
+        entries: {
+          background: 'background',
+          contentScript: 'content',
+        },
+      }),
+    );
+  }
+  return plugins;
+}
 
 module.exports = {
   entry: {
@@ -39,6 +58,7 @@ module.exports = {
       context: 'src/resources',
       from: '**/*.*',
     }]),
+    ...getChromeReloaderPlugin(),
   ],
   optimization: {
     splitChunks: {
