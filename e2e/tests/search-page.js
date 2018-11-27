@@ -162,7 +162,7 @@ module.exports = {
       .waitForElementVisible('.searchResultGroupHeading')
       .click('.searchList__item button.zc-button-download')
       .assert.fileDownloaded(track1Path)
-      .verify.fileHasSize(track1Path, 2489082)
+      .verify.fileHasSize(track1Path, 2489137)
       .assert.fileDownloaded(track2Path)
       .verify.fileHasSize(track2Path, 3215457);
   },
