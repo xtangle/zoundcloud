@@ -15,19 +15,19 @@ module.exports = {
     enabled: false,
     workers: 'auto',
   },
-  selenium: {
+  webdriver: {
     start_process: false,
+    server_path: 'node_modules/.bin/chromedriver',
+    port: 9515,
+    timeout_options: {
+      timeout: 20000,
+    },
   },
   test_settings: {
     default: {
       launch_url: 'http://soundcloud.com',
-      selenium_port: 9515,
-      selenium_host: '0.0.0.0',
       default_path_prefix: '',
       detailed_output: true,
-      request_timeout_options: {
-        timeout: 20000,
-      },
       screenshots: {
         enabled: true,
         on_failure: true,
