@@ -1,7 +1,10 @@
 import {IOptions} from 'src/ts/options/option';
 
 export const defaultOptions: IOptions = {
-  addMetadata: true,
+  addMetadata: {
+    enabled: true,
+    addCoverArt: true,
+  },
   alwaysDownloadMp3: true,
   cleanTrackTitle: {
     enabled: true,

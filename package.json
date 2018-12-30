@@ -20,6 +20,7 @@
   "scripts": {
     "build": "webpack --config webpack.dev.js",
     "build:prod": "webpack --config webpack.prod.js",
+    "build:watch": "yarn run build --watch",
     "ci": "run-s lint test:coverage coveralls build build:prod e2e:ci",
     "coveralls": "cat coverage/HeadlessChrome/lcovonly | coveralls",
     "e2e": "nightwatch",
@@ -29,7 +30,6 @@
     "lint:ts": "tslint -p .",
     "precommit": "run-s lint test:coverage build build:prod",
     "release": "release-tool",
-    "start": "yarn run build:watch",
     "test": "karma start karma.conf.js",
     "test:coverage": "karma start karma.conf.js --reporters mocha,karma-typescript",
     "test:watch": "karma start karma.conf.js --single-run false --mochaReporter.output autowatch"

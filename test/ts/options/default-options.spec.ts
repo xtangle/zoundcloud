@@ -6,7 +6,10 @@ const expect = configureChai();
 describe('the default options', () => {
   it('should have the default settings', () => {
     expect(defaultOptions).to.be.deep.equal({
-      addMetadata: true,
+      addMetadata: {
+        enabled: true,
+        addCoverArt: true,
+      },
       alwaysDownloadMp3: true,
       cleanTrackTitle: {
         enabled: true,

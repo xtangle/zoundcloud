@@ -25,7 +25,7 @@
     .option label,input[type=checkbox],summary {
       cursor: pointer;
     }
-    .option details,textarea {
+    .option div,details,textarea {
       margin: 0.5em 0 0.5em 2em;
     }
     .option summary {
@@ -55,20 +55,22 @@
     <label for="add-metadata-option">
       Add Metadata to mp3 files.
     </label>
+    <div>
+      <p>Note: When enabled, download progress will not show in the browser until the entire song is downloaded.</p>
+      <input type="checkbox" id="add-cover-art">
+      <label for="add-cover-art">
+        Also add cover art.
+      </label>
+    </div>
     <details>
       <summary>Expand for details.</summary>
       <p>
-        This option adds ID3v2 metadata tags to all tracks downloaded that have the .mp3 extension.
+        Adds ID3v2 metadata tags to all tracks downloaded that have the .mp3 extension.
         Metadata data is fetched from SoundCloud's API.
       </p>
       <p>
         The added metadata includes: cover art, title, album artist, genres, duration, release year,
         bpm, artist url, audio source url, and description.
-      </p>
-      <p>
-        Note that when adding metadata, the entire song needs to be downloaded to memory first.
-        This might cause a song to not appear to be downloading at first, but in most cases it is
-        actually downloading in the background.
       </p>
     </details>
   </div>
@@ -93,7 +95,7 @@
   <div class="option">
     <input type="checkbox" id="clean-title-option">
     <label for="clean-title-option">
-      Remove text from track titles matching the pattern:
+      Remove text from track titles matching this regex pattern:
     </label>
     <textarea id="clean-title-pattern" cols="40" rows="5" wrap="soft"></textarea>
     <details>

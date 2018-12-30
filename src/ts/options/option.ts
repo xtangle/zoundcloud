@@ -1,8 +1,13 @@
 export interface IOptions {
-  addMetadata: boolean;
+  addMetadata: IAddMetadataOption;
   alwaysDownloadMp3: boolean;
   cleanTrackTitle: ICleanTrackTitleOption;
   overwriteExistingFiles: boolean;
+}
+
+export interface IAddMetadataOption {
+  enabled: boolean;
+  addCoverArt: boolean;
 }
 
 export interface ICleanTrackTitleOption {

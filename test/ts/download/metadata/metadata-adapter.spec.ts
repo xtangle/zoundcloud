@@ -6,6 +6,7 @@ import {MetadataAdapter} from 'src/ts/download/metadata/metadata-adapter';
 import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
 import {TrackMetadataFactory} from 'src/ts/download/metadata/track-metadata-factory';
 import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {OptionsObservables} from 'src/ts/options/options-observables';
 import {XhrService} from 'src/ts/util/xhr-service';
 import {configureChai, useRxTesting} from 'test/ts/test-initializers';
 
@@ -18,6 +19,7 @@ describe('metadata adapter', () => {
   let inputDlInfo: ITrackDownloadInfo;
   let metadata: ITrackMetadata;
 
+  let stubGetOptions$: SinonStub;
   let stubPing$: SinonStub;
   let stubCreateMetadata: SinonStub;
   let stubAddIDV2Metadata: SinonStub;
@@ -27,6 +29,9 @@ describe('metadata adapter', () => {
 
     inputDlInfo = {downloadOptions: {}, trackInfo: {}} as ITrackDownloadInfo;
     metadata = {title: 'foo', cover_url: 'cover-url-large.jpg'} as ITrackMetadata;
+
+    stubGetOptions$ = stub(OptionsObservables, 'getOptions$');
+    stubGetOptions$.returns(of({addMetadata: {enabled: true, addCoverArt: true}}));
 
     stubPing$ = stub(XhrService, 'ping$');
     stubPing$.returns(of(404)); // Use original cover art url by default
@@ -41,6 +46,7 @@ describe('metadata adapter', () => {
     restore();
   });
 
+  // Note: add cover art option is enabled in test setup
   describe('updating the cover art url in the metadata', () => {
     const expectedHighResUrl = 'cover-url-t500x500.jpg';
 
@@ -48,6 +54,15 @@ describe('metadata adapter', () => {
       // Set file extension to .mp3 to enable adding metadata for these set of tests
       inputDlInfo.downloadOptions.filename = 'file.name.mp3';
       stubAddIDV2Metadata.returns(EMPTY);
+    });
+
+    it('should set the cover art url to empty if adding cover art is disabled', () => {
+      // disable adding cover art
+      stubGetOptions$.returns(of({addMetadata: {enabled: true, addCoverArt: false}}));
+      const expectedMetadata = {...metadata, cover_url: ''};
+
+      rx.subscribeTo(fixture.addMetadata$(inputDlInfo));
+      expect(stubAddIDV2Metadata).to.have.been.calledOnceWithExactly(expectedMetadata, inputDlInfo);
     });
 
     it('should not update cover art url if there is no cover art url', () => {

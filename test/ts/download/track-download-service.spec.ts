@@ -38,7 +38,7 @@ describe(`track download service`, () => {
     useFakeTimers();
 
     stubGetOptions$ = stub(OptionsObservables, 'getOptions$');
-    stubGetOptions$.returns(of({addMetadata: true}));
+    stubGetOptions$.returns(of({addMetadata: {enabled: true}}));
 
     stubCreateDownloadInfo$ = stub(TrackDownloadInfoFactory, 'create$');
     stubCreateDownloadInfo$.withArgs(trackInfo, downloadLocation).returns(of(downloadInfo));
@@ -65,7 +65,7 @@ describe(`track download service`, () => {
     });
 
     it('should download the track and not add track metadata when add metadata option is disabled', () => {
-      stubGetOptions$.returns(of({addMetadata: false}));
+      stubGetOptions$.returns(of({addMetadata: {enabled: false}}));
       fixture.download(trackInfo, downloadLocation);
 
       expect(stubAddMetadata$).not.to.have.been.called;

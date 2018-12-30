@@ -8,7 +8,8 @@ export class OptionsScript implements IRunnable {
     restoreOptions();
     $('#save-btn').on('click', saveOptions);
     $('#defaults-btn').on('click', setToDefaults);
-    $('#clean-title-option').on('click', (event: any) => syncCleanTitlePatternInput(event.target.checked));
+    $('#add-metadata-option').on('click', (event: any) => syncAddMetadataOptionInputs(event.target.checked));
+    $('#clean-title-option').on('click', (event: any) => syncCleanTitleOptionInputs(event.target.checked));
   }
 }
 
@@ -25,22 +26,34 @@ function setToDefaults() {
   setOptions(defaultOptions);
 }
 
-function syncCleanTitlePatternInput(enabled: boolean) {
-  $('#clean-title-pattern').prop('disabled', !enabled);
-}
-
 function setOptions(options: IOptions) {
-  $('#add-metadata-option').prop('checked', options.addMetadata);
+  $('#add-metadata-option').prop('checked', options.addMetadata.enabled);
+  $('#add-cover-art').prop('checked', options.addMetadata.addCoverArt);
+  syncAddMetadataOptionInputs(options.addMetadata.enabled);
+
   $('#always-mp3-option').prop('checked', options.alwaysDownloadMp3);
+
   $('#clean-title-option').prop('checked', options.cleanTrackTitle.enabled);
   $('#clean-title-pattern').val(options.cleanTrackTitle.pattern);
-  syncCleanTitlePatternInput(options.cleanTrackTitle.enabled);
+  syncCleanTitleOptionInputs(options.cleanTrackTitle.enabled);
+
   $('#overwrite-option').prop('checked', options.overwriteExistingFiles);
+}
+
+function syncAddMetadataOptionInputs(metadataEnabled: boolean) {
+  $('#add-cover-art').prop('disabled', !metadataEnabled);
+}
+
+function syncCleanTitleOptionInputs(cleanTitleEnabled: boolean) {
+  $('#clean-title-pattern').prop('disabled', !cleanTitleEnabled);
 }
 
 function getOptions(): IOptions {
   return {
-    addMetadata: $('#add-metadata-option').prop('checked'),
+    addMetadata: {
+      enabled: $('#add-metadata-option').prop('checked'),
+      addCoverArt: $('#add-cover-art').prop('checked'),
+    },
     alwaysDownloadMp3: $('#always-mp3-option').prop('checked'),
     cleanTrackTitle: {
       enabled: $('#clean-title-option').prop('checked'),

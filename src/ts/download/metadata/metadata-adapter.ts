@@ -1,16 +1,21 @@
-import {Observable, of} from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {catchError, flatMap, map, tap, timeout} from 'rxjs/operators';
 import {ID3MetadataService} from 'src/ts/download/metadata/id3-metadata-service';
 import {ITrackMetadata} from 'src/ts/download/metadata/track-metadata';
 import {TrackMetadataFactory} from 'src/ts/download/metadata/track-metadata-factory';
 import {ITrackDownloadInfo} from 'src/ts/download/track-download-info';
+import {IOptions} from 'src/ts/options/option';
+import {OptionsObservables} from 'src/ts/options/options-observables';
 import {logger} from 'src/ts/util/logger';
 import {XhrService} from 'src/ts/util/xhr-service';
 
 export const MetadataAdapter = {
   addMetadata$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
     const fileExtension = downloadInfo.downloadOptions.filename.split('.').pop();
-    const metadata$ = of(TrackMetadataFactory.create(downloadInfo.trackInfo)).pipe(
+    const metadata$ = combineLatest(
+      of(TrackMetadataFactory.create(downloadInfo.trackInfo)),
+      OptionsObservables.getOptions$(),
+    ).pipe(
       flatMap(withUpdatedCoverArtUrl$),
     );
 
@@ -26,7 +31,11 @@ export const MetadataAdapter = {
   },
 };
 
-function withUpdatedCoverArtUrl$(metadata: ITrackMetadata): Observable<ITrackMetadata> {
+function withUpdatedCoverArtUrl$([metadata, options]: [ITrackMetadata, IOptions]): Observable<ITrackMetadata> {
+  // set cover art url to empty (don't add cover art) if disabled
+  if (!options.addMetadata.addCoverArt) {
+    return of({...metadata, cover_url: ''});
+  }
   const origUrl = metadata.cover_url;
   if (!origUrl) {
     return of(metadata);

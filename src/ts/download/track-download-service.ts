@@ -33,7 +33,7 @@ export const TrackDownloadService = {
 function addMetadataIfEnabled$(downloadInfo: ITrackDownloadInfo): Observable<ITrackDownloadInfo> {
   return OptionsObservables.getOptions$().pipe(
     flatMap((options: IOptions) =>
-      options.addMetadata ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo),
+      options.addMetadata.enabled ? MetadataAdapter.addMetadata$(downloadInfo) : of(downloadInfo),
     ),
   );
 }

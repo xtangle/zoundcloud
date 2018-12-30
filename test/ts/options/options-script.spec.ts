@@ -13,9 +13,12 @@ describe('options script', () => {
   const sinonChrome = useSinonChrome();
   let fixture: OptionsScript;
 
-  // values should differ from default options
+  // mock options values should differ from the default options for testing purposes
   const mockOptions: IOptions = Object.freeze({
-    addMetadata: false,
+    addMetadata: {
+      enabled: false,
+      addCoverArt: false,
+    },
     alwaysDownloadMp3: true,
     cleanTrackTitle: {
       enabled: false,
@@ -49,18 +52,36 @@ describe('options script', () => {
     });
   });
 
+  context('when the add metadata option checkbox is clicked', () => {
+    beforeEach(() => {
+      fixture.run();
+    });
+
+    it('should enable the add cover art checkbox when checked', () => {
+      setHTMLState({...mockOptions, addMetadata: {enabled: false, addCoverArt: true}});
+      $('#add-metadata-option').trigger('click');
+      expect($('#add-cover-art')).to.have.$prop('disabled', false);
+    });
+
+    it('should disable the add cover art checkbox when unchecked', () => {
+      setHTMLState({...mockOptions, addMetadata: {enabled: true, addCoverArt: true}});
+      $('#add-metadata-option').trigger('click');
+      expect($('#clean-title-pattern')).to.have.$prop('disabled', true);
+    });
+  });
+
   context('when the clean title option checkbox is clicked', () => {
     beforeEach(() => {
       fixture.run();
     });
 
-    it('should enable the clean title pattern input when checkbox is checked', () => {
+    it('should enable the clean title pattern input when checked', () => {
       setHTMLState({...mockOptions, cleanTrackTitle: {enabled: false, pattern: ''}});
       $('#clean-title-option').trigger('click');
       expect($('#clean-title-pattern')).to.have.$prop('disabled', false);
     });
 
-    it('should disable the clean title pattern input when checkbox is unchecked', () => {
+    it('should disable the clean title pattern input when unchecked', () => {
       setHTMLState({...mockOptions, cleanTrackTitle: {enabled: true, pattern: ''}});
       $('#clean-title-option').trigger('click');
       expect($('#clean-title-pattern')).to.have.$prop('disabled', true);
@@ -100,25 +121,35 @@ describe('options script', () => {
     expect(confirmMsg).to.be.$hidden;
     button.trigger('click');
     expect(confirmMsg).to.be.$visible;
-    clock.tick(1500); // 1s + 400ms fade out animation + 100ms room for error
+    clock.tick(1500); // 1s + 400ms fade out animation + 100ms room for error (?)
     expect(confirmMsg).to.be.$hidden;
   }
 
   function setHTMLState(options: IOptions) {
-    $('#add-metadata-option').prop('checked', options.addMetadata);
+    $('#add-metadata-option').prop('checked', options.addMetadata.enabled);
+    const addCoverArtInput = $('#add-cover-art');
+    addCoverArtInput.prop('checked', options.addMetadata.addCoverArt);
+    addCoverArtInput.prop('disabled', !options.addMetadata.enabled);
+
     $('#always-mp3-option').prop('checked', options.alwaysDownloadMp3);
+
     $('#clean-title-option').prop('checked', options.cleanTrackTitle.enabled);
-    const cleanTitlePattern = $('#clean-title-pattern');
-    cleanTitlePattern.val(options.cleanTrackTitle.pattern);
-    cleanTitlePattern.prop('disabled', !options.cleanTrackTitle.enabled);
+    const cleanTitlePatternInput = $('#clean-title-pattern');
+    cleanTitlePatternInput.val(options.cleanTrackTitle.pattern);
+    cleanTitlePatternInput.prop('disabled', !options.cleanTrackTitle.enabled);
+
     $('#overwrite-option').prop('checked', options.overwriteExistingFiles);
   }
 
   function verifyHTMLState(options: IOptions) {
-    expect($('#add-metadata-option')).to.have.$prop('checked', options.addMetadata);
+    expect($('#add-metadata-option')).to.have.$prop('checked', options.addMetadata.enabled);
+    expect($('#add-cover-art')).to.have.$prop('checked', options.addMetadata.addCoverArt);
+
     expect($('#always-mp3-option')).to.have.$prop('checked', options.alwaysDownloadMp3);
+
     expect($('#clean-title-option')).to.have.$prop('checked', options.cleanTrackTitle.enabled);
     expect($('#clean-title-pattern')).to.have.$val(options.cleanTrackTitle.pattern);
+
     expect($('#overwrite-option')).to.have.$prop('checked', options.overwriteExistingFiles);
   }
 });
