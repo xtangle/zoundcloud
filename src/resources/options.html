@@ -15,7 +15,7 @@
       font-size: 12px;
       padding-bottom: 0.5em;
     }
-    .option label {
+    .option > label {
       font-weight: 500;
     }
     .option input[type=checkbox] {
@@ -25,7 +25,7 @@
     .option label,input[type=checkbox],summary {
       cursor: pointer;
     }
-    .option div,details,textarea {
+    .option > div,details {
       margin: 0.5em 0 0.5em 2em;
     }
     .option summary {
@@ -39,6 +39,9 @@
       width: 6em;
       height: 1.75em;
       margin-right: 1em;
+    }
+    .error {
+      color: red;
     }
     #confirm-msg {
       color: green;
@@ -59,7 +62,7 @@
       <p>Note: When enabled, download progress will not show in the browser until the entire song is downloaded.</p>
       <input type="checkbox" id="add-cover-art">
       <label for="add-cover-art">
-        Also add cover art.
+        Add cover art
       </label>
     </div>
     <details>
@@ -82,13 +85,12 @@
     <details>
       <summary>Expand for details.</summary>
       <p>
-        Enabling this option will cause all tracks downloaded to be in mp3 format.
-        Most of the time, this will be the 128 kbps bit rate streamable version you hear
-        during a normal browsing session on SoundCloud.
+        All tracks will be downloaded in mp3 format. This ensures that metadata will always be added
+        when the 'Add Metadata to mp3 files' option is enabled.
       </p>
       <p>
-        If this option is disabled, the original uploaded format of a track (often of higher quality)
-        will take precedence when downloading. However, metadata will not be added to non-mp3 formats.
+        If this option is disabled, the original uploaded format of a track (often of higher quality format)
+        will take precedence when downloading. However, metadata will not be added to non-mp3 files.
       </p>
     </details>
   </div>
@@ -97,17 +99,19 @@
     <label for="clean-title-option">
       Remove text from track titles matching this regex pattern:
     </label>
-    <textarea id="clean-title-pattern" cols="40" rows="5" wrap="soft"></textarea>
+    <div>
+      <textarea id="clean-title-pattern" cols="40" rows="5" wrap="soft"></textarea>
+      <div id="clean-title-pattern-err-msg" class="error" hidden></div>
+    </div>
     <details>
       <summary>Expand for details.</summary>
       <p>
         Before metadata is added and the file name is established, if the track title contains
         a substring matching the provided regular expression pattern, the matching part will be removed.
-        One exception is that if the regex matches the entire track title, then it will not be removed.
       </p>
       <p>
         The default setting attempts to remove strings containing 'Free Download' or
-        'Download Link' suffixes appended to the end of many track titles.
+        'Download Link' patterns that appears in the end of popular track titles.
       </p>
       <p>
         When entering a custom regular expression, make sure it conforms to Javascript's
@@ -126,7 +130,7 @@
   <div class="control">
     <button id="save-btn">Save</button>
     <button id="defaults-btn">Defaults</button>
-    <span id="confirm-msg" hidden>Options saved.</span>
+    <span id="confirm-msg" hidden></span>
   </div>
   <script type="text/javascript" src="vendor.js"></script>
   <script type="text/javascript" src="options.js"></script>

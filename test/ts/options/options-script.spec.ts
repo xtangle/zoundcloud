@@ -40,12 +40,12 @@ describe('options script', () => {
   });
 
   context('when script is run', () => {
-    it('should restore to the default options if there were no saved options', () => {
+    it('should load the default options if there were no saved options', () => {
       fixture.run();
       verifyHTMLState(defaultOptions);
     });
 
-    it('should restore options from Chrome storage if there were saved options', () => {
+    it('should load options from Chrome storage if there were saved options', () => {
       sinonChrome.storage.sync.get.withArgs(defaultOptions, match.any).yields(mockOptions);
       fixture.run();
       verifyHTMLState(mockOptions);
@@ -88,26 +88,64 @@ describe('options script', () => {
     });
   });
 
-  context('when the save button is clicked', () => {
+  context('when the Save button is clicked', () => {
     beforeEach(() => {
       fixture.run();
     });
 
-    it('should save options to Chrome storage', () => {
-      setHTMLState(mockOptions);
-      $('#save-btn').trigger('click');
-      expect(sinonChrome.storage.sync.set).to.have.been.calledOnceWithExactly(mockOptions);
+    it('should clear all existing error messages', () => {
+      verifyErrMsgsAreClearedWhenBtnIsClicked($('#save-btn'));
     });
 
-    it('should show the confirmation message', () => {
-      testConfirmMsgWhenBtnIsClicked($('#save-btn'));
+    context('when options are valid', () => {
+      it('should save options to Chrome storage', () => {
+        setHTMLState(mockOptions);
+        $('#save-btn').trigger('click');
+        expect(sinonChrome.storage.sync.set).to.have.been.calledOnceWithExactly(mockOptions);
+      });
+
+      it('should show the confirmation message', () => {
+        const confirmMsg = $('#confirm-msg');
+        expect(confirmMsg).to.be.$hidden;
+
+        $('#save-btn').trigger('click');
+        expect(confirmMsg).to.be.$visible;
+
+        clock.tick(1500); // 1s + 400ms fade out animation + 100ms room for error (?)
+        expect(confirmMsg).to.be.$hidden;
+      });
+    });
+
+    context('when the Clean Track Title regex pattern is invalid', () => {
+      beforeEach(() => {
+        setHTMLState({...mockOptions, cleanTrackTitle: {enabled: true, pattern: '\\\\\\'}});
+        $('#save-btn').trigger('click');
+      });
+
+      it('should not save options to Chrome storage', () => {
+        expect(sinonChrome.storage.sync.set).to.not.have.been.called;
+      });
+
+      it('should not show the confirmation message', () => {
+        expect($('#confirm-msg')).to.be.$hidden;
+      });
+
+      it('should show where the error is', () => {
+        expect($('#clean-title-pattern')).to.have.$css('border-color', 'rgb(255, 0, 0)');
+        expect($('#clean-title-pattern-err-msg')).to.be.$visible
+          .and.to.have.$text('Not a valid regular expression.');
+      });
     });
   });
 
-  context('when the reset button is clicked', () => {
+  context('when the Default button is clicked', () => {
     beforeEach(() => {
       fixture.run();
       setHTMLState(mockOptions);
+    });
+
+    it('should clear all existing error messages', () => {
+      verifyErrMsgsAreClearedWhenBtnIsClicked($('#save-btn'));
     });
 
     it('should set options on the page to reflect the default options', () => {
@@ -116,13 +154,19 @@ describe('options script', () => {
     });
   });
 
-  function testConfirmMsgWhenBtnIsClicked(button: JQuery<HTMLElement>) {
-    const confirmMsg = $('#confirm-msg');
-    expect(confirmMsg).to.be.$hidden;
+  function verifyErrMsgsAreClearedWhenBtnIsClicked(button: JQuery<HTMLElement>) {
+    // Show error messages
+    const cleanTitlePattern = $('#clean-title-pattern');
+    const cleanTitlePatternErrMsg = $('#clean-title-pattern-err-msg');
+
+    cleanTitlePattern.css('border-color', 'red');
+    cleanTitlePatternErrMsg.show();
+
     button.trigger('click');
-    expect(confirmMsg).to.be.$visible;
-    clock.tick(1500); // 1s + 400ms fade out animation + 100ms room for error (?)
-    expect(confirmMsg).to.be.$hidden;
+
+    // Verify errors are reset
+    expect(cleanTitlePattern).not.to.have.$css('border-color', 'rgb(255, 0, 0)');
+    expect(cleanTitlePatternErrMsg).to.be.$hidden;
   }
 
   function setHTMLState(options: IOptions) {
