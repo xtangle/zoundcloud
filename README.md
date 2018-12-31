@@ -25,19 +25,16 @@ This extension will add download buttons to:
 * Playlist pages (downloads the entire playlist).
 * Tracks that are contained in scrollable lists.
 
-When a download is initiated, by default it will download the mp3 version
-of the song with metadata (including cover art) added. It can be configured from the options
-menu to not add metadata or prefer to download songs in its uploaded format if available.
+By default, when a download is started it will download the mp3 version of the song with metadata (including cover art) added. 
+It can be configured from the options menu to not add metadata or prefer to download songs in its uploaded format (if available).
 
-Metadata information and cover art is automatically added to files in .mp3 format (as ID3v2 tags).
+Metadata information and cover art is automatically added to files in .mp3 format.
 The added metadata includes: cover art, title, album artist, genres, duration, release year, bpm, 
 artist url, audio source url, and description.
 
-Note that when adding metadata, the entire song needs to be downloaded to memory first.
-This might cause a song to not appear to be downloading at first, but in most cases it is
-actually downloading in the background.
+Note: When metadata is enabled, download progress will not show in the browser until the entire song is downloaded.
 
-All tracks will be downloaded to the user's default Downloads folder:
+All tracks will be downloaded to the user's default Downloads folder.
 
 * Tracks are downloaded with the name `track_title`.
 * Playlists are downloaded to a folder with the name `user_name - playlist_name`.

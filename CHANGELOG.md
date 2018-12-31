@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Added option to disable adding cover art.
+- Added validation to options page.
 
 ### [v1.4.1] - 2018-11-10
 #### Fixed
