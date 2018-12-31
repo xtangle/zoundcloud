@@ -76,4 +76,4 @@ To build from source, make sure Node.js (version >= 7.6) and yarn is installed.
 ## Todo
 
 * Make downloads cancellable.
-* Some visual indicator to track current download status and previous downloads.
+* Some visual indicator to track current and previous download progress.

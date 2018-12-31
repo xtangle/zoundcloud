@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
+
+### [v1.4.2] - 2018-12-30
+#### Added
 - Added option to disable adding cover art.
 - Added validation to options page.
 
@@ -78,7 +80,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.2...HEAD
+[v1.4.2]: https://github.com/xtangle/zoundcloud/compare/v1.4.1...v1.4.2
 [v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/xtangle/zoundcloud/compare/v1.3.2...v1.4.0
 [v1.3.2]: https://github.com/xtangle/zoundcloud/compare/v1.3.1...v1.3.2
