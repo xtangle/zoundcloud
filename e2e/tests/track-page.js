@@ -27,7 +27,7 @@ module.exports = {
     browser
       .click(zcBtnSelector)
       .assert.fileDownloaded(trackPath)
-      .verify.fileHasSize(trackPath, 2388853);
+      .verify.fileHasSize(trackPath, 2403075);
   },
 
   'Should be responsive and look similar to other buttons': (browser) => {
