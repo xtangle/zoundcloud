@@ -59,7 +59,7 @@
     "@types/sinon": "^7.0.5",
     "@types/sinon-chai": "^3.2.2",
     "@types/sinon-chrome": "^2.2.6",
-    "@xtangle/release-tool": "^0.0.1",
+    "@xtangle/release-tool": "^0.0.2",
     "chai": "^4.2.0",
     "chai-jq": "^0.0.9",
     "chromedriver": "^2.46.0",
