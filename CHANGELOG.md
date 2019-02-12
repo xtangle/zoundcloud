@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+#### Fixed
+- Fixed bug where options cannot be fetched, blocking the download. ([#17](https://github.com/xtangle/zoundcloud/issues/17))
 
 ### [v1.4.2] - 2018-12-30
 #### Added
