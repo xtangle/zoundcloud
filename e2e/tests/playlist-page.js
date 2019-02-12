@@ -1,7 +1,7 @@
 const path = require('path');
 
 const zcBtnSelector = '.listenEngagement .sc-button-share + button.zc-button-download';
-const trackItemSelector = '.listenDetails .trackList__item:last-of-type';
+const trackItemSelector = '.listenDetails .trackList__item:nth-of-type(3)';
 
 module.exports = {
   '@tags': ['playlist-page'],
@@ -32,6 +32,10 @@ module.exports = {
     const track2Path = path.join(playlistDir, '23. M2U - Blythe.mp3');
     // track 3: uses the a1_api method
     const track3Path = path.join(playlistDir, 'Ryuusei.mp3');
+    // track 4: has a weird problem where song cannot be downloaded due to
+    // 'Illegal invocation: Function must be called on an object of type StorageArea',
+    // see https://github.com/xtangle/zoundcloud/issues/17
+    const track4Path = path.join(playlistDir, 'Maggie Rogers - Alaska (Tycho Remix).mp3');
 
     browser
       .click(zcBtnSelector)
@@ -40,14 +44,16 @@ module.exports = {
       .assert.fileDownloaded(track2Path)
       .verify.fileHasSize(track2Path, 2189492)
       .assert.fileDownloaded(track3Path)
-      .verify.fileHasSize(track3Path, 5099728);
+      .verify.fileHasSize(track3Path, 5099728)
+      .assert.fileDownloaded(track4Path)
+      .verify.fileHasSize(track4Path, 3482186);
   },
 
   'Adds a Download button for every item in the track list': function (browser) {
     browser
       .elements('css selector', '.listenDetails .trackList__item'
         + ' .sc-button-share + button.zc-button-download', (result) => {
-        browser.assert.strictEqual(result.value.length, 3,
+        browser.assert.strictEqual(result.value.length, 4,
           'Should add a download button for every track item');
       })
       .assert.hidden(`${trackItemSelector} button.zc-button-download`, 'Download button is hidden on a track item')
