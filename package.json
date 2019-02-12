@@ -34,7 +34,12 @@
     "test:coverage": "karma start karma.conf.js --reporters mocha,karma-typescript",
     "test:watch": "karma start karma.conf.js --single-run false --mochaReporter.output autowatch"
   },
-  "pre-commit": "precommit",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "yarn precommit"
+    }
+  },
   "dependencies": {
     "@types/chrome": "^0.0.79",
     "@types/jquery": "^3.3.29",
@@ -46,6 +51,8 @@
     "verror": "^1.10.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^7.5.2",
+    "@commitlint/config-conventional": "^7.5.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "@types/mocha-each": "^1.1.0",
@@ -62,6 +69,7 @@
     "eslint": "^5.13.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
+    "husky": "^1.3.1",
     "karma": "^4.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-html2js-preprocessor": "^1.1.0",
@@ -72,7 +80,6 @@
     "mocha-each": "^1.2.0",
     "nightwatch": "^1.0.19",
     "npm-run-all": "^4.1.5",
-    "pre-commit": "^1.2.2",
     "rimraf": "^2.6.3",
     "sinon": "^7.2.3",
     "sinon-chai": "^3.3.0",
