@@ -28,7 +28,7 @@
     "lint": "run-p lint:js lint:ts",
     "lint:js": "eslint .",
     "lint:ts": "tslint -p .",
-    "precommit": "run-s lint test:coverage build build:prod",
+    "precommit": "run-s lint test:coverage",
     "release": "release-tool",
     "test": "karma start karma.conf.js",
     "test:coverage": "karma start karma.conf.js --reporters mocha,karma-typescript",
