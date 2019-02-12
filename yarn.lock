@@ -415,10 +415,10 @@
     "@webassemblyjs/wast-parser" "1.7.11"
     "@xtuc/long" "4.2.1"
 
-"@xtangle/release-tool@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@xtangle/release-tool/-/release-tool-0.0.1.tgz#1ef24cdd9a924be342408e3f9a569dc540f0d701"
-  integrity sha512-ev4jn8Xbstrb9I2M1KO4yr7vb8guU7x0fH5aiCABlXK2n9+dspkNI4LHxi4pvKimV5nGHEC1wyHEQME3bw1Mmg==
+"@xtangle/release-tool@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@xtangle/release-tool/-/release-tool-0.0.2.tgz#98cd962bd71796c701c544cee9ebb6f0ab618661"
+  integrity sha512-RRPCDRW52hpceqavgHoQKb2QTyODPVwJxI/ZRosKH89ilMApEcBwsVdwP4bSSkyC5jmm7tM9+cVjnR4TZzlACQ==
   dependencies:
     mime-types "^2.1.21"
     readline-sync "^1.4.9"
