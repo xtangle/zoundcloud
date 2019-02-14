@@ -5,7 +5,7 @@
 # ZoundCloud Downloader
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/bhnpokjikdldjiimbmoakkfekcnpkkij.svg)](https://chrome.google.com/webstore/detail/zoundcloud-downloader/bhnpokjikdldjiimbmoakkfekcnpkkij)
-[![Build Status](https://img.shields.io/travis/com/xtangle/zoundcloud.svg)](https://travis-ci.org/xtangle/zoundcloud)
+[![Build Status](https://img.shields.io/travis/com/xtangle/zoundcloud.svg)](https://travis-ci.com/xtangle/zoundcloud)
 [![Coverage Status](https://img.shields.io/coveralls/github/xtangle/zoundcloud.svg)](https://coveralls.io/github/xtangle/zoundcloud?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/xtangle/zoundcloud/badge.svg?targetFile=package.json)](https://snyk.io/test/github/xtangle/zoundcloud?targetFile=package.json)
 [![Dependencies Status](https://img.shields.io/david/xtangle/ZoundCloud.svg)](https://david-dm.org/xtangle/ZoundCloud)
