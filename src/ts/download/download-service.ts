@@ -19,10 +19,10 @@ export const DownloadService = {
     const downloadResult$: AsyncSubject<IDownloadResult> = new AsyncSubject();
     ResourceInfoService.getResourceInfo$(resourceInfoUrl)
       .pipe(timeout(30000))
-      .subscribe(
-        doDownload.bind(null, downloadResult$, resourceInfoUrl),
-        onError.bind(null, downloadResult$, resourceInfoUrl),
-      );
+      .subscribe({
+        next: doDownload.bind(null, downloadResult$, resourceInfoUrl),
+        error: onError.bind(null, downloadResult$, resourceInfoUrl),
+      });
     return downloadResult$.asObservable();
   },
 };

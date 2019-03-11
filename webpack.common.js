@@ -52,12 +52,14 @@ module.exports = {
   },
   plugins: [
     // clean build directory
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(),
     // copy assets
-    new CopyWebpackPlugin([{
-      context: 'src/resources',
-      from: '**/*.*',
-    }]),
+    new CopyWebpackPlugin([
+      {
+        context: 'src/resources',
+        from: '**/*.*',
+      },
+    ]),
     ...getChromeReloaderPlugin(),
   ],
   optimization: {

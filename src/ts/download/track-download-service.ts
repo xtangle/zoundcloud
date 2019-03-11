@@ -17,11 +17,11 @@ export const TrackDownloadService = {
       tap((downloadInfo: ITrackDownloadInfo) => logger.debug('Downloading track', downloadInfo)),
       flatMap(addMetadataIfEnabled$),
       timeout(1800000),
-    ).subscribe(
-      downloadTrack.bind(null, downloadMetadata$),
-      onError.bind(null, downloadMetadata$, trackInfo),
-      () => logger.debug('Track download info stream completed', trackInfo),
-    );
+    ).subscribe({
+      next: downloadTrack.bind(null, downloadMetadata$),
+      error: onError.bind(null, downloadMetadata$, trackInfo),
+      complete: () => logger.debug('Track download info stream completed', trackInfo),
+    });
     return {
       kind: ResourceType.Track,
       metadata$: downloadMetadata$.asObservable(),
