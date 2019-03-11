@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### [v1.4.4] - 2019-03-11
+#### Fixed
+- Fixed expired api token for i1 api.
+
 ### [v1.4.3] - 2019-02-12
 #### Fixed
 - Fixed bug where options cannot be fetched, blocking the download. ([#17](https://github.com/xtangle/zoundcloud/issues/17))
@@ -84,7 +88,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Karma test infrastructure.
 - Travis CI integration.
 
-[Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.3...HEAD
+[Unreleased]: https://github.com/xtangle/zoundcloud/compare/v1.4.4...HEAD
+[v1.4.4]: https://github.com/xtangle/zoundcloud/compare/v1.4.3...v1.4.4
 [v1.4.3]: https://github.com/xtangle/zoundcloud/compare/v1.4.2...v1.4.3
 [v1.4.2]: https://github.com/xtangle/zoundcloud/compare/v1.4.1...v1.4.2
 [v1.4.1]: https://github.com/xtangle/zoundcloud/compare/v1.4.0...v1.4.1

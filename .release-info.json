@@ -2,6 +2,7 @@
   "dump_configs": ".tmp/configs.json",
   "github": {
     "remote": "https://github.com/xtangle/zoundcloud.git",
+    "strict": false,
     "run_hooks": false,
     "assets": ".tmp/zoundcloud-*.zip"
   },
