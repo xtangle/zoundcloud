@@ -7,7 +7,6 @@
     "beforeStage": "npx conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "git": {
-    "requireCleanWorkingDir": false,
     "tagName": "v${version}"
   },
   "github": {
