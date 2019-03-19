@@ -1,0 +1,20 @@
+{
+  "pkgFiles": ["package.json", "src/resources/manifest.json"],
+  "increment": "conventional:angular",
+  "scripts": {
+    "changelog": "npx conventional-changelog -p angular -u | tail -n +3",
+    "afterBump": "yarn build:prod && rm -rf tmp/* && zip -rj9 tmp/zoundcloud-v${version}.zip dist",
+    "beforeStage": "npx conventional-changelog -p angular -i CHANGELOG.md -s"
+  },
+  "git": {
+    "requireCleanWorkingDir": false,
+    "tagName": "v${version}"
+  },
+  "github": {
+    "release": true,
+    "assets": ["tmp/*.zip"]
+  },
+  "npm": {
+    "publish": false
+  }
+}
