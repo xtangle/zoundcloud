@@ -2,7 +2,7 @@
   "pkgFiles": ["package.json", "src/resources/manifest.json"],
   "increment": "conventional:angular",
   "scripts": {
-    "changelog": "npx conventional-changelog -p angular -u | tail -n +3",
+    "changelog": "yarn exec conventional-changelog -p angular -u | tail -n +3",
     "afterBump": "yarn build:prod && rm -rf tmp/* && zip -rj9 tmp/zoundcloud-v${version}.zip dist",
     "beforeStage": "yarn exec conventional-changelog -- -p angular -i CHANGELOG.md -s",
     "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
