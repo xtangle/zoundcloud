@@ -8,6 +8,7 @@
     "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
   "git": {
+    "commitMessage": "chore(release): Release v${version}",
     "tagName": "v${version}"
   },
   "github": {
