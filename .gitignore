@@ -2,7 +2,7 @@
 *.iml
 *.log
 
-.tmp/
+tmp/
 dist/
 coverage/
 e2e/output/
