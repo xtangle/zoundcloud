@@ -75,5 +75,6 @@ To build from source, make sure Node.js (version >= 7.6) and yarn is installed.
 
 ## Todo
 
+* Firefox support.
 * Make downloads cancellable.
 * Some visual indicator to track current and previous download progress.
