@@ -5,7 +5,7 @@ export const defaultOptions: IOptions = {
     enabled: true,
     addCoverArt: true,
   },
-  alwaysDownloadMp3: true,
+  alwaysDownloadMp3: true
   cleanTrackTitle: {
     enabled: true,
     pattern:
