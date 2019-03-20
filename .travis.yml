@@ -14,14 +14,14 @@ before_script:
     fi
 jobs:
   include:
-    - name: lint
+    - name: Lint
       script: yarn lint
-    - name: unit tests
+    - name: Unit Test
       script: yarn run-s test:coverage coveralls
-    - name: e2e tests
+    - name: End-to-End Test
       script: yarn run-s build:prod e2e:ci
-    - name: deploy
+    - name: Deploy
       if: (branch = release-test) AND (env(TRAVIS_COMMIT_MESSAGE) = release) AND (type NOT IN (pull_request, cron))
-      script: yarn run-s build:prod release && bash scripts/deploy.sh
+      script: yarn run-s release deploy
 addons:
   chrome: stable
