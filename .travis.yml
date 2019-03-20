@@ -24,7 +24,7 @@ jobs:
       script: >-
         git checkout "${TRAVIS_BRANCH}" &&
         echo "One" &&
-        git remote get-url origin &&
+        git show-ref --head &&
         echo "Two" &&
         git tag &&
         echo "Three" &&
