@@ -27,8 +27,10 @@ jobs:
         echo "One" &&
         git show-ref --head &&
         echo "Two" &&
-        git fetch &&
+        git fetch --all &&
         echo "Three" &&
         git tag &&
+        echo "Four" &&
+        git show-ref --head &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         yarn release:local --dry-run
