@@ -9,7 +9,6 @@
   },
   "git": {
     "commitMessage": "chore(release): v${version}",
-    "pushArgs": "--set-upstream",
     "tagName": "v${version}"
   },
   "github": {
