@@ -22,6 +22,7 @@ jobs:
     - stage: deploy
       if: (branch = release-test) AND (commit_message = trigger-release)
       script: >-
+        git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*" &&
         git checkout "${TRAVIS_BRANCH}" &&
         echo "One" &&
@@ -32,5 +33,6 @@ jobs:
         git tag &&
         echo "Four" &&
         git show-ref --head &&
-        git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
+        echo "Five" &&
+        git describe --tags &&
         yarn release:local --dry-run
