@@ -25,7 +25,8 @@ jobs:
         fi
     - name: End-to-End Test
       script: yarn run-s build:prod e2e:ci
-    - name: Deploy
+    - stage: deploy
+      name: Deploy
       if: (branch = release-test) AND (commit_message = deploy)
       script: yarn run-s release deploy
 addons:
