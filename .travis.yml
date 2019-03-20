@@ -9,29 +9,16 @@ before_install:
 before_script:
   # Add an IPv6 config - see the corresponding Travis issue
   # https://github.com/travis-ci/travis-ci/issues/8361
-  - |
-    if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+  - >
+    if [ "${TRAVIS_OS_NAME}" == 'linux' ]; then
+      sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6';
     fi
-jobs:
-  include:
-    - name: Lint
-      stage: test
-      script: yarn lint
-    - name: Unit Test
-      stage: test
-      script: |
-        if [ "${TRAVIS_BRANCH}" == "master" ]; then
-          yarn run-s test:coverage coveralls
-        else
-          yarn test:coverage
-        fi
-    - name: End-to-End Test
-      stage: test
-      script: yarn run-s build:prod e2e:ci
-    - name: Deploy
-      stage: deploy
-      if: (branch = release-test) AND (commit_message = deploy)
-      script: yarn run-s release deploy
+script: >
+  yarn run-s -c
+  $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '') build:prod e2e:ci" | tr -s ' ')
+deploy:
+  - provider: script
+    script: yarn run-s release deploy
+    if: (branch = release-test) AND (commit_message = deploy)
 addons:
   chrome: stable
