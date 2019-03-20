@@ -9,6 +9,7 @@ before_script:
   # Add an IPv6 config - see the corresponding Travis issue
   # https://github.com/travis-ci/travis-ci/issues/8361
   - |
+    echo "Travis commit message: '${TRAVIS_COMMIT_MESSAGE}'"
     if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
       sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
     fi
@@ -17,11 +18,15 @@ jobs:
     - name: Lint
       script: yarn lint
     - name: Unit Test
+      if: branch = master
       script: yarn run-s test:coverage coveralls
+    - name: Unit Test
+      if: NOT branch = master
+      script: yarn test:coverage
     - name: End-to-End Test
       script: yarn run-s build:prod e2e:ci
     - name: Deploy
-      if: (branch = release-test) AND (env(TRAVIS_COMMIT_MESSAGE) = release) AND (type NOT IN (pull_request, cron))
+      if: (branch = release-test) AND (env(TRAVIS_COMMIT_MESSAGE) = deploy) AND (NOT type = cron)
       script: yarn run-s release deploy
 addons:
   chrome: stable
