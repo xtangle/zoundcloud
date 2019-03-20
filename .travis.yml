@@ -24,4 +24,4 @@ jobs:
       script: >-
         git checkout ${TRAVIS_BRANCH} &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
-        yarn release
+        yarn release --git.requireCleanWorkingDir=false
