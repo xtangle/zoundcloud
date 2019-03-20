@@ -25,4 +25,4 @@ jobs:
         chmod +x scripts/deploy.sh &&
         git checkout ${TRAVIS_BRANCH} &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
-        yarn release --no-git.requireCleanWorkingDir
+        yarn release:local --no-git.requireCleanWorkingDir

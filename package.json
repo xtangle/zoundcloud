@@ -28,7 +28,8 @@
     "lint": "run-p lint:js lint:ts",
     "lint:js": "eslint .",
     "lint:ts": "tslint -p .",
-    "release": "release-it",
+    "release": "",
+    "release:local": "release-it --verbose",
     "test": "karma start karma.conf.js",
     "test:coverage": "karma start karma.conf.js --reporters mocha,karma-typescript",
     "test:watch": "karma start karma.conf.js --single-run false --mochaReporter.output autowatch"
