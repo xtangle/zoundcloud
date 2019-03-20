@@ -10,14 +10,14 @@ before_script:
   # Add an IPv6 config - see the corresponding Travis issue
   # https://github.com/travis-ci/travis-ci/issues/8361
   - >
-    [[ "${TRAVIS_OS_NAME}" == 'linux' ]] && sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+    [ "${TRAVIS_OS_NAME}" == 'linux' ] && sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
 script: >
   yarn run-s -c
-  $(echo "lint test:coverage $([[ "${TRAVIS_BRANCH}" == 'master' ]] && echo 'coveralls' || echo '')" | tr -s ' ')
+  $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '')" | tr -s ' ')
 deploy:
   - provider: script
     script: >
-      [[ "${TRAVIS_COMMIT_MESSAGE}" == 'deploy' ]] && yarn run-s release deploy
+      [ "${TRAVIS_COMMIT_MESSAGE}" == 'deploy' ] && yarn run-s release deploy
     skip_cleanup: true
     on:
       branch: release-test
