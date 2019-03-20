@@ -15,10 +15,12 @@ before_script:
     fi
 script: >
   yarn run-s -c
-  $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '') build:prod e2e:ci" | tr -s ' ')
+  $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '')" | tr -s ' ')
 deploy:
   - provider: script
     script: yarn run-s release deploy
-    if: (branch = release-test) AND (commit_message = deploy)
+    if: commit_message = deploy
+    on:
+      branch: release-test
 addons:
   chrome: stable
