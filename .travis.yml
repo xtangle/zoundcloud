@@ -22,6 +22,7 @@ deploy:
       if [ "${TRAVIS_COMMIT_MESSAGE}" == 'deploy' ]; then
         yarn run-s release deploy
       fi
+    skip_cleanup: true
     on:
       branch: release-test
 addons:
