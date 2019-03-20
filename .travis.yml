@@ -25,8 +25,7 @@ jobs:
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*" &&
         git checkout "${TRAVIS_BRANCH}" &&
-        git fetch &&
-        git pull &&
+        git fetch --unshallow &&
         echo "===" &&
         git tag &&
         echo "===" &&
