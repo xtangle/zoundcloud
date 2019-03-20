@@ -1,6 +1,6 @@
 {
   "name": "zoundcloud",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Adds download buttons to SoundCloud pages.",
   "private": true,
   "author": "xtangle <jackyxu07@gmail.com>",
