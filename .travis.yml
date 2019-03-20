@@ -18,11 +18,12 @@ jobs:
     - name: Lint
       script: yarn lint
     - name: Unit Test
-      if: branch = master
-      script: yarn run-s test:coverage coveralls
-    - name: Unit Test
-      if: NOT branch = master
-      script: yarn test:coverage
+      script: |
+        if [ "${TRAVIS_BRANCH}" == "master" ]; then
+          yarn run-s test:coverage coveralls
+        else
+          yarn test:coverage
+        fi
     - name: End-to-End Test
       script: yarn run-s build:prod e2e:ci
     - name: Deploy
