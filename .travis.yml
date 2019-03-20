@@ -16,12 +16,12 @@ jobs:
       script: >-
         yarn run-s -c
         $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '')" | tr -s ' ')
-      if: commit_message != deploy
+      if: commit_message != release
       addons:
         chrome: stable
     - stage: deploy
-      if: (branch = release-test) AND (commit_message = deploy)
+      if: (branch = release-test) AND (commit_message = release)
       script: >-
         git checkout ${TRAVIS_BRANCH} &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
-        yarn run-s release deploy
+        yarn release

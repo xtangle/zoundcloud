@@ -23,7 +23,6 @@
     "build:watch": "yarn run build --watch",
     "commit": "git-cz -a",
     "coveralls": "cat coverage/HeadlessChrome/lcovonly | coveralls",
-    "deploy": "./scripts/deploy.sh",
     "e2e": "nightwatch",
     "e2e:ci": "xvfb-run --auto-servernum --server-num=1 nightwatch --suiteRetries 3",
     "lint": "run-p lint:js lint:ts",
