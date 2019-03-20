@@ -24,6 +24,7 @@ jobs:
       script: >-
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         git fetch --unshallow &&
+        git checkout "${TRAVIS_BRANCH}" &&
         echo "===" &&
         git tag &&
         echo "===" &&
