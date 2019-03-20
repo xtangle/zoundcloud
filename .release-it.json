@@ -9,6 +9,7 @@
   },
   "git": {
     "commitMessage": "chore(release): v${version}",
+    "requireUpstream": false,
     "tagName": "v${version}"
   },
   "github": {
