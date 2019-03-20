@@ -23,10 +23,12 @@ jobs:
       if: (branch = release-test) AND (commit_message = release)
       script: >-
         git checkout "${TRAVIS_BRANCH}" &&
-        echo "One: " &&
+        echo "One" &&
+        git config --get remote.origin.fetch &&
+        echo "Two" &&
         git tag &&
         git fetch &&
-        echo "Two: " &&
+        echo "Three" &&
         git tag &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         yarn release:local
