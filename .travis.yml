@@ -24,10 +24,10 @@ jobs:
       script: >-
         git checkout "${TRAVIS_BRANCH}" &&
         echo "One" &&
-        git config --get remote.origin.fetch &&
+        git remote get-url origin &&
         echo "Two" &&
         git tag &&
-        git fetch master &&
+        git fetch --all &&
         echo "Three" &&
         git tag &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
