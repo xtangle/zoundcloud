@@ -22,12 +22,13 @@ jobs:
     - stage: deploy
       if: (branch = release-test) AND (commit_message = trigger-release)
       script: >-
+        git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*" &&
         git checkout "${TRAVIS_BRANCH}" &&
         echo "One" &&
         git show-ref --head &&
         echo "Two" &&
-        git tag &&
+        git fetch &&
         echo "Three" &&
         git tag &&
-        git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
+        git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         yarn release:local --dry-run
