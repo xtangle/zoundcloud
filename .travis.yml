@@ -22,6 +22,7 @@ jobs:
     - stage: deploy
       if: (branch = release-test) AND (commit_message = deploy)
       script: >-
+        chmod +x scripts/deploy.sh &&
         git checkout ${TRAVIS_BRANCH} &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         yarn run-s release deploy
