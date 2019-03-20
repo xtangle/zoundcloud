@@ -18,6 +18,6 @@ deploy:
   provider: script
   script: yarn release && bash scripts/deploy.sh
   skip_cleanup: true
-  if: (branch = release-test) AND (env(TRAVIS_COMMIT_MESSAGE) = release) AND (type NOT IN (pull_request, cron))
+  if: branch = release-test AND env(TRAVIS_COMMIT_MESSAGE) = release AND type NOT IN (pull_request, cron)
 addons:
   chrome: stable
