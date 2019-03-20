@@ -1,3 +1,12 @@
+# [1.5.0](https://github.com/xtangle/zoundcloud/compare/v1.4.4...v1.5.0) (2019-03-20)
+
+
+### Features
+
+* **download:** dummy commit, for generating changelog purposes ([74377a3](https://github.com/xtangle/zoundcloud/commit/74377a3))
+
+
+
 ## [1.4.4](https://github.com/xtangle/zoundcloud/compare/v1.4.3...v1.4.4) (2019-03-11)
 
 
