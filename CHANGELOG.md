@@ -1,3 +1,7 @@
+## 1.4.5 (2019-03-20)
+
+
+
 ## [1.4.4](https://github.com/xtangle/zoundcloud/compare/v1.4.3...v1.4.4) (2019-03-11)
 
 
