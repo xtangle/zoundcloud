@@ -22,6 +22,11 @@ jobs:
     - stage: deploy
       if: (branch = release-test) AND (commit_message = release)
       script: >-
+        echo "One: " &&
+        git tag &&
+        git fetch &&
+        echo "Two: " &&
+        git tag &&
         git checkout ${TRAVIS_BRANCH} &&
         git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
         yarn release:local
