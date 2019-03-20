@@ -28,7 +28,7 @@ jobs:
         echo "One" &&
         git show-ref --head &&
         echo "Two" &&
-        git fetch --all &&
+        git fetch --all origin &&
         echo "Three" &&
         git tag &&
         echo "Four" &&
