@@ -20,7 +20,7 @@ jobs:
       addons:
         chrome: stable
     - stage: deploy
-      if: (branch = release-test) AND (commit_message = trigger-release)
+      if: (branch = release-test) AND (env(RELEASE_BUILD) = true)
       script: >-
         git fetch --unshallow &&
         git checkout "${TRAVIS_BRANCH}" &&
