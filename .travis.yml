@@ -16,7 +16,7 @@ jobs:
       script: >-
         yarn run-s -c
         $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '')" | tr -s ' ')
-      if: commit_message != trigger-release
+      if: env(RELEASE_BUILD) != true
       addons:
         chrome: stable
     - stage: deploy

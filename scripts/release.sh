@@ -33,7 +33,7 @@ EOM
     -d "${body}" \
     https://api.travis-ci.com/repo/${repo_slug}/requests
 
-  echo -e "\nSuccessfully triggered a release build on Travis CI"
+  echo -e "\nSuccessfully triggered release build on Travis CI"
 }
 
 if [[ -z "${TRAVIS_TOKEN}" ]]; then
