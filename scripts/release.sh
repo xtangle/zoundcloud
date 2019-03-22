@@ -2,7 +2,12 @@
 
 set -e
 
-# triggers a release build in CI environment (currently Travis CI)
+#
+# Triggers a release build in CI environment (currently Travis CI)
+# Requires the following env variables to be set:
+#
+# - TRAVIS_TOKEN
+#
 
 function trigger_release {
   local -r owner="xtangle"
