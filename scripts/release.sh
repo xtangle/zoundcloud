@@ -9,6 +9,14 @@ set -e
 # - TRAVIS_TOKEN
 #
 
+function check_env_var {
+  local -r ENV_VAR_NAME="${1}"
+  if [[ -z "${!ENV_VAR_NAME}" ]]; then
+    echo "ERROR Environment variable \"${ENV_VAR_NAME}\" is required for triggering builds on Travis CI."
+    exit 1
+  fi
+}
+
 function trigger_release {
   local -r owner="xtangle"
   local -r repo="zoundcloud"
@@ -41,9 +49,5 @@ EOM
   echo -e "\nSuccessfully triggered release build on Travis CI"
 }
 
-if [[ -z "${TRAVIS_TOKEN}" ]]; then
-  echo "ERROR Environment variable \"TRAVIS_TOKEN\" is required for triggering builds on Travis CI."
-  exit 1
-fi
-
+check_env_var TRAVIS_TOKEN
 trigger_release
