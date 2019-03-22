@@ -11,7 +11,7 @@ set -e
 
 function trigger_release {
   local -r owner="xtangle"
-  local -r repo_name="zoundcloud"
+  local -r repo="zoundcloud"
   local -r branch="release-test"
   local -r commit_msg="Release build"
 
@@ -29,7 +29,7 @@ function trigger_release {
 }
 EOM
 
-  local -r repo_slug="${owner}%2F${repo_name}"
+  local -r repo_slug="${owner}%2F${repo}"
   curl -fsS -X POST \
     -H "Content-Type: application/json" \
     -H "Accept: application/json" \
