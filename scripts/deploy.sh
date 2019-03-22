@@ -17,23 +17,41 @@ set -e
 # Steps to set up Google API and obtain these tokens are taken from this web page:
 # https://circleci.com/blog/continuously-deploy-a-chrome-extension/
 #
+# For reference documentation on Google Chrome Web Store API, see here:
+# https://developer.chrome.com/webstore/using_webstore_api
+#
 
 function check_env_var {
-  local -r ENV_VAR_NAME="${1}"
-  if [[ -z "${!ENV_VAR_NAME}" ]]; then
-    echo "ERROR Environment variable \"${ENV_VAR_NAME}\" is required for publishing to Chrome Web Store."
+  local -r env_var_name="${1}"
+  local -r err_msg="${2-ERROR Environment variable \"${env_var_name}\" is required for publishing to Chrome Web Store.}"
+  if [[ -z "${!env_var_name}" ]]; then
+    echo "${err_msg}"
     exit 1
   fi
 }
 
 function publish {
   echo "Publishing extension to Chrome Web Store..."
-  ACCESS_TOKEN="$( curl "https://accounts.google.com/o/oauth2/token" \
+
+  local -r access_token="$( curl "https://accounts.google.com/o/oauth2/token" \
     -d "client_id=${GOOGLE_CLIENT_ID}&client_secret=${GOOGLE_CLIENT_SECRET}&refresh_token=${GOOGLE_REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" \
     | jq -r .access_token )"
-  curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T tmp/zoundcloud-*.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_APP_ID}"
-  curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${CHROME_APP_ID}/publish"
-  echo "Successfully published extension to Chrome Web Store"
+
+  check_env_var access_token "Unable to fetch access token from Google Accounts API"
+
+  curl -fsS -X PUT -T tmp/zoundcloud-*.zip \
+    -H "Authorization: Bearer ${access_token}" \
+    -H "x-goog-api-version: 2" \
+    -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_APP_ID}"
+
+  curl -fsS -X POST \
+    -H "Authorization: Bearer ${access_token}" \
+    -H "x-goog-api-version: 2" \
+    -H "Content-Length: 0" \
+    -H "publishTarget: trustedTesters" \
+    -v "https://www.googleapis.com/chromewebstore/v1.1/items/${CHROME_APP_ID}/publish"
+
+  echo -e "\nSuccessfully published extension to Chrome Web Store"
 }
 
 check_env_var GOOGLE_CLIENT_ID
