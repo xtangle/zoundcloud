@@ -20,7 +20,7 @@ function check_env_var {
 function trigger_release {
   local -r owner="xtangle"
   local -r repo="zoundcloud"
-  local -r branch="release-test"
+  local -r branch="master"
   local -r commit_msg="Release build"
 
   read -r -d '' body <<- EOM || true
