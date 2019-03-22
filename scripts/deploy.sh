@@ -18,6 +18,19 @@ set -e
 # https://circleci.com/blog/continuously-deploy-a-chrome-extension/
 #
 
+function check_env_var {
+  local -r ENV_VAR_NAME="${1}"
+  if [[ -z "${!ENV_VAR_NAME}" ]]; then
+    echo "ERROR Environment variable \"${ENV_VAR_NAME}\" is required for publishing to Chrome Web Store."
+    exit 1
+  fi
+}
+
+check_env_var GOOGLE_CLIENT_ID
+check_env_var GOOGLE_CLIENT_SECRET
+check_env_var GOOGLE_REFRESH_TOKEN
+check_env_var CHROME_APP_ID
+
 echo "Publishing extension to Chrome Web Store..."
 
 ACCESS_TOKEN="$( curl "https://accounts.google.com/o/oauth2/token" \
