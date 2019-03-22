@@ -15,8 +15,7 @@ jobs:
         [ "${TRAVIS_OS_NAME}" == 'linux' ] &&
         sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
       script: >-
-        yarn run-s -c lint test:coverage coveralls &&
-        yarn run-s build:prod e2e:ci
+        yarn run-s lint test:coverage coveralls build:prod e2e:ci
       addons:
         chrome: stable
     - stage: deploy
