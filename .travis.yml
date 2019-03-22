@@ -12,10 +12,11 @@ jobs:
       # Add an IPv6 config - see the corresponding Travis issue
       # https://github.com/travis-ci/travis-ci/issues/8361
       before_script: >-
-          [ "${TRAVIS_OS_NAME}" == 'linux' ] && sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+        [ "${TRAVIS_OS_NAME}" == 'linux' ] &&
+        sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
       script: >-
-        yarn run-s -c
-        $(echo "lint test:coverage $([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '')" | tr -s ' ')
+        coveralls="$([ "${TRAVIS_BRANCH}" == 'master' ] && echo 'coveralls' || echo '')" &&
+        yarn run-s -c $(echo "lint test:coverage ${coveralls} e2e:ci" | tr -s ' ')
       addons:
         chrome: stable
     - stage: deploy
