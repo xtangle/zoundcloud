@@ -21,8 +21,8 @@ jobs:
         chrome: stable
     - stage: deploy
       if: (branch = release-test) AND (env(RELEASE_BUILD) = true)
-      script: >-
-        git fetch --unshallow &&
-        git checkout "${TRAVIS_BRANCH}" &&
-        git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}" &&
+      script: |-
+        git fetch --unshallow
+        git checkout "${TRAVIS_BRANCH}"
+        git remote set-url --push origin "https://${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}"
         yarn release:local --dry-run
