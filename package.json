@@ -81,7 +81,7 @@
     "clean-webpack-plugin": "^2.0.0",
     "commitizen": "^3.0.7",
     "conventional-changelog-cli": "^2.0.12",
-    "copy-webpack-plugin": "^5.0.0",
+    "copy-webpack-plugin": "^5.0.2",
     "coveralls": "^3.0.3",
     "cz-conventional-changelog": "2.1.0",
     "eslint": "^5.15.1",
