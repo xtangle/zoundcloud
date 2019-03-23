@@ -106,7 +106,7 @@
     "sinon-chrome": "^2.3.2",
     "terser-webpack-plugin": "^1.2.3",
     "ts-loader": "^5.3.3",
-    "tslint": "^5.13.1",
+    "tslint": "^5.14.0",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-microsoft-contrib": "^6.1.0",
     "typescript": "^3.3.3333",
