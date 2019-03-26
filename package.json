@@ -59,7 +59,7 @@
   "dependencies": {
     "@types/chrome": "^0.0.81",
     "@types/jquery": "^3.3.29",
-    "@types/node": "^11.11.7",
+    "@types/node": "^11.11.8",
     "@types/verror": "^1.10.3",
     "browser-id3-writer": "^4.1.0",
     "jquery": "^3.3.1",
