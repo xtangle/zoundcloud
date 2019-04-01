@@ -6990,10 +6990,10 @@ sinon-chai@^3.3.0:
   resolved "https://registry.yarnpkg.com/sinon-chai/-/sinon-chai-3.3.0.tgz#8084ff99451064910fbe2c2cb8ab540c00b740ea"
   integrity sha512-r2JhDY7gbbmh5z3Q62pNbrjxZdOAjpsqW/8yxAZRSqLZqowmfGZPGUZPFf3UX36NLis0cv8VEM5IJh9HgkSOAA==
 
-sinon-chrome@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/sinon-chrome/-/sinon-chrome-3.0.0.tgz#75ff034ce7ec5e0e10431c73c8d016e196c13c37"
-  integrity sha512-XZ/jTMbzB9TvBToHWJePtWzX6ChacBqCdzdf7QSGoGSrzcPD132c3U4ZMWuqQTw7HW1xeeCQWUEUIBep7xdnzA==
+sinon-chrome@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/sinon-chrome/-/sinon-chrome-3.0.1.tgz#9fb14c230fa0959cb280f9f589e9eda8ccfda1d9"
+  integrity sha512-NTEFhyuiWEMnRmIqldUiA2DhKn2EqnZxyEk5Ez5rBXj+Nl54aJ0MEmF4wjltrxecxd8zlNLxyE0HyLabev9JsQ==
   dependencies:
     lodash "^4.16.3"
     sinon "^7.2.3"
