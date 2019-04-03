@@ -8089,10 +8089,10 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
-webpack-chrome-extension-reloader@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/webpack-chrome-extension-reloader/-/webpack-chrome-extension-reloader-1.2.0.tgz#c1053179baa02bd048046b5c8735cf2bf14e29b4"
-  integrity sha512-nhRb7jm7UUyEqSaSeWjA9e4eQFAqkcmEi66TMoYit6m0cI/ofTp8/rBjsHkutZTCCgzAu05ubaw7alMK95xCvw==
+webpack-chrome-extension-reloader@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/webpack-chrome-extension-reloader/-/webpack-chrome-extension-reloader-1.2.3.tgz#41bc5b9a231b3245cf3a52ab73cf098d3e625ff0"
+  integrity sha512-GtnKViFHnEwkC3FAb7T4XSOkU+k9j/GGKMPsuBgFTz1c8t57mR9b6NMAVJL/483w8fmDLjMg2siyI29unSSbJQ==
   dependencies:
     colors "^1.1.2"
     lodash "^4.17.4"
