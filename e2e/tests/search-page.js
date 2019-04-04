@@ -116,7 +116,7 @@ module.exports = {
       .click('//*[contains(@class,\'g-nav-item\')]//a[contains(text(),\'Albums\')]')
       .useCss()
       .waitForElementVisible('.searchResultGroupHeading')
-      .elements('css selector', '.searchList__item', (results) => {
+      .elements('css selector', '.searchList__item .sc-button-group', (results) => {
         browser.globals.numAlbums = results.value.length;
       })
       .elements('css selector', '.searchList__item :not(.zc-button-download)'
@@ -137,7 +137,7 @@ module.exports = {
       .click('//*[contains(@class,\'g-nav-item\')]//a[contains(text(),\'Playlists\')]')
       .useCss()
       .waitForElementVisible('.searchResultGroupHeading')
-      .elements('css selector', '.searchList__item', (results) => {
+      .elements('css selector', '.searchList__item .sc-button-group', (results) => {
         browser.globals.numPlaylists = results.value.length;
       })
       .elements('css selector', '.searchList__item :not(.zc-button-download)'

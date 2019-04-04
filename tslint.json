@@ -4,7 +4,11 @@
     "tslint:recommended",
     "tslint-eslint-rules"
   ],
-  "jsRules": {},
+  "linterOptions": {
+    "exclude": [
+      "**/*.js"
+    ]
+  },
   "rules": {
     "arrow-return-shorthand": [
       true,
