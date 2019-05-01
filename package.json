@@ -77,7 +77,7 @@
     "@types/sinon-chrome": "^2.2.6",
     "chai": "^4.2.0",
     "chai-jq": "^0.0.9",
-    "chromedriver": "^2.46.0",
+    "chromedriver": "^74.0.0",
     "clean-webpack-plugin": "^2.0.1",
     "commitizen": "^3.0.7",
     "conventional-changelog-cli": "^2.0.12",
